@@ -47,4 +47,5 @@ aws-exports.js
 awsconfiguration.json
 .secret-*
 **.sample
-#amplify-do-not-edit-end
+
+.vscode
