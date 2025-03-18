@@ -43,8 +43,7 @@ next-env.d.ts
 build/
 dist/
 node_modules/
-aws-exports.js
-awsconfiguration.json
+
 .secret-*
 **.sample
 

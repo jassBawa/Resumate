@@ -5,13 +5,10 @@ import ChatInput from "@/components/ChatInput";
 import ChatWindow from "@/components/ChatWindow";
 import { ChatProvider } from "@/context/chat-context";
 import Link from "next/link";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 
 
 const ChatPage: React.FC = () => {
   return (
-    <Authenticator>
       <ChatProvider>
         <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
           {/* Header with title and link to settings */}
@@ -33,7 +30,6 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
       </ChatProvider>
-    </Authenticator>
   );
 };
 
