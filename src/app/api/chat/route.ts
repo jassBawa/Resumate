@@ -59,31 +59,23 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create OpenAI thread if it doesn't exist
-    let openaiThread;
-    try {
-      openaiThread = await openai.beta.threads.retrieve(threadId);
-    } catch {
-      // ideally it should not go here
-      openaiThread = await openai.beta.threads.create();
-    }
-
+    // Use the threadId directly (it's now the OpenAI thread ID)
     // Add user message to OpenAI thread
-    await openai.beta.threads.messages.create(openaiThread.id, {
+    await openai.beta.threads.messages.create(threadId, {
       role: "user",
       content: message,
     });
 
     // Run the assistant
-    const run = await openai.beta.threads.runs.create(openaiThread.id, {
+    const run = await openai.beta.threads.runs.create(threadId, {
       assistant_id: process.env.OPENAI_ASSISTANT_ID!,
     });
 
     // Wait for the run to complete
-    let runStatus = await openai.beta.threads.runs.retrieve(openaiThread.id, run.id);
+    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
     while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      runStatus = await openai.beta.threads.runs.retrieve(openaiThread.id, run.id);
+      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
     }
 
     if (runStatus.status === 'failed') {
@@ -91,7 +83,7 @@ export async function POST(request: Request) {
     }
 
     // Get the assistant's response
-    const messages = await openai.beta.threads.messages.list(openaiThread.id);
+    const messages = await openai.beta.threads.messages.list(threadId);
     const lastMessage = messages.data[0];
     const messageContent = lastMessage.content[0];
     

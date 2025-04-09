@@ -1,0 +1,173 @@
+"<parsedResume>
+  <contactInfo>
+    {
+      "data": {
+        "name": "Jaspreet Singh",
+        "email": "reetsbawa@gmail.com",
+        "phone": "6284845645",
+        "location": "Sangrur",
+        "portfolio": "https://jassbawa-portfolio.vercel.app"
+      },
+      "analysis": {
+        "summary": "Contact information is mostly  clear but contains extraneous formatting.",
+        "strengths": ["Includes a direct phone number and an online portfolio."],
+        "weaknesses": ["Email format appears incorrect due to mixed formatting."],
+        "suggestions": ["Ensure email is presented correctly and consistently."],
+        "ATS_Fit_Score": 85
+      }
+    }
+  </contactInfo>
+
+  <summary>
+    {
+      "data": {
+        "summary": "Experienced Frontend Developer with a year in React.js, Redux, Next.js, JavaScript, and frontend development. Strong problem-solving skills, a commitment to clean code, and a collaborative approach. Seeking opportunities to contribute to innovative projects and deliver exceptional user experiences."
+      },
+      "analysis": {
+        "summary": "Concise summary that showcases relevant experience and skills.",
+        "strengths": ["Clearly states the role and relevant technologies."],
+        "weaknesses": ["Could be more personalized with specific career goals."],
+        "suggestions": ["Mention specific types of projects or industries of interest."],
+        "ATS_Fit_Score": 90
+      }
+    }
+  </summary>
+
+  <skills>
+    {
+      "data": {
+        "hardSkills": [
+          "React",
+          "Next.js",
+          "Redux",
+          "TailwindCSS",
+          "Zustand",
+          "SASS",
+          "Typescript",
+          "NodeJs",
+          "ExpressJs",
+          "Zod",
+          "Prisma ORM",
+          "Docker",
+          "AWS",
+          "CI/CD",
+          "Git",
+          "Jenkins",
+          "Firebase"
+        ],
+        "softSkills": []
+      },
+      "analysis": {
+        "summary": "Strong array of tech skills across front-end and back-end development.",
+        "strengths": ["Covers both frontend and backend technologies, including DevOps."],
+        "weaknesses": ["Soft skills section is empty."],
+        "suggestions": ["Add relevant soft skills like teamwork or communication."],
+        "ATS_Fit_Score": 95
+      }
+    }
+  </skills>
+
+  <workExperience>
+    {
+      "data": [
+        {
+          "title": "Software Developer",
+          "company": "Ryaz",
+          "duration": "April 2024 - Present"
+        },
+        {
+          "title": "Front-End Intern",
+          "company": "Higheredd",
+          "duration": "August 2022 - February 2023"
+        }
+      ],
+      "analysis": {
+        "summary": "Experience shows progression from intern to developer, indicating growth.",
+        "strengths": ["Relevant roles that match the job target."],
+        "weaknesses": ["Lacks detailed descriptions of responsibilities or technologies used."],
+        "suggestions": ["Include specific achievements or impacts in roles."],
+        "ATS_Fit_Score": 87
+      }
+    }
+  </workExperience>
+
+  <education>
+    {
+      "data": [
+        {
+          "degree": "B. Tech in Computer Science & Engineering",
+          "institution": "Guru Nanak Dev Engineering College, Ludhiana",
+          "duration": "August 2020 - June 2024",
+          "cgpa": "8.3"
+        },
+        {
+          "degree": "Science",
+          "institution": "Govt. Sen. Sec. School Sherpur",
+          "duration": "April 2018 - March 2020",
+          "percentage": "88%"
+        }
+      ],
+      "analysis": {
+        "summary": "Strong educational background with good performance metrics.",
+        "strengths": ["Relevant degree aligns with career path."],
+        "weaknesses": ["Secondary education details may not be necessary beyond the degree."],
+        "suggestions": ["Consider omitting high school details as experience grows."],
+        "ATS_Fit_Score": 90
+      }
+    }
+  </education>
+
+  <projects>
+    {
+      "data": [
+        {
+          "title": "Quasarz",
+          "technologies": ["NextJS 14", "Tailwind CSS", "Server Action", "Django"],
+          "description": "A dynamic platform for managing schedules and offering services."
+        },
+        {
+          "title": "Bob The Builder",
+          "technologies": ["NextJs", "Firebase", "Tailwind", "SSR"],
+          "description": "An audit and organization portal to streamline the audit process."
+        },
+        {
+          "title": "Gurpal Films",
+          "technologies": ["NextJs", "Tailwind CSS", "YouTube API"],
+          "description": "A UI project showcasing cinematographers' work."
+        },
+        {
+          "title": "Eventify",
+          "technologies": ["NextJs", "Expressjs", "Redux"],
+          "description": "Web-based event management platform."
+        }
+      ],
+      "analysis": {
+        "summary": "Diverse range of projects showcasing technical skills and creativity.",
+        "strengths": ["Variety of projects demonstrating applied knowledge."],
+        "weaknesses": ["Descriptions could benefit from more focus on individual contributions."],
+        "suggestions": ["Highlight specific roles within project development."],
+        "ATS_Fit_Score": 92
+      }
+    }
+  </projects>
+
+  <certifications>
+    {
+      "data": [
+        {
+          "title": "UI-UX",
+          "issuer": "Udemy",
+          "date": "2022-08-04",
+          "url": "https://www.udemy.com/certificate/UC-e665c4c1-8b6a-49b0-a809-bd1ea3d74c6e/"
+        }
+      ],
+      "analysis": {
+        "summary": "Relevant certification that adds credibility to design skills.",
+        "strengths": ["Certification from a recognized platform."],
+        "weaknesses": ["Only one certification listed."],
+        "suggestions": ["Consider pursuing additional certifications to bolster skill set."],
+        "ATS_Fit_Score": 85
+      }
+    }
+  </certifications>
+</parsedResume>"

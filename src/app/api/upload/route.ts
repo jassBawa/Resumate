@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
 import { prisma } from '@/lib/prisma';
 import { processDocument } from '@/lib/embeddings';
+import openai from '@/lib/openai';
 
 export async function POST(request: Request) {
   try {
@@ -20,20 +20,20 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create a unique ID for this resume
-    const uniqueId = uuidv4();
+    // Create OpenAI thread first
+    const openaiThread = await openai.beta.threads.create();
 
-    // Create a thread for this resume
+    // Use OpenAI thread ID for our database
     const thread = await prisma.thread.create({
       data: {
-        id: uniqueId,
-        userId: 'jass',
+        id: openaiThread.id,
+        userId: 'jass', // Hardcoded user as required
         fileId: file.name,
       },
     });
 
     // Process the document and store in vector store
-    await processDocument(file, thread.id);
+    await processDocument(file, openaiThread.id);
 
     return NextResponse.json({
       success: true,
