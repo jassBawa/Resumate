@@ -1,123 +1,70 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 import openai from '@/lib/openai';
+import { getResumeSystemPrompt } from '@/config/prompts';
 
-export async function GET(request: Request) {
+/**
+ * POST /api/chat
+ *
+ * Expected JSON body:
+ * {
+ *   "message": "User's latest input",
+ *   "conversationHistory": [ { "role": "user", "content": "..." }, { "role": "assistant", "content": "..." } ],
+ *   "resumeText": "The full or snippet resume text..."
+ * }
+ */
+export async function POST(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const threadId = searchParams.get('threadId');
+    // Destructure the JSON payload
+    const { message, conversationHistory, resumeText } = await request.json();
+    console.log(message, conversationHistory, resumeText);
 
-    if (!threadId) {
-      return NextResponse.json(
-        { error: 'Thread ID is required' },
-        { status: 400 }
-      );
+    // Get the system prompt that defines how resumes should be processed.
+    const systemPrompt = getResumeSystemPrompt();
+
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content: `Here is the resume content for context:\n\n${resumeText}`,
+      },
+      ...conversationHistory,
+      {
+        role: 'user',
+        content: `
+    ${message}
+    
+    Please return a structured JSON object with two top-level keys:
+    
+    1. "response" – A short, friendly, human-like message summarizing or introducing the results.
+    2. "resume" – The full <parsedResume>...</parsedResume> block exactly as defined by the system prompt.
+    
+    Do NOT reuse the example text verbatim. Generate your own natural and helpful message in the "response" field.
+    
+    Example format (your message should be different):
+    {
+      "response": "Here’s your updated resume breakdown! Let me know if you'd like to tweak anything.",
+      "resume": "<parsedResume>...</parsedResume>"
     }
+        `.trim(),
+      },
+    ];
 
-    // Get messages from database
-    const messages = await prisma.message.findMany({
-      where: { threadId },
-      orderBy: { createdAt: 'asc' },
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      stream: false, // For simplicity; you could enable streaming for real-time responses.
     });
 
-    return NextResponse.json({ messages });
-  } catch (error) {
-    console.error('Error fetching messages:', error);
+    const responseContent = completion.choices[0].message.content;
+    console.log(responseContent);
+
+    return NextResponse.json({ response: responseContent });
+  } catch (error: any) {
+    console.error('Error in chat API:', error);
     return NextResponse.json(
-      { error: 'Error fetching messages' },
+      { error: error.message || 'Internal Server Error' },
       { status: 500 }
     );
   }
 }
-
-export async function POST(request: Request) {
-  try {
-    const { threadId, message } = await request.json();
-
-    if (!threadId || !message) {
-      return NextResponse.json(
-        { error: 'Thread ID and message are required' },
-        { status: 400 }
-      );
-    }
-
-    // Get thread from database
-    const thread = await prisma.thread.findUnique({
-      where: { id: threadId },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' },
-          take: 10, // Get last 10 messages for context
-        },
-      },
-    });
-
-    if (!thread) {
-      return NextResponse.json(
-        { error: 'Thread not found' },
-        { status: 404 }
-      );
-    }
-
-    // Use the threadId directly (it's now the OpenAI thread ID)
-    // Add user message to OpenAI thread
-    await openai.beta.threads.messages.create(threadId, {
-      role: "user",
-      content: message,
-    });
-
-    // Run the assistant
-    const run = await openai.beta.threads.runs.create(threadId, {
-      assistant_id: process.env.OPENAI_ASSISTANT_ID!,
-    });
-
-    // Wait for the run to complete
-    let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-    while (runStatus.status === 'in_progress' || runStatus.status === 'queued') {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
-    }
-
-    if (runStatus.status === 'failed') {
-      throw new Error('Assistant run failed');
-    }
-
-    // Get the assistant's response
-    const messages = await openai.beta.threads.messages.list(threadId);
-    const lastMessage = messages.data[0];
-    const messageContent = lastMessage.content[0];
-    
-    if (messageContent.type !== 'text') {
-      throw new Error('Unexpected message content type');
-    }
-
-    const assistantResponse = messageContent.text.value;
-
-    // Store messages in database
-    await prisma.message.createMany({
-      data: [
-        {
-          threadId,
-          role: 'user',
-          content: message,
-        },
-        {
-          threadId,
-          role: 'assistant',
-          content: assistantResponse,
-        },
-      ],
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: assistantResponse,
-    });
-  } catch (error) {
-    console.error('Error processing message:', error);
-    return NextResponse.json(
-      { error: 'Error processing message' },
-      { status: 500 }
-    );
-  }
-} 

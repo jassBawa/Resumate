@@ -4,7 +4,8 @@ import Dropzone from '@/components/Dropzone';
 import { useResumeUpload } from '@/hooks/useResumeUpload';
 import { FileText, Hash, User, Clock, Loader2 } from 'lucide-react';
 import ResumeLayout from '@/components/template/ResumeLayout';
-
+import { useEffect, useState } from 'react';
+import { extractResumeSections } from '@/config/parseSections';
 export default function Home() {
   const {
     isDragging,
@@ -12,10 +13,19 @@ export default function Home() {
     isLoading,
     isLoadingSections,
     setIsDragging,
+    resumeText,
     uploadStatus,
     resumeSections,
     handleFileUpload,
+    setIsLoadingSections,
+    setResumeSections,
   } = useResumeUpload();
+
+  useEffect(() => {
+    if (resumeSections && resumeSections.sections) {
+      console.log('Updated Resume Sections:', resumeSections);
+    }
+  }, [resumeSections]);
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -42,9 +52,79 @@ export default function Home() {
     if (file) handleFileUpload(file);
   };
 
+  // Chat state and handlers
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<
+    { role: 'user' | 'assistant'; content: string }[]
+  >([]);
+  const [chatLoading, setChatLoading] = useState(false);
+
+  const handleChatSend = async () => {
+    if (!chatInput.trim()) return;
+    const messageToSend = chatInput;
+    // Add the user's message to the conversation history
+    setChatMessages((prev) => [
+      ...prev,
+      { role: 'user', content: messageToSend },
+    ]);
+    setChatInput('');
+    setChatLoading(true);
+
+    try {
+      setIsLoadingSections(true);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: messageToSend,
+          // Optional: Pass any resume context if needed for enhanced answers
+          resumeText: resumeText,
+          // Pass only assistant messages from conversation history (adjust as needed)
+          conversationHistory: chatMessages,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.body) throw new Error('No response body returned');
+
+      const rawText:string = data.response;
+
+      // ✅ Extract <parsedResume>...</parsedResume> and `response` text
+      const resumeMatch = rawText.match(
+        /<parsedResume>([\s\S]*?)<\/parsedResume>/
+      );
+      const parsedResume = resumeMatch?.[1]?.trim();
+      const responseMessage = rawText
+        .replace(resumeMatch?.[0] || '', '')
+        .trim();
+
+      console.log(parsedResume, responseMessage);
+      if (parsedResume) {
+        const parsedResumeSections = extractResumeSections(
+          `<parsedResume>${parsedResume}</parsedResume>`
+        );
+        console.log(parsedResumeSections);
+        // setResumeSections(parsedResumeSections);
+      }
+
+      if (responseMessage) {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: JSON.parse(responseMessage).response },
+        ]);
+      }
+    } catch (error: any) {
+      console.error('Chat error:', error);
+    } finally {
+      setChatLoading(false);
+      setIsLoadingSections(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-black py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
+        {/* Resume Upload & Analysis */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Resume Upload
@@ -112,7 +192,8 @@ export default function Home() {
                     <span>
                       {uploadStatus.message === 'Using existing file'
                         ? 'Found at'
-                        : 'Uploaded at'}:{' '}
+                        : 'Uploaded at'}
+                      :{' '}
                       <span className="font-mono">
                         {new Date().toLocaleString()}
                       </span>
@@ -125,21 +206,67 @@ export default function Home() {
         </div>
 
         {uploadStatus?.success && (
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
-              Resume Sections
-            </h2>
+          <>
+            <div className="mt-12">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
+                Resume Sections
+              </h2>
 
-            <div>
-              {isLoadingSections ? (
-                <div className="text-center py-4">
-                  <Loader2 className="h-6 w-6 text-blue-500 animate-spin mx-auto" />
-                </div>
-              ) : (
-                <ResumeLayout sections={resumeSections} />
-              )}
+              <div>
+                {isLoadingSections ? (
+                  <div className="text-center py-4">
+                    <Loader2 className="h-6 w-6 text-blue-500 animate-spin mx-auto" />
+                  </div>
+                ) : (
+                  <ResumeLayout sections={resumeSections.sections} />
+                )}
+              </div>
             </div>
-          </div>
+
+            {/* Chat Interface */}
+            <div className="mt-12">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
+                Resume Chat Assistant
+              </h2>
+              <div className="max-w-3xl mx-auto bg-white dark:bg-zinc-900 border dark:border-zinc-700 rounded-lg shadow-xl p-6 transition-all duration-300">
+                <div className="space-y-4 h-64 overflow-y-auto border-b border-gray-200 dark:border-gray-600 pb-4">
+                  {chatMessages.map((msg, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-2 rounded-md ${
+                        msg.role === 'user'
+                          ? 'bg-blue-100 text-blue-900 self-end'
+                          : 'bg-gray-100 dark:bg-zinc-700 text-gray-900 dark:text-gray-100 self-start'
+                      }`}
+                    >
+                      {msg.content}
+                    </div>
+                  ))}
+                  {chatLoading && (
+                    <div className="text-center text-gray-600 dark:text-gray-400">
+                      Typing...
+                    </div>
+                  )}
+                </div>
+                <div className="mt-4 flex items-center">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Ask about your resume..."
+                    className="flex-1 border border-gray-300 dark:border-gray-600 rounded-l-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={handleChatSend}
+                    disabled={chatLoading}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

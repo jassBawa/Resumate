@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ParsedResume } from '@/config/parseSections';
+import { extractResumeSections, ParsedResume } from '@/config/parseSections';
 
 export interface SectionData {
   data: any;  
@@ -12,7 +12,8 @@ export const useResumeUpload = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingSections, setIsLoadingSections] = useState(false);
-  const [resumeSections, setResumeSections] = useState<ParsedResume>();
+  const [resumeText, setResumeText] = useState<string | null>();
+  const [resumeSections, setResumeSections] = useState<ParsedResume>({sections : {}} );
   const [uploadStatus, setUploadStatus] = useState<{
     success?: boolean;
     message?: string;
@@ -50,10 +51,13 @@ export const useResumeUpload = () => {
     try {
       const res = await fetch(`/api/retrieve-resume?threadId=${threadId}`);
       const data = await res.json();
-      console.log('API Response:', data);
+      console.log(data)
+      // console.log('API Response:', data);
       if (res.ok) {
-        
-        setResumeSections(data.parsedResume.sections);
+        setResumeText(data.response);
+        const parsedResumeSections = extractResumeSections(data.response)
+        console.log(parsedResumeSections.sections)
+        setResumeSections(parsedResumeSections);
       }
     } catch (err) {
       console.error('Error fetching resume sections:', err);
@@ -109,5 +113,8 @@ export const useResumeUpload = () => {
     resumeSections,
     uploadStatus,
     handleFileUpload,
+    resumeText,
+    setResumeSections,
+    setIsLoadingSections
   };
 };
