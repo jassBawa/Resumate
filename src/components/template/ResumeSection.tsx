@@ -1,5 +1,6 @@
 import React from 'react';
 import { SectionData } from '@/hooks/useResumeUpload';
+import { ExternalLink, Mail, Phone, MapPin, Link } from 'lucide-react';
 
 const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
   sectionKey,
@@ -10,51 +11,84 @@ const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
   switch (sectionKey) {
     case 'contactInfo':
       return (
-        <div className="space-y-1 text-muted-foreground">
-          {data.name && <p><strong>Name:</strong> {data.name}</p>}
-          {data.email && <p><strong>Email:</strong> {data.email}</p>}
-          {data.phone && <p><strong>Phone:</strong> {data.phone}</p>}
-          {data.location && <p><strong>Location:</strong> {data.location}</p>}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {data.name && (
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">👤</span>
+              <span className="text-lg font-medium">{data.name}</span>
+            </div>
+          )}
+          {data.email && (
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <a href={`mailto:${data.email}`} className="text-primary hover:underline">
+                {data.email}
+              </a>
+            </div>
+          )}
+          {data.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              <a href={`tel:${data.phone}`} className="text-primary hover:underline">
+                {data.phone}
+              </a>
+            </div>
+          )}
+          {data.location && (
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">{data.location}</span>
+            </div>
+          )}
           {data.portfolio && (
-            <p>
-              <strong>Portfolio:</strong>{' '}
-              <a href={data.portfolio} className="text-primary underline" target="_blank">
+            <div className="flex items-center gap-2">
+              <Link className="h-4 w-4 text-muted-foreground" />
+              <a href={data.portfolio} className="text-primary hover:underline" target="_blank">
                 {data.portfolio}
               </a>
-            </p>
+            </div>
           )}
           {data.profiles?.length > 0 && (
-            <p>
-              <strong>Profiles:</strong>{' '}
-              {data.profiles.map((p: string, i: number) => (
-                <span key={i}>
-                  <a href={p} target="_blank" className="text-primary underline">
+            <div className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4 text-muted-foreground" />
+              <div className="flex flex-wrap gap-2">
+                {data.profiles.map((p: string, i: number) => (
+                  <a key={i} href={p} target="_blank" className="text-primary hover:underline">
                     {p}
                   </a>
-                  {i < data.profiles.length - 1 && ', '}
-                </span>
-              ))}
-            </p>
+                ))}
+              </div>
+            </div>
           )}
         </div>
       );
+
     case 'summary':
-      return <p className="text-muted-foreground">{data.summary}</p>;
+      return (
+        <div className="prose prose-sm dark:prose-invert max-w-none">
+          <p className="text-muted-foreground leading-relaxed">{data.summary}</p>
+        </div>
+      );
 
     case 'skills':
       return (
-        <div className="space-y-4 text-muted-foreground">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {Object.entries(data).map(([key, value]: [string, any]) => {
             if (!Array.isArray(value)) return null;
             const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase());
             return (
-              <div key={key}>
-                <h3 className="font-semibold">{label}:</h3>
-                <ul className="list-disc list-inside ml-4">
+              <div key={key} className="space-y-2">
+                <h3 className="font-semibold text-primary">{label}</h3>
+                <div className="flex flex-wrap gap-2">
                   {value.map((skill: string, idx: number) => (
-                    <li key={idx}>{skill}</li>
+                    <span
+                      key={idx}
+                      className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm"
+                    >
+                      {skill}
+                    </span>
                   ))}
-                </ul>
+                </div>
               </div>
             );
           })}
@@ -63,11 +97,26 @@ const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
 
     case 'workExperience':
       return (
-        <div className="space-y-4 text-muted-foreground">
+        <div className="space-y-6">
           {data.map((job: any, idx: number) => (
-            <div key={idx}>
-              <h4 className="font-semibold">{job.title} at {job.company}</h4>
-              <p>{job.duration}</p>
+            <div key={idx} className="space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-semibold text-lg">{job.title}</h4>
+                  <p className="text-primary">{job.company}</p>
+                </div>
+                <span className="text-sm text-muted-foreground">{job.duration}</span>
+              </div>
+              {job.description && (
+                <p className="text-muted-foreground text-sm">{job.description}</p>
+              )}
+              {job.achievements && (
+                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  {job.achievements.map((achievement: string, idx: number) => (
+                    <li key={idx}>{achievement}</li>
+                  ))}
+                </ul>
+              )}
             </div>
           ))}
         </div>
@@ -75,13 +124,22 @@ const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
 
     case 'education':
       return (
-        <div className="space-y-4 text-muted-foreground">
+        <div className="space-y-6">
           {data.map((edu: any, idx: number) => (
-            <div key={idx}>
-              <h4 className="font-semibold">{edu.degree} - {edu.institution}</h4>
-              <p>{edu.duration}</p>
-              {edu.cgpa && <p><strong>CGPA:</strong> {edu.cgpa}</p>}
-              {edu.percentage && <p><strong>Percentage:</strong> {edu.percentage}</p>}
+            <div key={idx} className="space-y-2">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-semibold text-lg">{edu.degree}</h4>
+                  <p className="text-primary">{edu.institution}</p>
+                </div>
+                <span className="text-sm text-muted-foreground">{edu.duration}</span>
+              </div>
+              {(edu.cgpa || edu.percentage) && (
+                <div className="flex gap-4 text-sm text-muted-foreground">
+                  {edu.cgpa && <span>CGPA: {edu.cgpa}</span>}
+                  {edu.percentage && <span>Percentage: {edu.percentage}</span>}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -89,15 +147,32 @@ const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
 
     case 'projects':
       return (
-        <div className="space-y-4 text-muted-foreground">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.map((project: any, idx: number) => (
-            <div key={idx}>
-              <h4 className="font-semibold">{project.title}</h4>
-              <p>{project.description}</p>
-              <p><strong>Technologies:</strong> {project.technologies}</p>
-              <a href={project.link} target="_blank" className="text-primary underline">
-                View Project
-              </a>
+            <div key={idx} className="space-y-2">
+              <h4 className="font-semibold text-lg">{project.name}</h4>
+              <p className="text-muted-foreground text-sm">{project.description}</p>
+              <div className="flex flex-wrap gap-2">
+                {project.technologies?.split(',').map((tech: string, idx: number) => (
+                  <span
+                    key={idx}
+                    className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-xs"
+                  >
+                    {tech.trim()}
+                  </span>
+                ))}
+              </div>
+              {project.link && (
+                <a
+                  href={project.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-primary hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  View Project
+                </a>
+              )}
             </div>
           ))}
         </div>
@@ -105,15 +180,25 @@ const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
 
     case 'certifications':
       return (
-        <div className="space-y-4 text-muted-foreground">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {data.map((cert: any, idx: number) => (
-            <div key={idx}>
-              <h4 className="font-semibold">{cert.name}</h4>
-              <p><strong>Date:</strong> {cert.date}</p>
-              <p><strong>Institution:</strong> {cert.issuer || cert.platform}</p>
-              <a href={cert.link} target="_blank" className="text-primary underline">
-                Verify Certification
-              </a>
+            <div key={idx} className="space-y-2">
+              <h4 className="font-semibold text-lg">{cert.name}</h4>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p>Date: {cert.date}</p>
+                <p>Institution: {cert.issuer || cert.platform}</p>
+              </div>
+              {cert.link && (
+                <a
+                  href={cert.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-primary hover:underline"
+                >
+                  <ExternalLink className="h-4 w-4 mr-1" />
+                  Verify Certification
+                </a>
+              )}
             </div>
           ))}
         </div>

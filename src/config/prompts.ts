@@ -110,6 +110,20 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
       }
     }
   </workExperience>
+   <education>
+    {
+      "data": [
+        {
+          "institution": "University Name",
+          "degree": "B.Tech in Computer Science",
+          "startDate": "Aug 2018",
+          "endDate": "May 2022",
+          "cgpa": "8.6"
+        }
+      ],
+      ...
+    }
+  </education>
 
     <skills>
       {
@@ -126,6 +140,99 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
         }
       }
     </skills>
+     <certifications>
+    {
+      "data": [
+        {
+          "name": "AWS Certified Developer",
+          "issuer": "Amazon",
+          "date": "June 2023",
+          "url": "https://cert.aws/example"
+        }
+      ],
+      ...
+    }
+  </certifications>
+   <projects>
+    {
+      "data": [
+        {
+          "name": "AI Chatbot",
+          "description": "Built a chatbot using GPT-4 and Node.js",
+          "url": "https://github.com/user/project"
+        }
+      ],
+      ...
+    }
+  </projects>
+
+  <awards>
+    {
+      "data": [
+        {
+          "title": "Best Developer Award",
+          "issuer": "Hackathon X",
+          "year": "2023"
+        }
+      ],
+      ...
+    }
+  </awards>
+
+  <publications>
+    {
+      "data": [
+        {
+          "title": "Improving Resume Parsers with AI",
+          "publication": "Tech Journal",
+          "date": "March 2023",
+          "url": "https://publication.site/article"
+        }
+      ],
+      ...
+    }
+  </publications>
+
+  <languages>
+    {
+      "data": [
+        {
+          "language": "English",
+          "proficiency": "Native"
+        },
+        {
+          "language": "Spanish",
+          "proficiency": "Intermediate"
+        }
+      ],
+      ...
+    }
+  </languages>
+
+  <hobbies>
+    {
+      "data": ["Photography", "Open Source Contribution", "Chess"],
+      ...
+    }
+  </hobbies>
+
+  <customSection>
+    {
+      "data": [
+        {
+          "sectionTitle": "Volunteer Work",
+          "entries": [
+            {
+              "organization": "Code for Good",
+              "role": "Mentor",
+              "description": "Mentored underrepresented students in coding bootcamps"
+            }
+          ]
+        }
+      ],
+      ...
+    }
+  </customSection>
 
     ...
   </parsedResume>

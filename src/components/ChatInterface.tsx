@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, User, Bot } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -107,7 +107,7 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
   };
 
   return (
-    <div className="flex flex-col h-[600px] bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col h-[600px] bg-white dark:bg-gray-900 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message, index) => (
           <div
@@ -117,12 +117,22 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
             }`}
           >
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${
+              className={`max-w-[80%] rounded-lg p-4 ${
                 message.role === 'user'
                   ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100'
               }`}
             >
+              <div className="flex items-center gap-2 mb-2">
+                {message.role === 'user' ? (
+                  <User className="h-4 w-4" />
+                ) : (
+                  <Bot className="h-4 w-4" />
+                )}
+                <span className="text-xs font-medium">
+                  {message.role === 'user' ? 'You' : 'Assistant'}
+                </span>
+              </div>
               {message.role === 'assistant' ? (
                 <div className="prose prose-sm max-w-none dark:prose-invert">
                   <ReactMarkdown
@@ -130,7 +140,7 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
                       code({ className, children, ...props }) {
                         return (
                           <code
-                            className={`${className} bg-gray-200 dark:bg-gray-800 rounded px-1 py-0.5`}
+                            className={`${className} bg-gray-200 dark:bg-gray-700 rounded px-1 py-0.5`}
                             {...props}
                           >
                             {children}
@@ -140,7 +150,7 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
                       pre({ children, ...props }) {
                         return (
                           <pre
-                            className="bg-gray-200 dark:bg-gray-800 rounded p-2 overflow-x-auto"
+                            className="bg-gray-200 dark:bg-gray-700 rounded p-2 overflow-x-auto my-2"
                             {...props}
                           >
                             {children}
@@ -155,7 +165,7 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
               ) : (
                 <p className="text-sm">{message.content}</p>
               )}
-              <p className="text-xs mt-1 opacity-70">
+              <p className="text-xs mt-2 opacity-70">
                 {message.createdAt.toLocaleTimeString()}
               </p>
             </div>
@@ -163,27 +173,30 @@ export default function ChatInterface({ threadId }: ChatInterfaceProps) {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 rounded-lg p-3">
-              <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-gray-500 dark:text-gray-400" />
+                <span className="text-sm text-gray-500 dark:text-gray-400">Thinking...</span>
+              </div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={handleSubmit} className="p-4 border-t">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex space-x-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="bg-blue-500 text-white rounded-lg px-4 py-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
             <Send className="h-5 w-5" />
           </button>
