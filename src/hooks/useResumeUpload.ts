@@ -20,6 +20,7 @@ export const useResumeUpload = () => {
     threadId?: string;
     fileName?: string;
   } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const checkExistingThreads = async () => {
@@ -67,10 +68,10 @@ export const useResumeUpload = () => {
   };
 
   const handleFileUpload = async (file: File) => {
-    if (!file.name.endsWith('.docx')) {
+    if (!file.name.endsWith('.docx') && !file.name.endsWith('.pdf')) {
       return setUploadStatus({
         success: false,
-        message: 'Please upload a .docx file',
+        message: 'Please upload a .docx or .pdf file',
       });
     }
 
@@ -104,6 +105,28 @@ export const useResumeUpload = () => {
     }
   };
 
+  const handleDeleteResume = async () => {
+    if (!uploadStatus?.threadId) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/delete-resume?threadId=${uploadStatus.threadId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to delete resume');
+
+      // Reset all states
+      setResumeText(null);
+      setResumeSections({ sections: {} });
+      setUploadStatus(null);
+    } catch (error) {
+      console.error('Error deleting resume:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return {
     isUploading,
     isDragging,
@@ -115,6 +138,8 @@ export const useResumeUpload = () => {
     handleFileUpload,
     resumeText,
     setResumeSections,
-    setIsLoadingSections
+    setIsLoadingSections,
+    isDeleting,
+    handleDeleteResume,
   };
 };

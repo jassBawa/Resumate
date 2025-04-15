@@ -4,7 +4,7 @@ import Dropzone from '@/components/Dropzone';
 import { useResumeUpload } from '@/hooks/useResumeUpload';
 import { FileText, Hash, User, Clock, Loader2, Send, Bot, Sparkles } from 'lucide-react';
 import ResumeLayout from '@/components/template/ResumeLayout';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { extractResumeSections } from '@/config/parseSections';
 import { motion } from 'framer-motion';
 
@@ -20,13 +20,8 @@ export default function Home() {
     resumeSections,
     handleFileUpload,
     setIsLoadingSections,
+    handleDeleteResume,
   } = useResumeUpload();
-
-  useEffect(() => {
-    if (resumeSections && resumeSections.sections) {
-      console.log('Updated Resume Sections:', resumeSections);
-    }
-  }, [resumeSections]);
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -246,7 +241,7 @@ export default function Home() {
                     <Loader2 className="h-6 w-6 text-purple-500 animate-spin mx-auto" />
                   </div>
                 ) : (
-                  <ResumeLayout sections={resumeSections.sections} />
+                  <ResumeLayout sections={resumeSections.sections} onDelete={handleDeleteResume} />
                 )}
               </div>
             </motion.div>

@@ -13,9 +13,9 @@ export async function POST(request: Request) {
     }
 
     // Validate file type
-    if (!file.name.endsWith('.docx')) {
+    if (!file.name.endsWith('.docx') && !file.name.endsWith('.pdf')) {
       return NextResponse.json(
-        { error: 'Only .docx files are supported' },
+        { error: 'Only .docx and .pdf files are supported' },
         { status: 400 }
       );
     }
@@ -29,6 +29,7 @@ export async function POST(request: Request) {
         id: openaiThread.id,
         userId: 'jass', // Hardcoded user as required
         fileId: file.name,
+        resumeText: '',
       },
     });
 

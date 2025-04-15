@@ -5,11 +5,30 @@ import { Separator } from '@/components/ui/separator';
 import ResumeSection from './ResumeSection';
 import AnalysisCard from './AnalysisCard';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Info } from 'lucide-react';
+import { Info, Download, Trash2 } from 'lucide-react';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import ResumePDF from './ResumePDF';
 
-const ResumeLayout: React.FC<ParsedResume> = ({ sections }) => {
+interface ResumeLayoutProps extends ParsedResume {
+  onDelete?: () => Promise<void>;
+}
+
+const ResumeLayout: React.FC<ResumeLayoutProps> = ({ sections, onDelete }) => {
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const resumeRef = useRef<HTMLDivElement>(null);
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDelete();
+    } catch (error) {
+      console.error('Error deleting resume:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const sectionOrder: { key: keyof ResumeSections; displayName: string; icon: string }[] = [
     { key: 'contactInfo', displayName: 'Contact Information', icon: '👤' },
@@ -28,6 +47,30 @@ const ResumeLayout: React.FC<ParsedResume> = ({ sections }) => {
 
   return (
     <div className="max-w-4xl mx-auto">
+      <div className="flex justify-end gap-4 mb-4">
+        <PDFDownloadLink
+          document={<ResumePDF sections={sections} />}
+          fileName="resume.pdf"
+          className="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+        >
+          {({ loading }) => (
+            <>
+              <Download className="h-4 w-4 mr-2" />
+              {loading ? 'Preparing PDF...' : 'Download PDF'}
+            </>
+          )}
+        </PDFDownloadLink>
+        {onDelete && (
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            {isDeleting ? 'Deleting...' : 'Delete Resume'}
+          </button>
+        )}
+      </div>
       <div className="space-y-6 relative" ref={resumeRef}>
         {sectionOrder.map(({ key, displayName, icon }, idx) => {
           const section = sections[key];

@@ -31,10 +31,10 @@ export default function Dropzone({
     >
       <input
         type="file"
-        accept=".docx"
         onChange={onFileSelect}
         className="hidden"
         id="file-upload"
+        accept=".docx, .pdf"
       />
       <label
         htmlFor="file-upload"
@@ -82,7 +82,7 @@ export default function Dropzone({
                 </span>
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                Only .docx files are supported
+                Only .docx and .pdf files are supported
               </p>
             </div>
           </>

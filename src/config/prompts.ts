@@ -159,7 +159,8 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
         {
           "name": "AI Chatbot",
           "description": "Built a chatbot using GPT-4 and Node.js",
-          "url": "https://github.com/user/project"
+          "url": "https://github.com/user/project",
+          "technologies": ["React", "Node.js", "GPT-4", "MongoDB"]
         }
       ],
       ...

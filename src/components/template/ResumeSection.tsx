@@ -125,14 +125,14 @@ const ResumeSection: React.FC<{ sectionKey: string; section: SectionData }> = ({
     case 'education':
       return (
         <div className="space-y-6">
-          {data.map((edu: any, idx: number) => (
+          {data?.map((edu: any, idx: number) => (
             <div key={idx} className="space-y-2">
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="font-semibold text-lg">{edu.degree}</h4>
                   <p className="text-primary">{edu.institution}</p>
                 </div>
-                <span className="text-sm text-muted-foreground">{edu.duration}</span>
+                <span className="text-sm text-muted-foreground">{edu.startDate} - {edu.endDate}</span>
               </div>
               {(edu.cgpa || edu.percentage) && (
                 <div className="flex gap-4 text-sm text-muted-foreground">

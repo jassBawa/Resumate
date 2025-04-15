@@ -36,6 +36,7 @@ export interface ResumeSections {
       company: string;
       duration: string;
       description?: string;
+      achievements?: string[];
     }>;
     analysis: SectionAnalysis;
   };
@@ -46,6 +47,7 @@ export interface ResumeSections {
       startDate: string;
       endDate: string;
       cgpa?: string;
+      percentage?: string;
     }>;
     analysis: SectionAnalysis;
   };
@@ -63,6 +65,7 @@ export interface ResumeSections {
       name: string;
       description: string;
       url?: string;
+      technologies?: string[];
     }>;
     analysis: SectionAnalysis;
   };
@@ -149,28 +152,19 @@ export interface ParsedResume {
  * @returns A ParsedResume object with sections.
  */
 export function extractResumeSections(xmlString: string): ParsedResume {
-  // Create an XMLParser instance
   const parser = new XMLParser({
     ignoreAttributes: false,
     trimValues: true,
   });
   
-  // Convert XML string into an object
   const parsedXML = parser.parse(xmlString);
-  
-  // Assume the root node is <parsedResume>
   const resumeNode = parsedXML.parsedResume;
-  
-  // Define an object to hold the sections
   const sections: ResumeSections = {};
   
-  // Iterate over each key inside the root node
   for (const section in resumeNode) {
     if (resumeNode.hasOwnProperty(section)) {
       const rawSectionContent = resumeNode[section];
       
-      // In our XML, each section's content is a JSON string.
-      // Check if it's a string and try parsing it. Otherwise, assume it's already an object.
       let parsedSection: Section;
       if (typeof rawSectionContent === 'string') {
         try {
@@ -180,11 +174,15 @@ export function extractResumeSections(xmlString: string): ParsedResume {
           parsedSection = { data: null, analysis: null };
         }
       } else {
-        // If for some reason it is already an object, we assign it directly.
         parsedSection = rawSectionContent;
       }
+
+      // Ensure education data is always an array
+      if (section === 'education' && parsedSection.data && !Array.isArray(parsedSection.data)) {
+        parsedSection.data = [parsedSection.data];
+      }
       
-      sections[section] = parsedSection;
+      sections[section as keyof ResumeSections] = parsedSection;
     }
   }
   
