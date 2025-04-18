@@ -3,7 +3,7 @@
 import Dropzone from '@/components/Dropzone';
 import { useResumeUpload } from '@/hooks/useResumeUpload';
 import { FileText, Hash, User, Clock, Loader2, Send, Bot, Sparkles } from 'lucide-react';
-import ResumeLayout from '@/components/template/ResumeLayout';
+import { ResumeLayout } from '@/components/template/ResumeLayout';
 import { useState } from 'react';
 import { extractResumeSections } from '@/config/parseSections';
 import { motion } from 'framer-motion';
@@ -18,6 +18,7 @@ export default function Home() {
     resumeText,
     uploadStatus,
     resumeSections,
+    setResumeSections,
     handleFileUpload,
     setIsLoadingSections,
     handleDeleteResume,
@@ -73,9 +74,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: messageToSend,
-          // Optional: Pass any resume context if needed for enhanced answers
           resumeText: resumeText,
-          // Pass only assistant messages from conversation history (adjust as needed)
           conversationHistory: chatMessages,
         }),
       });
@@ -84,28 +83,24 @@ export default function Home() {
       if (!response.body) throw new Error('No response body returned');
 
       const rawText:string = data.response;
-
+        console.log(rawText)
       // ✅ Extract <parsedResume>...</parsedResume> and `response` text
-      const resumeMatch = rawText.match(
-        /<parsedResume>([\s\S]*?)<\/parsedResume>/
-      );
-      const parsedResume = resumeMatch?.[1]?.trim();
-      const responseMessage = rawText
-        .replace(resumeMatch?.[0] || '', '')
-        .trim();
-
-      console.log(parsedResume, responseMessage);
+      const responseMatch = rawText.match(/"response"\s*:\s*"([^"]*)"/);
+      const resumeMatch = rawText.match(/"resume"\s*:\s*"(.*)"/s); 
+      // 2. Handle edge cases
+      const parsedResponse = responseMatch ? responseMatch[1] : "";
+      let parsedResume = resumeMatch ? resumeMatch[1] : "";
+      parsedResume = parsedResume.replace(/\\"/g, '"').replace(/\\n/g, '\n');
+      
       if (parsedResume) {
-        const parsedResumeSections = extractResumeSections(
-          `<parsedResume>${parsedResume}</parsedResume>`
-        );
-        console.log(parsedResumeSections);
+        const parsedResumeSections = extractResumeSections(parsedResume);
+        setResumeSections(parsedResumeSections)
       }
 
-      if (responseMessage) {
+      if (parsedResponse) {
         setChatMessages((prev) => [
           ...prev,
-          { role: 'assistant', content: JSON.parse(responseMessage).response },
+          { role: 'assistant', content: parsedResponse},
         ]);
       }
     } catch (error: any) {

@@ -1,325 +1,187 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font, Link } from '@react-pdf/renderer';
+import { Document, Page, Text, View, Link } from '@react-pdf/renderer';
 import { ResumeSections } from '@/config/parseSections';
+import { templateStyles } from './styles/index';
 
-// Register fonts
-Font.register({
-  family: 'Helvetica',
-  fonts: [
-    { src: 'https://fonts.cdnfonts.com/s/29107/Helvetica.woff' },
-    { src: 'https://fonts.cdnfonts.com/s/29107/Helvetica-Bold.woff', fontWeight: 'bold' },
-  ],
-});
-
-// Create styles
-const styles = StyleSheet.create({
-  page: {
-    padding: 40,
-    fontFamily: 'Helvetica',
-    backgroundColor: '#ffffff',
-  },
-  section: {
-    marginBottom: 20,
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 10,
-    fontWeight: 'bold',
-    color: '#000000',
-  },
-  subheader: {
-    fontSize: 18,
-    marginBottom: 8,
-    fontWeight: 'bold',
-    color: '#000000',
-  },
-  text: {
-    fontSize: 12,
-    marginBottom: 4,
-    color: '#000000',
-  },
-  link: {
-    fontSize: 12,
-    marginBottom: 4,
-    color: '#2563eb',
-    textDecoration: 'underline',
-  },
-  contactInfo: {
-    marginBottom: 20,
-    borderBottom: '1 solid #e5e7eb',
-    paddingBottom: 20,
-  },
-  experienceItem: {
-    marginBottom: 15,
-    paddingLeft: 10,
-    borderLeft: '2 solid #e5e7eb',
-  },
-  skillTag: {
-    backgroundColor: '#f3f4f6',
-    padding: '2 6',
-    borderRadius: 4,
-    marginRight: 4,
-    marginBottom: 4,
-    color: '#000000',
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#000000',
-  },
-  bulletPoint: {
-    marginLeft: 10,
-    marginBottom: 4,
-  },
-});
+// No need to register fonts as we'll use built-in PDF fonts
 
 interface ResumePDFProps {
   sections: ResumeSections;
+  template: 'modern' | 'classic' | 'minimal' | 'creative';
 }
 
-const ResumePDF: React.FC<ResumePDFProps> = ({ sections }) => {
-  return (
-    <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Contact Information */}
-        {sections.contactInfo && (
-          <View style={styles.contactInfo}>
-            <Text style={styles.header}>{sections.contactInfo.data.name}</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-              {sections.contactInfo.data.email && (
-                <Link src={`mailto:${sections.contactInfo.data.email}`} style={styles.link}>
-                  {sections.contactInfo.data.email}
-                </Link>
-              )}
-              {sections.contactInfo.data.phone && (
-                <Link src={`tel:${sections.contactInfo.data.phone}`} style={styles.link}>
-                  {sections.contactInfo.data.phone}
-                </Link>
-              )}
-              {sections.contactInfo.data.location && (
-                <Text style={styles.text}>{sections.contactInfo.data.location}</Text>
-              )}
-              {sections.contactInfo.data.linkedin && (
-                <Link src={sections.contactInfo.data.linkedin} style={styles.link}>
-                  LinkedIn
-                </Link>
-              )}
-            </View>
-          </View>
-        )}
+export function ResumePDF({ sections, template }: ResumePDFProps) {
+  const styles = templateStyles[template];
+  const isCreative = template === 'creative';
 
-        {/* Summary */}
-        {sections.summary && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Professional Summary</Text>
-            <Text style={styles.text}>{sections.summary.data.summary}</Text>
-          </View>
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Text style={styles.name}>{sections.contactInfo?.data.name}</Text>
+      <View style={styles.contactInfo}>
+        <Text>{sections.contactInfo?.data.email}</Text>
+        <Text>{sections.contactInfo?.data.phone}</Text>
+        <Text>{sections.contactInfo?.data.location}</Text>
+        {sections.contactInfo?.data.linkedin && (
+          <Link src={sections.contactInfo.data.linkedin} style={styles.link}>
+            LinkedIn
+          </Link>
         )}
+      </View>
+    </View>
+  );
 
-        {/* Skills */}
-        {sections.skills && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Skills</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-              {sections.skills.data.hardSkills.map((skill, index) => (
-                <Text key={index} style={[styles.text, styles.skillTag]}>
-                  {skill}
-                </Text>
-              ))}
+  const renderSkills = () => (
+    sections.skills?.data && (
+      <View style={styles.section}>
+        <Text style={isCreative ? styles.sectionTitle : styles.sectionTitle}>Skills</Text>
+        <View style={styles.skills}>
+          {sections.skills.data.hardSkills.map((skill, index) => (
+            <Text key={index} style={styles.skill}>
+              {skill}
+            </Text>
+          ))}
+        </View>
+      </View>
+    )
+  );
+
+  const renderWorkExperience = () => (
+    sections.workExperience?.data && (
+      <View style={styles.section}>
+        <Text style={isCreative ? styles.mainSectionTitle : styles.sectionTitle}>
+          Work Experience
+        </Text>
+        {sections.workExperience.data.map((job, index) => (
+          <View key={index} style={styles.item}>
+            <View style={styles.itemHeader}>
+              <View>
+                <Text style={isCreative ? styles.mainTitle : styles.title}>{job.title}</Text>
+                <Text style={isCreative ? styles.mainSubtitle : styles.subtitle}>{job.company}</Text>
+              </View>
+              <Text style={isCreative ? styles.mainDuration : styles.duration}>{job.duration}</Text>
             </View>
-            {sections.skills.data.softSkills && (
-              <View style={{ marginTop: 8 }}>
-                <Text style={styles.sectionTitle}>Soft Skills</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-                  {sections.skills.data.softSkills.map((skill, index) => (
-                    <Text key={index} style={[styles.text, styles.skillTag]}>
-                      {skill}
-                    </Text>
-                  ))}
-                </View>
+            {job.description && (
+              <Text style={isCreative ? styles.mainDescription : styles.description}>
+                {job.description}
+              </Text>
+            )}
+            {job.achievements && job.achievements.length > 0 && (
+              <View style={{ marginTop: 4 }}>
+                {job.achievements.map((achievement, idx) => (
+                  <Text key={idx} style={isCreative ? styles.mainDescription : styles.description}>
+                    • {achievement}
+                  </Text>
+                ))}
               </View>
             )}
           </View>
-        )}
+        ))}
+      </View>
+    )
+  );
 
-        {/* Work Experience */}
-        {sections.workExperience && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Work Experience</Text>
-            {sections.workExperience.data.map((job, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{job.title}</Text>
-                <Text style={styles.text}>{job.company}</Text>
-                <Text style={styles.text}>{job.duration}</Text>
-                {job.description && <Text style={styles.text}>{job.description}</Text>}
-                {job.achievements && (
-                  <View style={{ marginTop: 4 }}>
-                    {job.achievements.map((achievement, idx) => (
-                      <Text key={idx} style={[styles.text, styles.bulletPoint]}>
-                        • {achievement}
-                      </Text>
-                    ))}
-                  </View>
-                )}
+  const renderEducation = () => (
+    sections.education?.data && (
+      <View style={styles.section}>
+        <Text style={isCreative ? styles.mainSectionTitle : styles.sectionTitle}>Education</Text>
+        {sections.education.data.map((edu, index) => (
+          <View key={index} style={styles.item}>
+            <View style={styles.itemHeader}>
+              <View>
+                <Text style={isCreative ? styles.mainTitle : styles.title}>{edu.degree}</Text>
+                <Text style={isCreative ? styles.mainSubtitle : styles.subtitle}>{edu.institution}</Text>
               </View>
-            ))}
+              <Text style={isCreative ? styles.mainDuration : styles.duration}>
+                {edu.startDate} - {edu.endDate}
+              </Text>
+            </View>
+            {(edu.cgpa || edu.percentage) && (
+              <Text style={isCreative ? styles.mainDescription : styles.description}>
+                {edu.cgpa ? `CGPA: ${edu.cgpa}` : `Percentage: ${edu.percentage}`}
+              </Text>
+            )}
           </View>
-        )}
+        ))}
+      </View>
+    )
+  );
 
-        {/* Education */}
-        {sections.education && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Education</Text>
-            {sections.education.data.map((edu, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{edu.degree}</Text>
-                <Text style={styles.text}>{edu.institution}</Text>
-                <Text style={styles.text}>{edu.startDate} - {edu.endDate}</Text>
-                {(edu.cgpa || edu.percentage) && (
-                  <View style={{ marginTop: 4 }}>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-                      {edu.cgpa && <Text style={styles.text}>CGPA: {edu.cgpa}</Text>}
-                      {edu.percentage && <Text style={styles.text}>Percentage: {edu.percentage}</Text>}
-                    </View>
-                  </View>
-                )}
+  const renderProjects = () => (
+    sections.projects?.data && (
+      <View style={styles.section}>
+        <Text style={isCreative ? styles.mainSectionTitle : styles.sectionTitle}>Projects</Text>
+        {sections.projects.data.map((project, index) => (
+          <View key={index} style={styles.item}>
+            <View style={styles.itemHeader}>
+              <View>
+                <Text style={isCreative ? styles.mainTitle : styles.title}>{project.name}</Text>
               </View>
-            ))}
+            </View>
+            <Text style={isCreative ? styles.mainDescription : styles.description}>
+              {project.description}
+            </Text>
+            {project.technologies && project.technologies.length > 0 && (
+              <Text style={isCreative ? styles.mainTechnologies : styles.technologies}>
+                Technologies: {project.technologies.join(', ')}
+              </Text>
+            )}
+            {project.url && (
+              <Link src={project.url} style={isCreative ? styles.mainLink : styles.link}>
+                View Project
+              </Link>
+            )}
           </View>
-        )}
+        ))}
+      </View>
+    )
+  );
 
-        {/* Projects */}
-        {sections.projects && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Projects</Text>
-            {sections.projects.data.map((project, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{project.name}</Text>
-                <Text style={styles.text}>{project.description}</Text>
-                {project.technologies && (
-                  <View style={{ marginTop: 4 }}>
-                    <Text style={[styles.text, { fontWeight: 'bold' }]}>Technologies Used:</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 2 }}>
-                      {project.technologies.map((tech, idx) => (
-                        <Text key={idx} style={[styles.text, styles.skillTag]}>
-                          {tech}
-                        </Text>
-                      ))}
-                    </View>
-                  </View>
-                )}
-                {project.url && (
-                  <Link src={project.url} style={styles.link}>
-                    View Project
-                  </Link>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
+  if (template === 'creative') {
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View style={styles.container}>
+            {/* Sidebar */}
+            <View style={styles.sidebar}>
+              {renderHeader()}
+              {renderSkills()}
+            </View>
 
-        {/* Certifications */}
-        {sections.certifications && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Certifications</Text>
-            {sections.certifications.data.map((cert, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{cert.name}</Text>
-                <Text style={styles.text}>Issuer: {cert.issuer}</Text>
-                <Text style={styles.text}>Date: {cert.date}</Text>
-                {cert.url && (
-                  <Link src={cert.url} style={styles.link}>
-                    Verify Certification
-                  </Link>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Awards */}
-        {sections.awards && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Awards & Achievements</Text>
-            {sections.awards.data.map((award, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{award.title}</Text>
-                <Text style={styles.text}>Issuer: {award.issuer}</Text>
-                <Text style={styles.text}>Year: {award.year}</Text>
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Publications */}
-        {sections.publications && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Publications</Text>
-            {sections.publications.data.map((pub, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{pub.title}</Text>
-                <Text style={styles.text}>Publication: {pub.publication}</Text>
-                <Text style={styles.text}>Date: {pub.date}</Text>
-                {pub.url && (
-                  <Link src={pub.url} style={styles.link}>
-                    View Publication
-                  </Link>
-                )}
-              </View>
-            ))}
-          </View>
-        )}
-
-        {/* Languages */}
-        {sections.languages && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Languages</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-              {sections.languages.data.map((lang, index) => (
-                <Text key={index} style={styles.text}>
-                  {lang.language} ({lang.proficiency})
-                </Text>
-              ))}
+            {/* Main Content */}
+            <View style={styles.mainContent}>
+              {sections.summary?.data && (
+                <View style={styles.section}>
+                  <Text style={styles.mainSectionTitle}>Summary</Text>
+                  <Text style={styles.mainDescription}>{sections.summary.data.summary}</Text>
+                </View>
+              )}
+              {renderWorkExperience()}
+              {renderEducation()}
+              {renderProjects()}
             </View>
           </View>
-        )}
+        </Page>
+      </Document>
+    );
+  }
 
-        {/* Hobbies */}
-        {sections.hobbies && (
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {renderHeader()}
+        {sections.summary?.data && (
           <View style={styles.section}>
-            <Text style={styles.subheader}>Hobbies & Interests</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4 }}>
-              {sections.hobbies.data.map((hobby, index) => (
-                <Text key={index} style={[styles.text, styles.skillTag]}>
-                  {hobby}
-                </Text>
-              ))}
-            </View>
+            <Text style={styles.sectionTitle}>Summary</Text>
+            <Text style={styles.description}>{sections.summary.data.summary}</Text>
           </View>
         )}
-
-        {/* Custom Section */}
-        {sections.customSection && (
-          <View style={styles.section}>
-            <Text style={styles.subheader}>Additional Information</Text>
-            {sections.customSection.data.map((section, index) => (
-              <View key={index} style={styles.experienceItem}>
-                <Text style={styles.sectionTitle}>{section.sectionTitle}</Text>
-                {section.entries.map((entry, idx) => (
-                  <View key={idx} style={{ marginBottom: 8 }}>
-                    {entry.organization && <Text style={styles.text}>Organization: {entry.organization}</Text>}
-                    {entry.role && <Text style={styles.text}>Role: {entry.role}</Text>}
-                    {entry.description && <Text style={styles.text}>{entry.description}</Text>}
-                  </View>
-                ))}
-              </View>
-            ))}
-          </View>
-        )}
+        {renderSkills()}
+        {renderWorkExperience()}
+        {renderEducation()}
+        {renderProjects()}
       </Page>
     </Document>
   );
-};
+}
 
 export default ResumePDF; 

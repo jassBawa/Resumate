@@ -71,7 +71,7 @@ export async function GET(request: Request) {
       data: { resumeText: response },
     });
 
-    return NextResponse.json({response: threadData.resumeText });
+    return NextResponse.json({response: response });
   } catch (error) {
     console.error('Error retrieving resume sections:', error);
     return NextResponse.json(

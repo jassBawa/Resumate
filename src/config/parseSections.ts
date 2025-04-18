@@ -36,7 +36,7 @@ export interface ResumeSections {
       company: string;
       duration: string;
       description?: string;
-      achievements?: string[];
+      responsibilities?: string[];
     }>;
     analysis: SectionAnalysis;
   };

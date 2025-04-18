@@ -94,6 +94,7 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
           "title": "Software Developer",
           "company": "Ryaz",
           "duration": "April 2024 - Present"
+          responsibilities: ['Improved development workflows by setting up CI/CD', 'Took initiative to learn on the job and applied that knowledge to streamline team']
         },
         {
           "title": "Front-End Intern",
@@ -105,7 +106,7 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
         "summary": "Experience shows progression from intern to developer, indicating growth.",
         "strengths": ["Relevant roles that match the job target."],
         "weaknesses": ["Lacks detailed descriptions of responsibilities or technologies used."],
-        "suggestions": ["Include specific achievements or impacts in roles."],
+        "suggestions": ["Include specific responsibilities or impacts in roles."],
         "ATS_Fit_Score": 87
       }
     }

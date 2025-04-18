@@ -60,7 +60,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ analysis }) => {
   } = analysis;
 
   return (
-    <div className="w-full md:w-[280px] bg-background border rounded-lg shadow-lg p-4 space-y-4 text-sm sticky top-8 h-fit">
+    <div className="w-full my-4 bg-background border rounded-lg p-4 space-y-4 text-sm sticky h-fit">
       {summary && (
         <CardSection title="Summary" icon={<Info className="w-4 h-4 text-blue-500" />}>
           <p>{summary}</p>
