@@ -8,7 +8,12 @@ interface ResumeSectionProps {
   icon: string;
 }
 
-export default function ResumeSection({ type, data, displayName, icon }: ResumeSectionProps) {
+export default function ResumeSection({
+  type,
+  data,
+  displayName,
+  icon,
+}: ResumeSectionProps) {
   switch (type) {
     case 'contactInfo':
       return (
@@ -87,21 +92,36 @@ export default function ResumeSection({ type, data, displayName, icon }: ResumeS
                 </div>
                 <p className="text-sm text-muted-foreground">{job.duration}</p>
               </div>
+
               {job.description && (
-                <p className="text-sm text-muted-foreground">{job.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {job.description}
+                </p>
               )}
-              {job.achievements && job.achievements.length > 0 && (
-                <ul className="list-disc list-inside text-sm text-muted-foreground">
-                  {job.achievements.map((achievement: string, idx: number) => (
-                    <li key={idx}>{achievement}</li>
-                  ))}
-                </ul>
-              )}
+
+              {Array.isArray(job.responsibilities) &&
+                job.responsibilities.length > 0 && (
+                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                    {job.responsibilities.map((item: string, idx: number) => (
+                      <li key={idx}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+
+              {Array.isArray(job.achievements) &&
+                job.achievements.length > 0 && (
+                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                    {job.achievements.map(
+                      (achievement: string, idx: number) => (
+                        <li key={idx}>{achievement}</li>
+                      )
+                    )}
+                  </ul>
+                )}
             </div>
           ))}
         </div>
       );
-
     case 'education':
       return (
         <div className="space-y-4">
@@ -114,13 +134,17 @@ export default function ResumeSection({ type, data, displayName, icon }: ResumeS
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-medium">{edu.degree}</h3>
-                  <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {edu.institution}
+                  </p>
                 </div>
                 <p className="text-sm text-muted-foreground">{edu.duration}</p>
               </div>
               {(edu.cgpa || edu.percentage) && (
                 <p className="text-sm text-muted-foreground">
-                  {edu.cgpa ? `CGPA: ${edu.cgpa}` : `Percentage: ${edu.percentage}`}
+                  {edu.cgpa
+                    ? `CGPA: ${edu.cgpa}`
+                    : `Percentage: ${edu.percentage}`}
                 </p>
               )}
             </div>
@@ -139,7 +163,9 @@ export default function ResumeSection({ type, data, displayName, icon }: ResumeS
             <div key={index} className="space-y-2">
               <div>
                 <h3 className="font-medium">{project.name}</h3>
-                <p className="text-sm text-muted-foreground">{project.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {project.description}
+                </p>
               </div>
               {project.technologies && project.technologies.length > 0 && (
                 <div className="flex flex-wrap gap-2">

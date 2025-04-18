@@ -16,7 +16,6 @@ export async function POST(request: Request) {
   try {
     // Destructure the JSON payload
     const { message, conversationHistory, resumeText } = await request.json();
-    console.log(message, conversationHistory, resumeText);
 
     // Get the system prompt that defines how resumes should be processed.
     const systemPrompt = getResumeSystemPrompt();
@@ -31,21 +30,21 @@ export async function POST(request: Request) {
       {
         role: 'user',
         content: `
-    ${message}
-    
-    Please return a structured JSON object with two top-level keys:
-    
-    1. "response" – A short, friendly, human-like message summarizing or introducing the results.
-    2. "resume" – The full <parsedResume>...</parsedResume> block exactly as defined by the system prompt.
-    
-    Do NOT reuse the example text verbatim. Generate your own natural and helpful message in the "response" field.
-    
-    Example format (your message should be different):
-    {
-      "response": "Here’s your updated resume breakdown! Let me know if you'd like to tweak anything.",
-      "resume": "<parsedResume>...</parsedResume>"
-    }
-        `.trim(),
+          ${message}
+          
+          Please return a structured JSON object with two top-level keys:
+          
+          1. "response" – A short, friendly, human-like message summarizing or introducing the results.
+          2. "resume" – The full <parsedResume>...</parsedResume> block exactly as defined by the system prompt.
+          
+          Do NOT reuse the example text verbatim. Generate your own natural and helpful message in the "response" field.
+          
+          Example format (your message should be different):
+          {
+            "response": "Here’s your updated resume breakdown! Let me know if you'd like to tweak anything.",
+            "resume": "<parsedResume>...</parsedResume>"
+          }
+            `.trim(),
       },
     ];
 
@@ -57,7 +56,6 @@ export async function POST(request: Request) {
     });
 
     const responseContent = completion.choices[0].message.content;
-    console.log(responseContent);
 
     return NextResponse.json({ response: responseContent });
   } catch (error: any) {

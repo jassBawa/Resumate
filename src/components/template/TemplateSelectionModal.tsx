@@ -1,6 +1,8 @@
 import ClassicResume from '@/assets/classic-resume-placeholder.png';
 import MinimalResume from '@/assets/minimal-resume-placeholder.png';
 import ModernResume from '@/assets/modern-resume-placeholder.png';
+import CreativeResume from '@/assets/creative-resume-placeholder.png';
+
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
@@ -48,7 +50,7 @@ const templates: Template[] = [
     id: 'creative',
     name: 'Creative',
     description: 'Modern design with creative elements',
-    preview: ClassicResume, // Replace with CreativeResume when available
+    preview: CreativeResume,
   },
   {
     id: 'minimal',

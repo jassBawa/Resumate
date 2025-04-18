@@ -5,7 +5,7 @@ import { TemplateSelectionModal } from './TemplateSelectionModal';
 import { Button } from '@/components/ui/button';
 import { ParsedResume, ResumeSections } from '@/config/parseSections';
 import ResumeSection from './ResumeSection';
-import AnalysisCard from './AnalysisCard';
+// import AnalysisCard from './AnalysisCard';
 import { FileText, Trash } from 'lucide-react';
 
 interface ResumeLayoutProps extends ParsedResume {
