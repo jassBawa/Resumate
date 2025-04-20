@@ -111,7 +111,7 @@ export default function Home() {
                 Resume Sections
               </h2>
 
-              <div>
+
                 {isLoadingSections ? (
                   <div className="text-center py-4">
                     <Loader2 className="h-6 w-6 text-purple-500 animate-spin mx-auto" />
@@ -119,7 +119,7 @@ export default function Home() {
                 ) : (
                   <ResumeLayout sections={resumeSections.sections} onDelete={handleDeleteResume} />
                 )}
-              </div>
+              {/* </div> */}
             </motion.div>
 
             <motion.div 

@@ -90,11 +90,11 @@ export function TemplateSelectionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full md:max-w-6xl">
+      <DialogContent className="w-full max-w-sm mx-auto md:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Select a Template</DialogTitle>
         </DialogHeader>
-        <div className="overflow-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
+        <div className="overflow-scroll h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
           {templates.map((template) => (
             <Card
               key={template.id}
