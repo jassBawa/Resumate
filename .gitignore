@@ -70,3 +70,6 @@ amplifytools.xcconfig
 .secret-*
 **.sample
 #amplify-do-not-edit-end
+
+# clerk configuration (can include secrets)
+/.clerk/
