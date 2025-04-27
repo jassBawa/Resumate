@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { extractResumeSections, ParsedResume } from '@/config/parseSections';
+import { getThreadById } from '@/lib/actions/threads';
+import { usePathname } from 'next/navigation';
 
 export const useResumeUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -17,31 +19,32 @@ export const useResumeUpload = () => {
     fileName?: string;
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const threadId = usePathname().split('/').pop();
+  // console.log(pathname)
+// 
   useEffect(() => {
     const checkExistingThreads = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch(`/api/thread?userId=jass`);
-        const data = await res.json();
-        if (res.ok && data.thread) {
-          setUploadStatus({
-            success: true,
-            message: 'Using existing file',
-            threadId: data.thread.id,
-            fileName: data.thread.fileId,
-          });
-          fetchResumeSections(data.thread.id);
-        }
-      } catch (error) {
-        console.error('Thread check failed', error);
-      } finally {
-        setIsLoading(false);
+      if(!threadId){
+        return;
       }
+      setIsLoading(true);
+      const { data, error } = await getThreadById(threadId);
+      if (!data) {
+        console.log(error);
+        return;
+      }
+      setUploadStatus({
+        success: true,
+        message: 'Using existing file',
+        threadId: data.thread.id,
+        fileName: data.thread.fileId,
+      });
+      fetchResumeSections(data.thread.id);
+      setIsLoading(false);
     };
 
     checkExistingThreads();
-  }, []);
+  }, [threadId]);
 
   const fetchResumeSections = async (threadId: string) => {
     setIsLoadingSections(true);

@@ -1,23 +1,42 @@
 'use client';
 
 import { Loader2, FileText } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function Dropzone({
-  isDragging,
   isUploading,
-  onDragOver,
-  onDragLeave,
   onDrop,
-  onFileSelect,
 }: {
-  isDragging: boolean;
   isUploading: boolean;
-  onDragOver: (e: React.DragEvent) => void;
-  onDragLeave: (e: React.DragEvent) => void;
-  onDrop: (e: React.DragEvent) => void;
-  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDrop: (e: File) => Promise<void>;
 }) {
+  const [isDragging, setIsDragging] = useState(false);
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  const onDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) onDrop(file);
+  };
+
+  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) onDrop(file);
+  };
+
+
   return (
     <div
       className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-all duration-300 ${
@@ -27,7 +46,7 @@ export default function Dropzone({
       }`}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
-      onDrop={onDrop}
+      onDrop={handleDrop}
     >
       <input
         type="file"

@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma';
 import { getResumeSystemPrompt } from '@/config/prompts';
 import { ENV_CONFIG } from '@/config/config';
 
-export async function GET(request: Request) {
+export async function GET(request: Request, 
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { searchParams } = new URL(request.url);
-    const threadId = searchParams.get('threadId');
-
+    const { id: threadId } = await params;
+console.log(threadId)
     if (!threadId) {
       return NextResponse.json(
         { error: 'Thread ID is required' },
@@ -67,12 +68,12 @@ export async function GET(request: Request) {
     }
 
     // Store the parsed resume text in the database
-   await prisma.thread.update({
+    await prisma.thread.update({
       where: { id: threadData.id },
       data: { resumeText: response },
     });
 
-    return NextResponse.json({response: response });
+    return NextResponse.json({ response: response });
   } catch (error) {
     console.error('Error retrieving resume sections:', error);
     return NextResponse.json(
