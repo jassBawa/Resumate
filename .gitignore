@@ -73,3 +73,6 @@ amplifytools.xcconfig
 
 # clerk configuration (can include secrets)
 /.clerk/
+/src/generated
+dev.db
+prisma/migrations

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import openai from '@/lib/openai';
 import { prisma } from '@/lib/prisma';
 import { getResumeSystemPrompt } from '@/config/prompts';
+import { ENV_CONFIG } from '@/config/config';
 
 export async function GET(request: Request) {
   try {
@@ -32,7 +33,7 @@ export async function GET(request: Request) {
     }
 
     const fileContent = await openai.vectorStores.files.content(
-      process.env.OPENAI_VECTOR_STORE_ID!,
+      ENV_CONFIG.OPENAI_VECTOR_STORE_ID,
       threadData.fileId
     );
 

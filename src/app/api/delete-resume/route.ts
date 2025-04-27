@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import openai from '@/lib/openai';
+import { ENV_CONFIG } from '@/config/config';
 
 
 export async function DELETE(request: Request) {
@@ -31,7 +32,7 @@ export async function DELETE(request: Request) {
     if (thread.fileId) {
       try {
         await openai.vectorStores.files.del(
-          process.env.OPENAI_VECTOR_STORE_ID!,
+          ENV_CONFIG.OPENAI_VECTOR_STORE_ID,
           thread.fileId
         );
       } catch (error) {

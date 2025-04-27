@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
 import openai from './openai';
+import { ENV_CONFIG } from '@/config/config';
 
 export async function processDocument(
   file: File,
@@ -8,7 +9,7 @@ export async function processDocument(
   const uFile = await openai.files.create({ file, purpose: 'assistants' });
 
   // Upload file to vector store
-  await openai.vectorStores.files.create(process.env.OPENAI_VECTOR_STORE_ID!, {
+  await openai.vectorStores.files.create(ENV_CONFIG.OPENAI_VECTOR_STORE_ID, {
     file_id: uFile.id,
   });
 
