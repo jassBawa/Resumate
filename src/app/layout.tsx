@@ -4,6 +4,7 @@ import './globals.css';
 import { ThemeProvider } from '@/components/themeProvider';
 import CustomDarkToggle from '@/components/DarkToggle';
 import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -40,6 +41,7 @@ export default function RootLayout({
             {children}
 
             <CustomDarkToggle />
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

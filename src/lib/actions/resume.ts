@@ -24,8 +24,7 @@ export async function uploadResume(threadId: string, formData: FormData) {
   }
 }
 
-
-export async function getResumeSections(threadId: string)  {
+export async function getResumeSections(threadId: string) {
   try {
     if (!threadId) {
       return { success: false, error: 'Threadid is required', data: null };
@@ -34,15 +33,24 @@ export async function getResumeSections(threadId: string)  {
     const res = await fetchWithAuth(`/api/threads/${threadId}/resume`);
 
     if (!res.ok) {
-      return { success: false, error: 'Failed to fetch resume content', data: null };
+      return {
+        success: false,
+        error: 'Failed to fetch resume content',
+        data: null,
+      };
     }
     const data = await res.json();
+    console.log(data);
     const parsedResumeSections = extractResumeSections(data.response);
 
     return {
       success: true,
-      data: { sections: parsedResumeSections, resumeText: data.response },
-      error:null
+      data: {
+        sections: parsedResumeSections,
+        resumeText: data.response as string,
+        threadData: data.threadData,
+      },
+      error: null,
     };
   } catch (error) {
     console.error('Unexpected error fetching threads:', error);

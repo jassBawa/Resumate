@@ -17,7 +17,7 @@ import { Button } from '../ui/button';
 import { ResumeSections } from '@/config/parseSections';
 import { pdf } from '@react-pdf/renderer';
 import FileSaver from 'file-saver';
-import { ResumePDF } from './ResumePDF';
+import { ResumePDF } from '../template/ResumePDF';
 
 interface TemplateSelectionModalProps {
   isOpen: boolean;

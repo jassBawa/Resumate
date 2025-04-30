@@ -72,3 +72,21 @@ export async function createThread(title: string) {
     throw error;
   }
 }
+
+export async function getShareableResumeById(publicId: string) {
+  try {
+    const response = await fetchWithAuth(`/api/public-resume/${publicId}`); // Assuming this is a GET request for a specific thread
+    const result = await response.json();
+    // console.log(result);
+    return { data: result.data, error: null, sucess: true };
+  } catch (error) {
+    console.error(
+      `Unexpected error fetching  resume with public ID ${publicId}:`,
+      error
+    );
+    return {
+      data: null,
+      error: `Unexpected error fetching public ID ${publicId}: ${error}`,
+    };
+  }
+}

@@ -4,12 +4,13 @@ import { prisma } from '@/lib/prisma';
 import { getResumeSystemPrompt } from '@/config/prompts';
 import { ENV_CONFIG } from '@/config/config';
 
-export async function GET(request: Request, 
+export async function GET(
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id: threadId } = await params;
-console.log(threadId)
+
     if (!threadId) {
       return NextResponse.json(
         { error: 'Thread ID is required' },
@@ -28,9 +29,20 @@ console.log(threadId)
       );
     }
 
+    const { isSharable, publicId, viewerCount, title } = threadData;
+    const data = {
+      isSharable,
+      publicId,
+      viewerCount,
+      title,
+    };
+
     if (threadData.resumeText) {
       // If resumeText is already stored, return it
-      return NextResponse.json({ response: threadData.resumeText });
+      return NextResponse.json({
+        response: threadData.resumeText,
+        threadData: data,
+      });
     }
 
     const fileContent = await openai.vectorStores.files.content(
@@ -73,7 +85,7 @@ console.log(threadId)
       data: { resumeText: response },
     });
 
-    return NextResponse.json({ response: response });
+    return NextResponse.json({ response: response, threadData: data });
   } catch (error) {
     console.error('Error retrieving resume sections:', error);
     return NextResponse.json(

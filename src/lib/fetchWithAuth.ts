@@ -1,17 +1,17 @@
 // lib/apiFetch.ts
-"use server";
+'use server';
 
-import { auth } from "@clerk/nextjs/server";
+import { ENV_CONFIG } from '@/config/config';
+import { auth } from '@clerk/nextjs/server';
 
 export async function fetchWithAuth(path: string, options: RequestInit = {}) {
   const { getToken } = await auth();
   const token = await getToken();
-
-  if (!token) {
-    throw new Error("Authentication token missing.");
+  const headers = new Headers(options.headers);
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
-
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const baseUrl = ENV_CONFIG.BASE_URL;
 
   const response = await fetch(`${baseUrl}${path}`, {
     ...options,
@@ -19,7 +19,7 @@ export async function fetchWithAuth(path: string, options: RequestInit = {}) {
       ...(options.headers || {}),
       Authorization: `Bearer ${token}`,
     },
-    cache: "no-store",
+    cache: 'no-store',
   });
 
   return response;
