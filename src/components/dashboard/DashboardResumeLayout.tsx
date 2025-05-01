@@ -1,0 +1,115 @@
+'use client';
+import { useState } from 'react';
+import { TemplateSelectionModal } from './TemplateSelectionModal';
+
+import { Button } from '@/components/ui/button';
+import { ParsedResume } from '@/config/parseSections';
+import { FileText, MoveLeft, Share, Trash } from 'lucide-react';
+import ParsedResumeTemplate from '../template/ParsedResumeTemplate';
+import { ShareResumeModal } from './ShareResumeModal';
+import Link from 'next/link';
+import { deleteResume } from '@/lib/actions/resume';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
+
+export interface ThreadData {
+  isSharable: boolean;
+  publicId: string;
+  viewerCount: number;
+  title: string;
+}
+
+interface ResumeLayoutProps extends ParsedResume {
+  sections: ParsedResume['sections'];
+  threadData: ThreadData;
+  threadId: string;
+}
+
+export function ResumeLayout({
+  sections,
+  threadData,
+  threadId,
+}: ResumeLayoutProps) {
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isShareResumeModalOpen, setIsShareResumeModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const result = await deleteResume(threadId);
+    setIsDeleting(false);
+
+    if (result.success) {
+      toast.success('Resume deleted successfully');
+      router.refresh();
+    } else {
+      toast.error(result.error || 'Failed to delete resume');
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <div className="max-w-4xl mx-auto mb-6">
+        <div className="mb-4">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 transition"
+          >
+            <MoveLeft className="" />
+            <span>Dashboard</span>
+          </Link>
+        </div>
+        <div className="w-full flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Your Resume</h1>
+
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsShareResumeModalOpen(true)}
+            >
+              Share Resume
+              <Share />
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsTemplateModalOpen(true)}
+            >
+              Export pdf
+              <FileText />
+            </Button>
+
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Resume'}
+              <Trash />
+            </Button>
+          </div>
+        </div>
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          <span className="font-semibold text-blue-600">Tip:</span> Hover over
+          different sections to view helpful insights
+        </p>
+      </div>
+
+      <TemplateSelectionModal
+        isOpen={isTemplateModalOpen}
+        onClose={() => setIsTemplateModalOpen(false)}
+        sections={sections}
+      />
+      <ShareResumeModal
+        isOpen={isShareResumeModalOpen}
+        onClose={() => setIsShareResumeModalOpen(false)}
+        isSharable={threadData.isSharable}
+        publicId={threadData.publicId}
+        threadId={threadId}
+      />
+
+      <ParsedResumeTemplate showAnalysis={true} sections={sections} />
+    </div>
+  );
+}
