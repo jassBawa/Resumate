@@ -77,8 +77,11 @@ export async function getShareableResumeById(publicId: string) {
   try {
     const response = await fetchWithAuth(`/api/public-resume/${publicId}`); // Assuming this is a GET request for a specific thread
     const result = await response.json();
-    // console.log(result);
-    return { data: result.data, error: null, sucess: true };
+
+    if (response.status == 404) {
+      return { data: null, error: result, status: 404 };
+    }
+    return { data: result.data, error: null, status: 200 };
   } catch (error) {
     console.error(
       `Unexpected error fetching  resume with public ID ${publicId}:`,
@@ -87,6 +90,44 @@ export async function getShareableResumeById(publicId: string) {
     return {
       data: null,
       error: `Unexpected error fetching public ID ${publicId}: ${error}`,
+      status: 500,
+    };
+  }
+}
+
+export async function updateResumeSharing(
+  threadId: string,
+  isSharable: boolean
+) {
+  try {
+    const response = await fetchWithAuth(`/api/threads/${threadId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isSharable }),
+    });
+    const result = await response.json();
+
+    if (!response.ok) {
+      return {
+        data: null,
+        error: result.error || 'Failed to update sharing status',
+        success: false,
+      };
+    }
+
+    return {
+      data: result.thread,
+      error: null,
+      success: true,
+    };
+  } catch (error) {
+    console.error(
+      `Unexpected error updating resume with thread ID ${threadId}:`,
+      error
+    );
+    return {
+      data: null,
+      error: `Unexpected error: ${error}`,
+      success: false,
     };
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 import { uploadResume } from '@/lib/actions/resume';
 import React, { useState } from 'react';
-import DragAndDrop from '../Dropzone';
+import DragAndDrop from './Dropzone';
 
 function ResumeDropZone({ threadId }: { threadId: string }) {
   const [isUploading, setIsUploading] = useState(false);
@@ -12,14 +12,12 @@ function ResumeDropZone({ threadId }: { threadId: string }) {
       const formData = new FormData();
       formData.append('file', file);
       await uploadResume(threadId, formData);
-      
-      // todo; remove
-      location.reload()
 
+      // todo; remove
+      location.reload();
     } catch (error) {
       console.error('Error updating thread with file:', error);
-    }
-    finally{
+    } finally {
       setIsUploading(false);
     }
   };

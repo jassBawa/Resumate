@@ -2,9 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { ResumeLayout, ThreadData } from './DashboardResumeLayout';
-import { ChatInterface } from '../ChatInterface';
+import { ChatInterface } from '../resume/ChatInterface';
 import { getResumeSections } from '@/lib/actions/resume';
 import { extractResumeSections, ParsedResume } from '@/config/parseSections';
+import { ResumeSkeleton } from '../resume/ResumeSkelton';
 
 interface ResumeContainerProps {
   threadId: string;
@@ -25,7 +26,6 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({
     const fetchData = async () => {
       try {
         const { data, error } = await getResumeSections(threadId);
-        console.log(data);
         if (!error && data?.sections) {
           setResumeSections(data.sections);
           setThreadData(data.threadData);
@@ -45,32 +45,23 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({
     setResumeSections(parsedResumeSections);
   };
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <p>Loading resume...</p>
-        {/* Replace the <p> with a spinner component if available */}
-      </div>
-    );
-  }
-
   return (
     <div>
-      <ResumeLayout
-        sections={resumeSections.sections}
-        threadData={threadData}
-      />
-      <ChatInterface
-        resumeText={resumeText}
-        onResumeUpdate={handleResumeUpdate}
-      />
+      {loading ? (
+        <ResumeSkeleton />
+      ) : (
+        <>
+          <ResumeLayout
+            sections={resumeSections.sections}
+            threadData={threadData}
+            threadId={threadId}
+          />
+          <ChatInterface
+            resumeText={resumeText}
+            onResumeUpdate={handleResumeUpdate}
+          />
+        </>
+      )}
     </div>
   );
 };

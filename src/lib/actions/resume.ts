@@ -40,7 +40,6 @@ export async function getResumeSections(threadId: string) {
       };
     }
     const data = await res.json();
-    console.log(data);
     const parsedResumeSections = extractResumeSections(data.response);
 
     return {
@@ -57,6 +56,37 @@ export async function getResumeSections(threadId: string) {
     return {
       success: false,
       data: null,
+      error: 'An unexpected error occurred. Please try again.',
+    };
+  }
+}
+
+export async function deleteResume(threadId: string) {
+  try {
+    const response = await fetchWithAuth(
+      `/api/threads/${threadId}/delete-resume`,
+      {
+        method: 'PATCH',
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error(
+        `Failed to delete resume: ${response.status} - ${result.error}`
+      );
+      return {
+        success: false,
+        error: result.error || 'Failed to delete resume',
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Unexpected error deleting resume:', error);
+    return {
+      success: false,
       error: 'An unexpected error occurred. Please try again.',
     };
   }

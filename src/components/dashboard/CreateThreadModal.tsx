@@ -35,7 +35,7 @@ export default function CreateThreadButton() {
       });
       setOpen(false);
     } catch (error) {
-      console.log('Error: ', error);
+      console.error('Error: ', error);
       toast.error('Failed to create thread. Please try again.');
     } finally {
       setIsLoading(false);

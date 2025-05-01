@@ -52,3 +52,58 @@ export async function GET(
     );
   }
 }
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id: threadId } = await params;
+    const { isSharable } = await request.json();
+
+    if (typeof isSharable !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Invalid value for isSharable' },
+        { status: 400 }
+      );
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { clerkId: userId },
+      select: { id: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const thread = await prisma.thread.findUnique({
+      where: { id: threadId },
+    });
+
+    if (!thread || thread.userId !== user.id) {
+      return NextResponse.json(
+        { error: 'Thread not found or access denied' },
+        { status: 404 }
+      );
+    }
+
+    const updated = await prisma.thread.update({
+      where: { id: threadId },
+      data: { isSharable },
+    });
+
+    return NextResponse.json({ success: true, thread: updated });
+  } catch (error) {
+    console.error('PATCH /api/threads/[id] error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

@@ -1,25 +1,26 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useState } from 'react';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { updateResumeSharing } from '@/lib/actions/threads';
 import { Copy } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { ENV_CONFIG } from '@/config/config';
 
 interface ShareResumeModalProps {
   isOpen: boolean;
   onClose: () => void;
   isSharable: boolean;
   publicId: string;
+  threadId: string;
 }
 
 export function ShareResumeModal({
@@ -27,14 +28,27 @@ export function ShareResumeModal({
   onClose,
   isSharable,
   publicId,
+  threadId,
 }: ShareResumeModalProps) {
   const [shareEnabled, setShareEnabled] = useState(isSharable);
+  const [loading, setLoading] = useState(false);
 
   const handleToggle = async (value: boolean) => {
-    setShareEnabled(value);
+    setShareEnabled(value); // optimistic UI
+    setLoading(true);
+
+    const result = await updateResumeSharing(threadId, value);
+    setLoading(false);
+
+    if (result.success) {
+      toast.success(`Resume is now ${value ? 'sharable' : 'private'}`);
+    } else {
+      toast.error(result.error || 'Failed to update sharing settings');
+      setShareEnabled(!value); // revert on failure
+    }
   };
 
-  const publicURL = `${ENV_CONFIG.BASE_URL}/resume/view/${publicId}`;
+  const publicURL = `${process.env.NEXT_PUBLIC_APP_URL}/resume/view/${publicId}`;
 
   const handleCopy = () => {
     toast.success('Link copied to clipboard!');
@@ -60,21 +74,19 @@ export function ShareResumeModal({
               id="share-toggle"
               checked={shareEnabled}
               onCheckedChange={handleToggle}
+              disabled={loading}
             />
           </div>
 
-          {/* Copy Public Link */}
-          {shareEnabled && (
-            <div>
-              <Label className="mb-2 block">Public Link</Label>
-              <div className="flex gap-2">
-                <Input value={publicURL} readOnly className="flex-1" />
-                <Button variant="outline" onClick={handleCopy}>
-                  <Copy className="w-4 h-4" />
-                </Button>
-              </div>
+          <div>
+            <Label className="mb-2 block">Public Link</Label>
+            <div className="flex gap-2">
+              <Input value={publicURL} readOnly className="flex-1" />
+              <Button variant="outline" onClick={handleCopy}>
+                <Copy className="w-4 h-4" />
+              </Button>
             </div>
-          )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

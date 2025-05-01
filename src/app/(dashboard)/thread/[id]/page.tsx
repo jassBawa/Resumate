@@ -22,7 +22,7 @@ async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-black py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden">
       <BackgroundElements />
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Thread Details</h1>
+        <h1 className="text-2xl font-bold mb-4">Thread: {threadData.name}</h1>
         {!isResumeUploaded && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-2">Upload Resume</h2>

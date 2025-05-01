@@ -8,7 +8,7 @@ interface ShareableResumeProps {
 function ShareableResume({ sections }: ShareableResumeProps) {
   return (
     <div>
-      <ParsedResumeTemplate showAnalysis={true} sections={sections} />
+      <ParsedResumeTemplate showAnalysis={false} sections={sections} />
     </div>
   );
 }
