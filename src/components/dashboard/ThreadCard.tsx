@@ -11,7 +11,7 @@ import { MessageSquare, ArrowRight, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-interface Thread {
+export interface Thread {
   id: string;
   title: string;
   createdAt: string;
