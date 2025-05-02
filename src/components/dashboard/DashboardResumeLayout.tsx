@@ -50,7 +50,7 @@ export function ResumeLayout({
   };
 
   return (
-    <div className="p-6">
+    <div className="p-3 md:p-6">
       <div className="max-w-4xl mx-auto mb-6">
         <div className="mb-4">
           <Link
@@ -61,39 +61,41 @@ export function ResumeLayout({
             <span>Dashboard</span>
           </Link>
         </div>
-        <div className="w-full flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Your Resume</h1>
+        <div className="mt-8 flex flex-col gap-4 justify-center items-center md:block">
+          <div className="w-full flex flex-col gap-6 md:flex-row justify-between items-center">
+            <h1 className="text-2xl font-bold">Your Resume</h1>
 
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsShareResumeModalOpen(true)}
-            >
-              Share Resume
-              <Share />
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsTemplateModalOpen(true)}
-            >
-              Export pdf
-              <FileText />
-            </Button>
+            <div className="flex flex-col md:flex-row gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsShareResumeModalOpen(true)}
+              >
+                Share Resume
+                <Share />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsTemplateModalOpen(true)}
+              >
+                Export pdf
+                <FileText />
+              </Button>
 
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? 'Deleting...' : 'Delete Resume'}
-              <Trash />
-            </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isDeleting}
+              >
+                {isDeleting ? 'Deleting...' : 'Delete Resume'}
+                <Trash />
+              </Button>
+            </div>
           </div>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+            <span className="font-semibold text-blue-600">Tip:</span> Hover over
+            different sections to view helpful insights
+          </p>
         </div>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-          <span className="font-semibold text-blue-600">Tip:</span> Hover over
-          different sections to view helpful insights
-        </p>
       </div>
 
       <TemplateSelectionModal

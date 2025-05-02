@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import openai from '@/lib/openai';
-import { getResumeSystemPrompt } from '@/config/prompts';
+import {
+  getCoverLetterSystemPrompt,
+  getDefaultSystemPrompt,
+  getResumeSystemPrompt,
+} from '@/config/prompts';
 
 /**
  * POST /api/chat
@@ -17,35 +21,41 @@ export async function POST(request: Request) {
     // Destructure the JSON payload
     const { message, conversationHistory, resumeText } = await request.json();
 
-    // Get the system prompt that defines how resumes should be processed.
-    const systemPrompt = getResumeSystemPrompt();
+    let systemPrompt = getDefaultSystemPrompt();
+    const userContent = `Here is the resume content for context:\n\n${resumeText}`;
+    let postMessage = '';
+
+    if (message.startsWith('/modify')) {
+      systemPrompt = getResumeSystemPrompt();
+      postMessage = `
+        ${message}
+        
+        Please return a structured JSON object with two top-level keys:
+
+        1. "response" – A short, friendly, human-like message summarizing or introducing the results.
+        2. "resume" – The full <parsedResume>...</parsedResume> block exactly as defined by the system prompt.
+      `.trim();
+    } else if (message.startsWith('/cover-letter')) {
+      systemPrompt = getCoverLetterSystemPrompt();
+      postMessage = `
+        ${message}
+
+        Please return a JSON object with one key:
+        {
+          "coverLetter": "Your personalized cover letter goes here."
+        }
+      `.trim();
+    } else {
+      // Default resume Q&A
+      systemPrompt = getDefaultSystemPrompt();
+      postMessage = message;
+    }
 
     const messages = [
       { role: 'system', content: systemPrompt },
-      {
-        role: 'user',
-        content: `Here is the resume content for context:\n\n${resumeText}`,
-      },
+      { role: 'user', content: userContent },
       ...conversationHistory,
-      {
-        role: 'user',
-        content: `
-          ${message}
-          
-          Please return a structured JSON object with two top-level keys:
-          
-          1. "response" – A short, friendly, human-like message summarizing or introducing the results.
-          2. "resume" – The full <parsedResume>...</parsedResume> block exactly as defined by the system prompt.
-          
-          Do NOT reuse the example text verbatim. Generate your own natural and helpful message in the "response" field.
-          
-          Example format (your message should be different):
-          {
-            "response": "Here’s your updated resume breakdown! Let me know if you'd like to tweak anything.",
-            "resume": "<parsedResume>...</parsedResume>"
-          }
-            `.trim(),
-      },
+      { role: 'user', content: postMessage },
     ];
 
     const completion = await openai.chat.completions.create({
