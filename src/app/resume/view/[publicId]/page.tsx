@@ -1,6 +1,6 @@
 import { BackgroundElements } from '@/components/BackgroundElements';
-import ShareableResume from '@/components/resume/ShareableResume';
-import { extractResumeSections } from '@/config/parseSections';
+import ShareableResumeTemplate from '@/components/template/ShareableResumeTemplate';
+// import { extractResumeSections } from '@/config/parseSections';
 import { getShareableResumeById } from '@/lib/actions/threads';
 import { notFound } from 'next/navigation';
 
@@ -26,7 +26,7 @@ async function ThreadPage({
     return <div>Something went wrong</div>;
   }
 
-  const { sections } = extractResumeSections(threadData.resumeText);
+  const sections = threadData.parsedSections;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-black py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden">
@@ -36,7 +36,9 @@ async function ThreadPage({
           {threadData.name}&apos;s Resume
         </h1>
 
-        <div className="mt-6">{<ShareableResume sections={sections} />}</div>
+        <div className="mt-6">
+          {<ShareableResumeTemplate sections={sections} />}
+        </div>
       </div>
     </div>
   );

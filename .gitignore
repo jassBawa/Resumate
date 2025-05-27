@@ -76,3 +76,4 @@ amplifytools.xcconfig
 /src/generated
 dev.db
 prisma/migrations
+env.prod

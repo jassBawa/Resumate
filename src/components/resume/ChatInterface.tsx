@@ -63,6 +63,7 @@ export function ChatInterface({
           message: messageToSend,
           resumeText: resumeText,
           conversationHistory: chatMessages,
+          // sectionId: []
         }),
       });
 

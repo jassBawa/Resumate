@@ -8,7 +8,10 @@ export async function GET() {
 
     if (!userId) {
       console.warn('Unauthorized access to /api/threads');
-      return NextResponse.json({ success: false, error: 'Not authorized' }, { status: 401 });
+      return NextResponse.json(
+        { success: false, error: 'Not authorized' },
+        { status: 401 }
+      );
     }
 
     const dbUser = await prisma.user.findUnique({
@@ -17,12 +20,15 @@ export async function GET() {
 
     if (!dbUser) {
       console.warn(`User not found. Clerk ID: ${userId}`);
-      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
     }
 
     const threads = await prisma.thread.findMany({
       where: { userId: dbUser.id },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
       include: {
         // Include related data if needed
       },
@@ -31,15 +37,21 @@ export async function GET() {
     return NextResponse.json({ success: true, data: threads });
   } catch (error) {
     console.error('Error fetching threads:', error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
-
 
 export async function POST(request: Request) {
   try {
     const { userId } = await auth();
-    if (!userId) return NextResponse.json({ error: 'Not Unauthorized', sucess: false,  }, { status: 401 });
+    if (!userId)
+      return NextResponse.json(
+        { error: 'Not Unauthorized', sucess: false },
+        { status: 401 }
+      );
 
     const { title } = await request.json();
 
@@ -47,7 +59,10 @@ export async function POST(request: Request) {
     const dbUser = await prisma.user.findUnique({ where: { clerkId: userId } });
 
     if (!dbUser)
-    return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'User not found' },
+        { status: 404 }
+      );
 
     // Create empty thread first
     const thread = await prisma.thread.create({
@@ -56,12 +71,15 @@ export async function POST(request: Request) {
         userId: dbUser.id,
         fileId: '',
         resumeText: '',
-      }
+        parsedSections: {},
+      },
     });
     return NextResponse.json({ success: true, data: thread });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
-
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 }

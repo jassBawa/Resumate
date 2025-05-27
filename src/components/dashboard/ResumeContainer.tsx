@@ -55,6 +55,7 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({
             sections={resumeSections.sections}
             threadData={threadData}
             threadId={threadId}
+            resumeText={resumeText}
           />
           <ChatInterface
             resumeText={resumeText}

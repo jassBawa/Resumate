@@ -23,12 +23,14 @@ interface ResumeLayoutProps extends ParsedResume {
   sections: ParsedResume['sections'];
   threadData: ThreadData;
   threadId: string;
+  resumeText: string;
 }
 
 export function ResumeLayout({
   sections,
   threadData,
   threadId,
+  resumeText,
 }: ResumeLayoutProps) {
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isShareResumeModalOpen, setIsShareResumeModalOpen] = useState(false);
@@ -111,7 +113,11 @@ export function ResumeLayout({
         threadId={threadId}
       />
 
-      <ParsedResumeTemplate showAnalysis={true} sections={sections} />
+      <ParsedResumeTemplate
+        showAnalysis={true}
+        initialSections={sections}
+        resumeText={resumeText}
+      />
     </div>
   );
 }

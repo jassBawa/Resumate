@@ -18,7 +18,7 @@ import {
  */
 export async function POST(request: Request) {
   try {
-    // Destructure the JSON payload
+    // Destructure the JSON payload (sectionId)
     const { message, conversationHistory, resumeText } = await request.json();
 
     let systemPrompt = getDefaultSystemPrompt();
