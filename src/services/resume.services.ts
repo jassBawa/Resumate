@@ -4,17 +4,23 @@ import { getResumeSystemPrompt } from '@/config/prompts';
 import { ENV_CONFIG } from '@/config/config';
 
 export async function parseAndStoreResume(threadId: string) {
+  console.log('[parseAndStoreResume] Called with threadId:', threadId);
+
   // Fetch the thread
   const thread = await prisma.thread.findUnique({
     where: { id: threadId },
   });
 
   if (!thread || !thread.fileId) {
+    console.warn('[parseAndStoreResume] Thread or file not found');
     throw new Error('Thread or file not found');
   }
-
-  // If parsedSections already exists, return it immediately
-  if (thread.parsedSections) {
+  if (
+    thread.parsedSections &&
+    typeof thread.parsedSections === 'object' &&
+    Object.keys(thread.parsedSections).length > 0
+  ) {
+    console.log('[parseAndStoreResume] Returning cached parsedSections');
     return { parsedResume: thread.parsedSections, thread };
   }
 
@@ -26,6 +32,7 @@ export async function parseAndStoreResume(threadId: string) {
 
   const resumeText = fileContent?.data.map((item) => item.text).join('\n');
   if (!resumeText) {
+    console.error('[parseAndStoreResume] Resume text not found');
     throw new Error('Resume text not found');
   }
 
@@ -40,20 +47,26 @@ export async function parseAndStoreResume(threadId: string) {
 
   const response = completion.choices[0].message.content;
   if (!response) {
+    console.error('[parseAndStoreResume] No response from OpenAI');
     throw new Error('No response from OpenAI');
   }
 
   const parsedResumeJSON = JSON.parse(response).parsedResume;
-  console.log(parsedResumeJSON);
+
   if (!parsedResumeJSON) {
+    console.error('[parseAndStoreResume] Failed to parse <parsedResume> block');
     throw new Error('Failed to parse <parsedResume> block');
   }
 
   // Save parsed sections to the database
   await prisma.thread.update({
     where: { id: thread.id },
-    data: { parsedSections: parsedResumeJSON, resumeText: resumeText },
+    data: {
+      parsedSections: parsedResumeJSON,
+      resumeText: resumeText,
+    },
   });
 
-  return { parsedResume: parsedResumeJSON, thread };
+  console.log('[parseAndStoreResume] Parse and save complete.');
+  return { thread };
 }

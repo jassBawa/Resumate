@@ -4,24 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { ResumeLayout, ThreadData } from './DashboardResumeLayout';
 import { ChatInterface } from '../resume/ChatInterface';
 import { getResumeSections } from '@/lib/actions/resume';
-import { extractResumeSections, ParsedResume } from '@/config/parseSections';
 import { ResumeSkeleton } from '../resume/ResumeSkelton';
+import { useResumeStore } from '@/hooks/useResumeStore';
 
 interface ResumeContainerProps {
   threadId: string;
-  resumeText: string;
 }
 
-const ResumeContainer: React.FC<ResumeContainerProps> = ({
-  threadId,
-  resumeText,
-}) => {
-  const [resumeSections, setResumeSections] = useState<ParsedResume>({
-    sections: {},
-  });
+const ResumeContainer: React.FC<ResumeContainerProps> = ({ threadId }) => {
+  const [loading, setLoading] = useState(true);
   const [threadData, setThreadData] = useState<ThreadData>({} as ThreadData);
-  const [loading, setLoading] = useState<boolean>(true);
-
+  // const [resumeText, setResumeText] = useState('');
+  const { setResumeSections } = useResumeStore();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,12 +32,7 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({
     };
 
     fetchData();
-  }, [threadId]);
-
-  const handleResumeUpdate = (parsedResume: string) => {
-    const parsedResumeSections = extractResumeSections(parsedResume);
-    setResumeSections(parsedResumeSections);
-  };
+  }, [threadId, setResumeSections]);
 
   return (
     <div>
@@ -52,15 +41,11 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({
       ) : (
         <>
           <ResumeLayout
-            sections={resumeSections.sections}
-            threadData={threadData}
             threadId={threadId}
-            resumeText={resumeText}
+            resumeText={threadData.resumeText}
+            threadData={threadData}
           />
-          <ChatInterface
-            resumeText={resumeText}
-            onResumeUpdate={handleResumeUpdate}
-          />
+          <ChatInterface resumeText={threadData.resumeText} />
         </>
       )}
     </div>

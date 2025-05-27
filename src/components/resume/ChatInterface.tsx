@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Loader2, Send, Bot, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { useResumeStore } from '@/hooks/useResumeStore';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
@@ -10,7 +11,6 @@ interface ChatMessage {
 
 interface ChatInterfaceProps {
   resumeText: string;
-  onResumeUpdate: (resumseString: string) => void;
 }
 
 const commandSuggestions = [
@@ -24,16 +24,14 @@ const commandSuggestions = [
   },
 ];
 
-export function ChatInterface({
-  resumeText,
-  onResumeUpdate,
-}: ChatInterfaceProps) {
+export function ChatInterface({ resumeText }: ChatInterfaceProps) {
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] = useState(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { setResumeSections } = useResumeStore();
 
   const filteredSuggestions = chatInput.startsWith('/')
     ? commandSuggestions.filter((s) =>
@@ -56,58 +54,28 @@ export function ChatInterface({
     setShowSuggestions(false);
 
     try {
-      const response = await fetch('/api/chat', {
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: messageToSend,
-          resumeText: resumeText,
           conversationHistory: chatMessages,
+          resumeText: resumeText,
           // sectionId: []
         }),
       });
 
-      const data = await response.json();
+      const data = await res.json();
       console.log(data);
-      if (!response.body) throw new Error('No response body returned');
-      const rawText: string = data.response;
-      let assistantMessage = '';
-      let parsed = null;
-
-      try {
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          parsed = JSON.parse(jsonMatch[0]);
-        }
-        console.log(parsed);
-
-        // const parsed = JSON.parse(jsonMatch[0]);
-
-        if (parsed?.response) {
-          assistantMessage = parsed.response;
-        } else if (parsed?.coverLetter) {
-          assistantMessage = parsed.coverLetter;
-        } else {
-          assistantMessage = rawText;
-        }
-
-        if (parsed?.resume) {
-          const cleanResume = parsed.resume
-            .replace(/\\"/g, '"')
-            .replace(/\\n/g, '\n');
-          onResumeUpdate(cleanResume);
-        }
-      } catch (error) {
-        console.error('Parsing error or fallback:', error);
-        assistantMessage =
-          rawText ||
-          'Sorry, I couldn’t parse the response, but here’s the raw output:\n\n' +
-            rawText;
+      const { response, parsedSections } = data;
+      console.log(parsedSections);
+      if (parsedSections) {
+        setResumeSections(parsedSections);
       }
 
       setChatMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: assistantMessage },
+        { role: 'assistant', content: response },
       ]);
     } catch (error: any) {
       console.error('Chat error:', error);

@@ -1,5 +1,4 @@
 'use server';
-import { extractResumeSections } from '@/config/parseSections';
 import { fetchWithAuth } from '../fetchWithAuth';
 
 export async function uploadResume(threadId: string, formData: FormData) {
@@ -40,13 +39,11 @@ export async function getResumeSections(threadId: string) {
       };
     }
     const data = await res.json();
-    const parsedResumeSections = extractResumeSections(data.response);
-
+    console.log(data);
     return {
       success: true,
       data: {
-        sections: parsedResumeSections,
-        resumeText: data.response as string,
+        sections: data.parsedSections,
         threadData: data.threadData,
       },
       error: null,

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { TemplateSelectionModal } from './TemplateSelectionModal';
 
 import { Button } from '@/components/ui/button';
-import { ParsedResume } from '@/config/parseSections';
 import { FileText, MoveLeft, Share, Trash } from 'lucide-react';
 import ParsedResumeTemplate from '../template/ParsedResumeTemplate';
 import { ShareResumeModal } from './ShareResumeModal';
@@ -11,23 +10,23 @@ import Link from 'next/link';
 import { deleteResume } from '@/lib/actions/resume';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useResumeStore } from '@/hooks/useResumeStore';
 
 export interface ThreadData {
   isSharable: boolean;
   publicId: string;
   viewerCount: number;
   title: string;
+  resumeText: string;
 }
 
-interface ResumeLayoutProps extends ParsedResume {
-  sections: ParsedResume['sections'];
+interface ResumeLayoutProps {
   threadData: ThreadData;
   threadId: string;
   resumeText: string;
 }
 
 export function ResumeLayout({
-  sections,
   threadData,
   threadId,
   resumeText,
@@ -35,6 +34,7 @@ export function ResumeLayout({
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isShareResumeModalOpen, setIsShareResumeModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { resumeSections } = useResumeStore();
 
   const router = useRouter();
 
@@ -103,7 +103,7 @@ export function ResumeLayout({
       <TemplateSelectionModal
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
-        sections={sections}
+        sections={resumeSections}
       />
       <ShareResumeModal
         isOpen={isShareResumeModalOpen}
@@ -113,11 +113,7 @@ export function ResumeLayout({
         threadId={threadId}
       />
 
-      <ParsedResumeTemplate
-        showAnalysis={true}
-        initialSections={sections}
-        resumeText={resumeText}
-      />
+      <ParsedResumeTemplate showAnalysis={true} resumeText={resumeText} />
     </div>
   );
 }

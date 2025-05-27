@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import AnalysisCard from './AnalysisCard';
 import ResumeSection from './ResumeSection';
 import { useClickOutside } from '@/hooks/useClickOutside';
+import { useResumeStore } from '@/hooks/useResumeStore';
 
 const sectionOrder: {
   key: keyof ResumeSections;
@@ -19,8 +20,8 @@ const sectionOrder: {
     icon: '👤',
     editable: false,
   },
-  { key: 'summary', displayName: 'Summary', icon: '📝', editable: true },
-  { key: 'skills', displayName: 'Skills', icon: '🛠️', editable: true },
+  { key: 'summary', displayName: 'Summary', icon: '📝', editable: false },
+  { key: 'skills', displayName: 'Skills', icon: '🛠️', editable: false },
   {
     key: 'workExperience',
     displayName: 'Work Experience',
@@ -33,12 +34,10 @@ const sectionOrder: {
 
 interface ParsedResumeTemplateProps {
   showAnalysis: boolean;
-  initialSections: ResumeSections;
   resumeText: string;
 }
 function ParsedResumeTemplate({
   showAnalysis,
-  initialSections,
   resumeText,
 }: ParsedResumeTemplateProps) {
   const [hoveredSection, setHoveredSection] = useState<
@@ -50,11 +49,13 @@ function ParsedResumeTemplate({
   const [tempMessage, setTempMessage] = useState('');
   const [aiResponse, setAIResponse] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sections, setSections] = useState<ResumeSections>(initialSections);
-  const [originalSections] = useState<ResumeSections>(initialSections); // for revert
+  const { resumeSections, setResumeSections, updateSection } = useResumeStore();
+  const [originalSectionsMap, setOriginalSectionsMap] = useState<
+    Partial<ResumeSections>
+  >({});
 
   const handleRevertChanges = () => {
-    setSections(originalSections);
+    setResumeSections(originalSectionsMap);
     setEditingSection(null);
     setAIResponse('');
     setTempMessage('');
@@ -79,10 +80,7 @@ function ParsedResumeTemplate({
       const data = await res.json();
       console.log(data);
 
-      setSections((sections) => ({
-        ...sections,
-        [sectionId]: data.section,
-      }));
+      updateSection(sectionId, data.section);
 
       setAIResponse(data.response);
     } catch (err) {
@@ -102,11 +100,15 @@ function ParsedResumeTemplate({
     }
   });
 
+  const hasChanges =
+    editingSection &&
+    JSON.stringify(resumeSections[editingSection]) !==
+      JSON.stringify(originalSectionsMap[editingSection]);
   return (
     <div className="max-w-3xl mx-auto flex items-center gap-4">
       <div className="space-y-3 relative mt-4 bg-white/80 dark:bg-zinc-900 backdrop-blur-sm border dark:border-zinc-600 drop-shadow-2xl rounded-lg p-4">
         {sectionOrder.map(({ key, displayName, icon, editable }) => {
-          const section = sections[key];
+          const section = resumeSections[key];
           if (!section?.data) return null;
 
           return (
@@ -127,6 +129,10 @@ function ParsedResumeTemplate({
                       setTempMessage('');
                       setAIResponse('');
                       setEditingSection(key);
+                      setOriginalSectionsMap((prev) => ({
+                        ...prev,
+                        [key]: resumeSections[key],
+                      }));
                     }}
                     className="absolute top-0 right-0 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-700"
                     title="Edit this section"
@@ -139,54 +145,66 @@ function ParsedResumeTemplate({
               {editable && editingSection === key && (
                 <div
                   ref={chatRef}
-                  className="absolute top-2 right-2 z-30 bg-white dark:bg-zinc-800 border dark:border-zinc-600 p-3 rounded-lg shadow-xl w-72 space-y-2"
+                  className="absolute top-2 right-2 z-30 bg-white dark:bg-zinc-800 border dark:border-zinc-600 p-4 rounded-xl shadow-xl w-80 space-y-3"
                 >
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Edit &quot;{displayName}&quot;
+                    Editing &quot;{displayName}&quot;
                   </label>
                   <input
                     type="text"
                     value={tempMessage}
                     onChange={(e) => setTempMessage(e.target.value)}
-                    className="w-full border rounded px-2 py-1 dark:bg-zinc-700 dark:text-white text-sm"
-                    placeholder="e.g. Edit existing or add new"
+                    className="w-full border rounded px-3 py-2 dark:bg-zinc-700 dark:text-white text-sm"
+                    placeholder="e.g. Improve bullet points, add more achievements"
                     disabled={isSubmitting}
                   />
                   {aiResponse && (
-                    <>
-                      <div className="text-xs mt-1 text-green-600 dark:text-green-400">
-                        {aiResponse}
-                      </div>
-                      <div className="mt-6 flex justify-end">
-                        <Button variant="outline" onClick={handleRevertChanges}>
-                          Revert Changes
-                        </Button>
-                      </div>
-                    </>
+                    <div className="text-xs mt-1 text-green-600 dark:text-green-400 italic">
+                      ✅ Changes applied. You can Regenerate or Revert.
+                    </div>
                   )}
-                  <div className="flex justify-end gap-2 mt-2">
-                    <Button
-                      size="sm"
-                      disabled={isSubmitting || !tempMessage}
-                      onClick={() => handleEditSection(key)}
-                      className="bg-blue-600 text-white hover:bg-blue-700"
-                    >
-                      {isSubmitting ? 'Submitting...' : 'Submit'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setEditingSection(null);
-                        setAIResponse('');
-                      }}
-                    >
-                      Cancel
-                    </Button>
+                  <div className="flex flex-wrap justify-between items-center gap-2 mt-2">
+                    {hasChanges && (
+                      <Button
+                        variant="ghost"
+                        onClick={handleRevertChanges}
+                        className="text-xs text-gray-600 hover:text-red-500 hover:underline"
+                      >
+                        ⟲ Revert
+                      </Button>
+                    )}
+
+                    <div className="ml-auto flex gap-2">
+                      <Button
+                        size="sm"
+                        disabled={
+                          isSubmitting ||
+                          !tempMessage ||
+                          tempMessage.trim().length < 3
+                        }
+                        onClick={() => handleEditSection(key)}
+                        className="bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        {isSubmitting
+                          ? 'Thinking...'
+                          : aiResponse
+                          ? 'Regenerate'
+                          : 'Submit'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingSection(null);
+                          setAIResponse('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
                   </div>
                 </div>
               )}
-
               <ResumeSection
                 type={key}
                 data={section.data}

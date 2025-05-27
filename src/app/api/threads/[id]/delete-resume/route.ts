@@ -60,6 +60,9 @@ export async function PATCH(
       data: {
         fileId: '',
         resumeText: '',
+        parsedSections: {},
+        viewerCount: 0,
+        isSharable: false,
       },
     });
 

@@ -1,6 +1,3 @@
-// lib/parseResume.ts
-import { XMLParser } from 'fast-xml-parser';
-
 export type Section = {
   data: any;
   analysis: any;
@@ -120,71 +117,4 @@ export interface SectionAnalysis {
 
 export interface ParsedResume {
   sections: ResumeSections;
-}
-
-/**
- * Extracts resume sections from the XML response.
- *
- * The backend returns an XML where each section (contactInfo, summary, etc.)
- * contains a JSON string with keys "data" and "analysis".
- *
- * Example XML:
- * <parsedResume>
- *   <contactInfo>
- *     { "data": { ... }, "analysis": { ... } }
- *   </contactInfo>
- *   <summary>
- *     { "data": { ... }, "analysis": { ... } }
- *   </summary>
- *   ...
- * </parsedResume>
- *
- * This function returns an object with the structure:
- * {
- *   sections: {
- *     contactInfo: { data: { ... }, analysis: { ... } },
- *     summary: { data: { ... }, analysis: { ... } },
- *     ...
- *   }
- * }
- *
- * @param xmlString - The XML response as a string.
- * @returns A ParsedResume object with sections.
- */
-export function extractResumeSections(xmlString: string): ParsedResume {
-  const parser = new XMLParser({
-    ignoreAttributes: false,
-    trimValues: true,
-  });
-  
-  const parsedXML = parser.parse(xmlString);
-  const resumeNode = parsedXML.parsedResume;
-  const sections: ResumeSections = {};
-  
-  for (const section in resumeNode) {
-    if (resumeNode.hasOwnProperty(section)) {
-      const rawSectionContent = resumeNode[section];
-      
-      let parsedSection: Section;
-      if (typeof rawSectionContent === 'string') {
-        try {
-          parsedSection = JSON.parse(rawSectionContent);
-        } catch (error) {
-          console.error(`Error parsing JSON for section "${section}":`, error);
-          parsedSection = { data: null, analysis: null };
-        }
-      } else {
-        parsedSection = rawSectionContent;
-      }
-
-      // Ensure education data is always an array
-      if (section === 'education' && parsedSection.data && !Array.isArray(parsedSection.data)) {
-        parsedSection.data = [parsedSection.data];
-      }
-      
-      sections[section as keyof ResumeSections] = parsedSection;
-    }
-  }
-  
-  return { sections };
 }

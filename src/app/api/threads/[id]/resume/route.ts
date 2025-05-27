@@ -15,16 +15,17 @@ export async function GET(
       );
     }
 
-    const { parsedResume, thread } = await parseAndStoreResume(threadId);
+    const { thread } = await parseAndStoreResume(threadId);
 
     return NextResponse.json({
-      response: parsedResume,
       threadData: {
         isSharable: thread.isSharable,
         publicId: thread.publicId,
         viewerCount: thread.viewerCount,
         title: thread.title,
+        resumeText: thread.resumeText,
       },
+      parsedSections: thread.parsedSections,
     });
   } catch (error) {
     console.error('Resume parsing failed:', error);
