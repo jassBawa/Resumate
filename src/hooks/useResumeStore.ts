@@ -4,8 +4,10 @@ import { ResumeSections } from '@/config/parseSections';
 type SectionKey = keyof ResumeSections;
 
 interface ResumeStore {
+  originalSections: ResumeSections;
   resumeSections: ResumeSections;
   setResumeSections: (sections: ResumeSections) => void;
+  setOriginalSections: (sections: ResumeSections) => void;
   updateSection: <T extends SectionKey>(
     key: T,
     section: ResumeSections[T]
@@ -14,8 +16,10 @@ interface ResumeStore {
 }
 
 export const useResumeStore = create<ResumeStore>((set) => ({
+  originalSections: {},
   resumeSections: {},
   setResumeSections: (sections) => set({ resumeSections: sections }),
+  setOriginalSections: (sections) => set({ originalSections: sections }),
   updateSection: (key, section) =>
     set((state) => ({
       resumeSections: {
@@ -23,5 +27,8 @@ export const useResumeStore = create<ResumeStore>((set) => ({
         [key]: section,
       },
     })),
-  resetSections: () => set({ resumeSections: {} }),
+  resetSections: () =>
+    set((state) => ({
+      resumeSections: state.originalSections, // Reset to original
+    })),
 }));
