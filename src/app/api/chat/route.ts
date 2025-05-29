@@ -52,7 +52,6 @@ export async function POST(request: Request) {
       `;
     }
 
-    console.log(commandInstruction, userPrompt);
     const messages = [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userPrompt },

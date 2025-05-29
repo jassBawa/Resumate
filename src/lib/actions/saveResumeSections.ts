@@ -13,7 +13,8 @@ interface SaveResumeResponse {
 
 export const saveResumeSections = async (
   threadId: string,
-  sections: ResumeSections
+  sections: ResumeSections,
+  title: string
 ): Promise<SaveResumeResponse> => {
   try {
     if (!threadId || !sections) {
@@ -25,7 +26,7 @@ export const saveResumeSections = async (
 
     const res = await fetchWithAuth(`/api/threads/${threadId}/resume`, {
       method: 'PATCH',
-      body: JSON.stringify({ sections }),
+      body: JSON.stringify({ sections, title }),
     });
 
     if (!res.ok) {

@@ -1,5 +1,5 @@
 import { BackgroundElements } from '@/components/BackgroundElements';
-import ResumeContainer from '@/components/dashboard/ResumeContainer';
+import ResumeContainer from '@/components/dashboard/resume/ResumeContainer';
 import ResumeDropZone from '@/components/resume/ResumeDropzone';
 import { getThreadById } from '@/lib/actions/threads';
 import React from 'react';

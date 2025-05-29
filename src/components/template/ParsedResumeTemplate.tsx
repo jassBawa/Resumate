@@ -34,12 +34,8 @@ const sectionOrder: {
 
 interface ParsedResumeTemplateProps {
   showAnalysis: boolean;
-  resumeText: string;
 }
-function ParsedResumeTemplate({
-  showAnalysis,
-  resumeText,
-}: ParsedResumeTemplateProps) {
+function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
   const [hoveredSection, setHoveredSection] = useState<
     keyof ResumeSections | null
   >(null);
@@ -49,7 +45,8 @@ function ParsedResumeTemplate({
   const [tempMessage, setTempMessage] = useState('');
   const [aiResponse, setAIResponse] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { resumeSections, setResumeSections, updateSection } = useResumeStore();
+  const { resumeSections, setResumeSections, updateSection, originalSections } =
+    useResumeStore();
   const [originalSectionsMap, setOriginalSectionsMap] = useState<
     Partial<ResumeSections>
   >({});
@@ -67,6 +64,7 @@ function ParsedResumeTemplate({
     setAIResponse('');
 
     try {
+      const resumeText = JSON.stringify(originalSections);
       const res = await fetch('/api/chat/edit-section', {
         method: 'POST',
         body: JSON.stringify({
@@ -78,13 +76,12 @@ function ParsedResumeTemplate({
       });
 
       const data = await res.json();
-      console.log(data);
 
       updateSection(sectionId, data.section);
 
       setAIResponse(data.response);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setAIResponse('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -105,8 +102,8 @@ function ParsedResumeTemplate({
     JSON.stringify(resumeSections[editingSection]) !==
       JSON.stringify(originalSectionsMap[editingSection]);
   return (
-    <div className="max-w-3xl mx-auto flex items-center gap-4">
-      <div className="space-y-3 relative mt-4 bg-white/80 dark:bg-zinc-900 backdrop-blur-sm border dark:border-zinc-600 drop-shadow-2xl rounded-lg p-4">
+    <div className="flex items-center max-w-3xl gap-4 mx-auto">
+      <div className="relative p-4 mt-4 space-y-3 border rounded-lg bg-white/80 dark:bg-zinc-900 backdrop-blur-sm dark:border-zinc-600 drop-shadow-2xl">
         {sectionOrder.map(({ key, displayName, icon, editable }) => {
           const section = resumeSections[key];
           if (!section?.data) return null;
@@ -134,7 +131,7 @@ function ParsedResumeTemplate({
                         [key]: resumeSections[key],
                       }));
                     }}
-                    className="absolute top-0 right-0 text-sm px-2 py-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-700"
+                    className="absolute top-0 right-0 px-2 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-zinc-700"
                     title="Edit this section"
                   >
                     ✏️
@@ -145,7 +142,7 @@ function ParsedResumeTemplate({
               {editable && editingSection === key && (
                 <div
                   ref={chatRef}
-                  className="absolute top-2 right-2 z-30 bg-white dark:bg-zinc-800 border dark:border-zinc-600 p-4 rounded-xl shadow-xl w-80 space-y-3"
+                  className="absolute z-30 p-4 space-y-3 bg-white border shadow-xl top-2 right-2 dark:bg-zinc-800 dark:border-zinc-600 rounded-xl w-80"
                 >
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Editing &quot;{displayName}&quot;
@@ -154,16 +151,16 @@ function ParsedResumeTemplate({
                     type="text"
                     value={tempMessage}
                     onChange={(e) => setTempMessage(e.target.value)}
-                    className="w-full border rounded px-3 py-2 dark:bg-zinc-700 dark:text-white text-sm"
+                    className="w-full px-3 py-2 text-sm border rounded dark:bg-zinc-700 dark:text-white"
                     placeholder="e.g. Improve bullet points, add more achievements"
                     disabled={isSubmitting}
                   />
                   {aiResponse && (
-                    <div className="text-xs mt-1 text-green-600 dark:text-green-400 italic">
+                    <div className="mt-1 text-xs italic text-green-600 dark:text-green-400">
                       ✅ Changes applied. You can Regenerate or Revert.
                     </div>
                   )}
-                  <div className="flex flex-wrap justify-between items-center gap-2 mt-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
                     {hasChanges && (
                       <Button
                         variant="ghost"
@@ -174,7 +171,7 @@ function ParsedResumeTemplate({
                       </Button>
                     )}
 
-                    <div className="ml-auto flex gap-2">
+                    <div className="flex gap-2 ml-auto">
                       <Button
                         size="sm"
                         disabled={
@@ -183,7 +180,7 @@ function ParsedResumeTemplate({
                           tempMessage.trim().length < 3
                         }
                         onClick={() => handleEditSection(key)}
-                        className="bg-blue-600 text-white hover:bg-blue-700"
+                        className="text-white bg-blue-600 hover:bg-blue-700"
                       >
                         {isSubmitting
                           ? 'Thinking...'

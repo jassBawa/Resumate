@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { parseAndStoreResume } from '@/services/resume.services';
-import { prisma } from '@/lib/prisma';
+import {
+  parseAndStoreResume,
+  updateResumeSections,
+} from '@/services/resume.services';
 
 export async function GET(
   request: Request,
@@ -16,7 +18,7 @@ export async function GET(
       );
     }
 
-    const { thread } = await parseAndStoreResume(threadId);
+    const { thread, currentVersionId } = await parseAndStoreResume(threadId);
 
     return NextResponse.json({
       threadData: {
@@ -25,6 +27,7 @@ export async function GET(
         viewerCount: thread.viewerCount,
         title: thread.title,
         resumeText: thread.resumeText,
+        currentVersionId: currentVersionId,
       },
       parsedSections: thread.parsedSections,
     });
@@ -52,7 +55,7 @@ export async function PATCH(
     }
 
     const body = await req.json();
-    const { sections } = body;
+    const { sections, title } = body;
 
     if (!sections || typeof sections !== 'object') {
       return NextResponse.json(
@@ -61,17 +64,16 @@ export async function PATCH(
       );
     }
 
-    const updatedThread = await prisma.thread.update({
-      where: { id: threadId },
-      data: {
-        parsedSections: sections,
-        updatedAt: new Date(),
-      },
-    });
+    const { updatedAt, skipped } = await updateResumeSections(
+      threadId,
+      sections,
+      title
+    );
 
     return NextResponse.json({
       success: true,
-      data: { updatedAt: updatedThread.updatedAt.toISOString() },
+      skipped,
+      data: { updatedAt },
     });
   } catch (error) {
     console.error('PATCH /resume error:', error);

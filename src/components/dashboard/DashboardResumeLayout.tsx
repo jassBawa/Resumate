@@ -1,15 +1,26 @@
 'use client';
-import { useState } from 'react';
-import { TemplateSelectionModal } from './TemplateSelectionModal';
 
-import { Button } from '@/components/ui/button';
-import { FileText, MoveLeft, Share, Trash } from 'lucide-react';
-import ParsedResumeTemplate from '../template/ParsedResumeTemplate';
-import { ShareResumeModal } from './ShareResumeModal';
+import type React from 'react';
+
 import Link from 'next/link';
-import { deleteResume } from '@/lib/actions/resume';
-import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+// Icons
+import { ArrowLeft, Info, KeyRound } from 'lucide-react';
+
+// Components
+import { Card } from '@/components/ui/card';
+import ParsedResumeTemplate from '../template/ParsedResumeTemplate';
+import { ShareResumeModal } from './modals/ShareResumeModal';
+import { TemplateSelectionModal } from './modals/TemplateSelectionModal';
+import { VersionModal } from './modals/VersionModal';
+import { DeleteResumeModal } from './modals/DeleteResumeModal';
+
+// Actions
+import { deleteResume, getResumeSections } from '@/lib/actions/resume';
+import { ResumeActionBar } from './DashboardActionBar';
 import { useResumeStore } from '@/hooks/useResumeStore';
 
 export interface ThreadData {
@@ -18,93 +29,169 @@ export interface ThreadData {
   viewerCount: number;
   title: string;
   resumeText: string;
+  currentVersionId: string;
 }
 
 interface ResumeLayoutProps {
   threadData: ThreadData;
   threadId: string;
-  resumeText: string;
+  setThreadData: React.Dispatch<React.SetStateAction<ThreadData>>;
 }
 
 export function ResumeLayout({
   threadData,
   threadId,
-  resumeText,
+  setThreadData,
 }: ResumeLayoutProps) {
+  // Modal states
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
   const [isShareResumeModalOpen, setIsShareResumeModalOpen] = useState(false);
+  const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  // Loading states
   const [isDeleting, setIsDeleting] = useState(false);
-  const { resumeSections } = useResumeStore();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const router = useRouter();
 
+  const { setOriginalSections, setResumeSections } = useResumeStore();
+
   const handleDelete = async () => {
     setIsDeleting(true);
-    const result = await deleteResume(threadId);
-    setIsDeleting(false);
+    try {
+      const result = await deleteResume(threadId);
 
-    if (result.success) {
-      toast.success('Resume deleted successfully');
-      router.refresh();
-    } else {
-      toast.error(result.error || 'Failed to delete resume');
+      if (result.success) {
+        toast.success('Resume deleted successfully');
+        router.push('/dashboard');
+      } else {
+        toast.error(result.error || 'Failed to delete resume');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
+  const handleRefreshResume = async () => {
+    setIsRefreshing(true);
+    try {
+      const { data, error } = await getResumeSections(threadId);
+      if (error) {
+        toast.error(error);
+      }
+      if (data?.sections) {
+        setResumeSections(data.sections);
+        setOriginalSections(data.sections);
+        setThreadData(data.threadData);
+      }
+    } finally {
+      setTimeout(() => setIsRefreshing(false), 500); // Ensure user sees the loading state
+    }
+  };
+
+  // Keyboard shortcuts
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Cmd/Ctrl + S for share
+    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+      e.preventDefault();
+      setIsShareResumeModalOpen(true);
+    }
+    // Cmd/Ctrl + E for export
+    if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+      e.preventDefault();
+      setIsTemplateModalOpen(true);
+    }
+    // Cmd/Ctrl + V for versions
+    if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
+      e.preventDefault();
+      setIsVersionModalOpen(true);
     }
   };
 
   return (
-    <div className="p-3 md:p-6">
+    <div className="p-3 md:p-6" onKeyDown={handleKeyDown} tabIndex={0}>
       <div className="max-w-4xl mx-auto mb-6">
-        <div className="mb-4">
-          <Link
-            href="/dashboard"
-            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 transition"
-          >
-            <MoveLeft className="" />
-            <span>Dashboard</span>
-          </Link>
-        </div>
-        <div className="mt-8 flex flex-col gap-4 justify-center items-center md:block">
-          <div className="w-full flex flex-col gap-6 md:flex-row justify-between items-center">
-            <h1 className="text-2xl font-bold">Your Resume</h1>
+        {/* Back navigation */}
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm transition-colors rounded-md hover:bg-muted"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Dashboard</span>
+        </Link>
 
-            <div className="flex flex-col md:flex-row gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setIsShareResumeModalOpen(true)}
-              >
-                Share Resume
-                <Share />
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsTemplateModalOpen(true)}
-              >
-                Export pdf
-                <FileText />
-              </Button>
-
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Resume'}
-                <Trash />
-              </Button>
+        <div className="mt-8">
+          {/* Header section */}
+          <div className="space-y-4">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">
+                  {threadData.title || 'Full-Stack Developer'}
+                </h1>
+                <p className="text-muted-foreground">
+                  Resume • Last updated 2 hours ago
+                </p>
+              </div>
             </div>
+
+            {/* Action Bar */}
+            <ResumeActionBar
+              onShare={() => setIsShareResumeModalOpen(true)}
+              onExport={() => setIsTemplateModalOpen(true)}
+              onVersions={() => setIsVersionModalOpen(true)}
+              onRefresh={handleRefreshResume}
+              onDelete={handleDelete}
+              isDeleting={isDeleting}
+              isRefreshing={isRefreshing}
+              viewCount={threadData.viewerCount}
+            />
           </div>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            <span className="font-semibold text-blue-600">Tip:</span> Hover over
-            different sections to view helpful insights
-          </p>
+
+          {/* Tip card */}
+          <Card className="p-4 mt-4 mb-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-900">
+            <div className="flex items-start gap-3">
+              <Info className="flex-shrink-0 w-5 h-5 mt-0.5 text-blue-500" />
+              <div>
+                <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
+                  Pro Tips
+                </p>
+                <ul className="mt-1 text-sm text-blue-700 dark:text-blue-400">
+                  <li className="flex items-center gap-1.5">
+                    <span>•</span> Hover over different sections to view helpful
+                    insights
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <span>•</span> Use keyboard shortcuts for quick actions
+                    <span className="inline-flex items-center ml-1 text-xs bg-blue-200 dark:bg-blue-800 px-1.5 py-0.5 rounded">
+                      <KeyRound className="w-3 h-3 mr-1" /> ⌘+S, ⌘+E, ⌘+V
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
 
+      {/* Resume template */}
+      <div
+        className="transition-opacity duration-300"
+        style={{ opacity: isRefreshing ? 0.6 : 1 }}
+      >
+        <ParsedResumeTemplate showAnalysis={true} />
+      </div>
+
+      {/* Modals */}
       <TemplateSelectionModal
         isOpen={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
-        sections={resumeSections}
       />
+
       <ShareResumeModal
         isOpen={isShareResumeModalOpen}
         onClose={() => setIsShareResumeModalOpen(false)}
@@ -113,7 +200,20 @@ export function ResumeLayout({
         threadId={threadId}
       />
 
-      <ParsedResumeTemplate showAnalysis={true} resumeText={resumeText} />
+      <VersionModal
+        isOpen={isVersionModalOpen}
+        onClose={() => setIsVersionModalOpen(false)}
+        currentVersionId={threadData.currentVersionId}
+        threadId={threadId}
+        onRevert={handleRefreshResume}
+      />
+
+      <DeleteResumeModal
+        handleDelete={handleDelete}
+        isDeleteDialogOpen={isDeleteDialogOpen}
+        isDeleting={isDeleting}
+        setIsDeleteDialogOpen={setIsDeleteDialogOpen}
+      />
     </div>
   );
 }

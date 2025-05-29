@@ -2,10 +2,9 @@ import openai from '@/lib/openai';
 import { prisma } from '@/lib/prisma';
 import { getResumeSystemPrompt } from '@/config/prompts';
 import { ENV_CONFIG } from '@/config/config';
+import { applyDiff, createDiff } from '@/lib/utils';
 
 export async function parseAndStoreResume(threadId: string) {
-  console.log('[parseAndStoreResume] Called with threadId:', threadId);
-
   // Fetch the thread
   const thread = await prisma.thread.findUnique({
     where: { id: threadId },
@@ -20,8 +19,16 @@ export async function parseAndStoreResume(threadId: string) {
     typeof thread.parsedSections === 'object' &&
     Object.keys(thread.parsedSections).length > 0
   ) {
-    console.log('[parseAndStoreResume] Returning cached parsedSections');
-    return { parsedResume: thread.parsedSections, thread };
+    const latestVersion = await prisma.resumeVersion.findFirst({
+      where: { threadId: thread.id },
+      orderBy: { createdAt: 'desc' },
+      select: { id: true },
+    });
+
+    return {
+      thread,
+      currentVersionId: latestVersion?.id ?? null,
+    };
   }
 
   // Fetch resume file content from OpenAI vector store
@@ -32,7 +39,6 @@ export async function parseAndStoreResume(threadId: string) {
 
   const resumeText = fileContent?.data.map((item) => item.text).join('\n');
   if (!resumeText) {
-    console.error('[parseAndStoreResume] Resume text not found');
     throw new Error('Resume text not found');
   }
 
@@ -46,13 +52,13 @@ export async function parseAndStoreResume(threadId: string) {
   });
 
   const response = completion.choices[0].message.content;
+
   if (!response) {
     console.error('[parseAndStoreResume] No response from OpenAI');
     throw new Error('No response from OpenAI');
   }
 
   const parsedResumeJSON = JSON.parse(response).parsedResume;
-
   if (!parsedResumeJSON) {
     console.error('[parseAndStoreResume] Failed to parse <parsedResume> block');
     throw new Error('Failed to parse <parsedResume> block');
@@ -67,6 +73,131 @@ export async function parseAndStoreResume(threadId: string) {
     },
   });
 
-  console.log('[parseAndStoreResume] Parse and save complete.');
-  return { thread };
+  // Create first diff version (from empty object {})
+  const initialDiff = JSON.parse(
+    JSON.stringify(createDiff({}, parsedResumeJSON))
+  );
+  const version = await prisma.resumeVersion.create({
+    data: {
+      threadId: thread.id,
+      diff: initialDiff,
+      title: 'Initial full version',
+    },
+  });
+
+  return { thread, currentVersionId: version?.id ?? null };
+}
+
+export async function updateResumeSections(
+  threadId: string,
+  newSections: any,
+  title = `Changes at ${new Date().toLocaleString()}`
+) {
+  const thread = await prisma.thread.findUnique({
+    where: { id: threadId },
+    include: {
+      versions: {
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+
+  if (!thread) {
+    throw new Error('Thread not found');
+  }
+
+  const base = thread.parsedSections ?? {};
+
+  const diff = JSON.parse(JSON.stringify(createDiff(base, newSections)));
+
+  console.log(diff);
+
+  // Skip if no meaningful diff
+  if (!diff || Object.keys(diff).length === 0) {
+    return { updatedAt: new Date().toISOString(), skipped: true };
+  }
+
+  await prisma.resumeVersion.create({
+    data: {
+      threadId,
+      diff,
+      title,
+    },
+  });
+
+  const result = await prisma.thread.update({
+    where: { id: threadId },
+    data: { parsedSections: newSections, updatedAt: new Date() },
+  });
+
+  return { updatedAt: result.updatedAt.toISOString(), skipped: false };
+}
+
+export async function revertToVersion(threadId: string, versionId: string) {
+  const thread = await prisma.thread.findUnique({
+    where: { id: threadId },
+    include: {
+      versions: {
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+
+  if (!thread) throw new Error('Thread not found');
+
+  const targetIndex = thread.versions.findIndex((v) => v.id === versionId);
+  if (targetIndex === -1) throw new Error('Version not found');
+
+  // Start reconstruction from empty object
+  let reconstructed: any = {};
+
+  for (let i = 0; i <= targetIndex; i++) {
+    let diff = thread.versions[i].diff;
+
+    if (typeof diff === 'string') {
+      diff = JSON.parse(diff);
+    }
+
+    if (!diff) {
+      throw new Error(`Missing diff data at version index ${i}`);
+    }
+
+    try {
+      reconstructed = applyDiff(reconstructed, diff);
+    } catch (err) {
+      console.error(`[revertToVersion] Error applying diff at index ${i}`, err);
+      throw new Error(`Failed to apply diff at index ${i}`);
+    }
+  }
+
+  const now = new Date();
+
+  const currentState = thread.parsedSections ?? {};
+  const revertDiff = JSON.parse(
+    JSON.stringify(createDiff(currentState, reconstructed))
+  );
+
+  // Save new version only if state changed
+  if (Object.keys(revertDiff).length > 0) {
+    await prisma.resumeVersion.create({
+      data: {
+        threadId,
+        diff: revertDiff,
+        title: `Reverted to version ${targetIndex + 1} at ${now.toISOString()}`,
+      },
+    });
+  }
+
+  const updated = await prisma.thread.update({
+    where: { id: threadId },
+    data: {
+      parsedSections: reconstructed,
+      updatedAt: now,
+    },
+  });
+
+  return {
+    parsedSections: reconstructed,
+    updatedAt: updated.updatedAt.toISOString(),
+  };
 }

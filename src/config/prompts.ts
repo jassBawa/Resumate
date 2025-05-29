@@ -174,6 +174,9 @@ const getExamplesOutputPrompt = () => `
       ...
     }
 } }
+
+📌 Ensure the JSON is **valid**, **strict**, and **parsable**. No markdown, extra formatting, or explanations.
+
 `;
 
 export const getResumeSystemPrompt = () => `
@@ -201,7 +204,7 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
 
   Each section should contain:
     {
-      "data": <structured data>,
+      "data": {},
       "analysis": {
         "summary": "Brief impression",
         "strengths": ["..."],
@@ -250,11 +253,11 @@ Your task is to:
   1. Parse the input resume into structured JSON inside \`parsedResume\`.
   2. Embed analysis directly under each section using the format:
      {
-       "data": ...,
+       "data": {},
        "analysis": { ... }
      }
 
-     📌 Ensure the JSON is **valid**, **strict**, and **parsable**. No markdown, extra formatting, or explanations.
+📌 Ensure the JSON is **valid**, **strict**, and **parsable**. No markdown, extra formatting, or explanations.
 
 📌 Use double quotes for all keys and string values.
 

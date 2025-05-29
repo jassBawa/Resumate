@@ -39,7 +39,6 @@ export async function getResumeSections(threadId: string) {
       };
     }
     const data = await res.json();
-    console.log(data);
     return {
       success: true,
       data: {

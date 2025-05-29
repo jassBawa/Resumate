@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       resumeText: string;
       sectionId: string;
     } = await request.json();
+    console.log('resumeText', resumeText);
 
     if (!message || !sectionId || !resumeText || !conversationHistory) {
       return NextResponse.json(
@@ -52,14 +53,10 @@ export async function POST(request: Request) {
       temperature: 0.7,
     });
     const response = completion.choices[0].message.content;
-    console.log(response);
     if (!response) {
       return;
     }
     const parsed = JSON.parse(response);
-    console.log(parsed);
-
-    // return NextResponse.json({ result: parsed });
 
     return NextResponse.json({
       response: parsed.response,
