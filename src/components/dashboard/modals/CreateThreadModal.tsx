@@ -53,9 +53,9 @@ export default function CreateThreadButton() {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create a new thread</DialogTitle>
+            <DialogTitle>Create a new Resume</DialogTitle>
             <DialogDescription>
-              Give your thread a title to help you identify it later.
+              Give your resume a title to help you identify it later.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
@@ -64,7 +64,7 @@ export default function CreateThreadButton() {
                 <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
-                  placeholder="Enter thread title..."
+                  placeholder="Full-Stack Developer"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   autoFocus
@@ -81,7 +81,7 @@ export default function CreateThreadButton() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading || !title.trim()}>
-                {isLoading ? 'Creating...' : 'Create Thread'}
+                {isLoading ? 'Creating...' : 'Create Resume'}
               </Button>
             </DialogFooter>
           </form>

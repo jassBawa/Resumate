@@ -1,8 +1,10 @@
 import ClassicResume from '@/assets/classic-resume-placeholder.png';
+import CreativeResume from '@/assets/creative-resume-placeholder.png';
 import MinimalResume from '@/assets/minimal-resume-placeholder.png';
 import ModernResume from '@/assets/modern-resume-placeholder.png';
-import CreativeResume from '@/assets/creative-resume-placeholder.png';
 
+import ResumePDF from '@/components/template/ResumePDF';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
@@ -10,19 +12,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import Image, { StaticImageData } from 'next/image';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-// import CreativeResume from '@/assets/creative-resume-placeholder.png';
-import { ResumeSections } from '@/config/parseSections';
+import { useResumeStore } from '@/hooks/useResumeStore';
 import { pdf } from '@react-pdf/renderer';
 import FileSaver from 'file-saver';
-import { ResumePDF } from '../template/ResumePDF';
+import Image, { StaticImageData } from 'next/image';
+import { useState } from 'react';
 
 interface TemplateSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  sections: ResumeSections;
 }
 
 type TemplateId = 'modern' | 'classic' | 'minimal' | 'creative';
@@ -63,8 +61,8 @@ const templates: Template[] = [
 export function TemplateSelectionModal({
   isOpen,
   onClose,
-  sections,
 }: TemplateSelectionModalProps) {
+  const { resumeSections } = useResumeStore();
   const [selectedTemplate, setSelectedTemplate] =
     useState<TemplateId>('modern');
 
@@ -75,11 +73,11 @@ export function TemplateSelectionModal({
   const generatePdfDocument = async () => {
     try {
       const blob = await pdf(
-        <ResumePDF sections={sections} template={selectedTemplate} />
+        <ResumePDF sections={resumeSections} template={selectedTemplate} />
       ).toBlob();
       FileSaver.saveAs(
         blob,
-        `${selectedTemplate}-${sections.contactInfo?.data.name}-resume.pdf`
+        `${selectedTemplate}-${resumeSections.contactInfo?.data.name}-resume.pdf`
       );
     } catch (error) {
       console.error('Error generating PDF:', error);
@@ -94,7 +92,7 @@ export function TemplateSelectionModal({
         <DialogHeader>
           <DialogTitle>Select a Template</DialogTitle>
         </DialogHeader>
-        <div className="overflow-scroll h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
+        <div className="scrollbar-hide overflow-y-auto h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
           {templates.map((template) => (
             <Card
               key={template.id}
@@ -103,12 +101,12 @@ export function TemplateSelectionModal({
               }`}
               onClick={() => handleSelect(template.id)}
             >
-              <div className="aspect-square relative h-auto w-full bg-muted rounded-lg flex items-center justify-center">
+              <div className="relative flex items-center justify-center w-full h-auto rounded-lg aspect-square bg-muted">
                 <Image
                   src={template.preview}
                   alt={template.name}
                   fill
-                  className="w-full h-full absolute object-fit rounded-lg"
+                  className="absolute w-full h-full rounded-lg object-fit"
                 />
               </div>
               <h3 className="mt-2 text-lg font-semibold">{template.name}</h3>
@@ -119,7 +117,7 @@ export function TemplateSelectionModal({
           ))}
         </div>
         <div className="flex items-center justify-end">
-          {sections && (
+          {resumeSections && (
             <Button className="" onClick={generatePdfDocument}>
               Download PDF
             </Button>

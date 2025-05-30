@@ -1,5 +1,5 @@
-import EmptyState from '@/components/dashboard/EmptyState';
-import ThreadCard, { Thread } from '@/components/dashboard/ThreadCard';
+import EmptyState from '@/components/dashboard/threads/EmptyState';
+import ThreadCard, { Thread } from '@/components/dashboard/threads/ThreadCard';
 import { getThreads } from '@/lib/actions/threads';
 
 export default async function ThreadList() {

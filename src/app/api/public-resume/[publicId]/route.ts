@@ -47,6 +47,7 @@ export async function GET(
         name: user.name,
         createdAt,
         viewerCount: thread.viewerCount + 1,
+        parsedSections: thread.parsedSections,
       },
     });
   } catch (error) {

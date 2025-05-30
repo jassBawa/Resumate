@@ -1,7 +1,7 @@
 // components/MinimalTemplate.tsx
 import React from 'react';
 import { Text, View, StyleSheet, Link } from '@react-pdf/renderer';
-import type { ResumeSections } from '@/config/parseSections';
+import type { ResumeSections } from '@/types';
 
 interface MinimalTemplateProps {
   sections: ResumeSections;

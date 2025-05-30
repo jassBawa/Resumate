@@ -1,6 +1,6 @@
 import React from 'react';
 import { Document, Page } from '@react-pdf/renderer';
-import { ResumeSections } from '@/config/parseSections';
+import { ResumeSections } from '@/types';
 import {
   MinimalTemplate,
   ClassicTemplate,

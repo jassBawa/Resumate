@@ -11,9 +11,7 @@ export default function DashboardPage() {
     <main className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Your Conversations
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Your Resumes</h1>
           <p className="text-muted-foreground mt-2">
             Manage and continue your resume conversations
           </p>
@@ -26,7 +24,7 @@ export default function DashboardPage() {
         </div>
         <div className="relative flex justify-center">
           <span className="bg-background px-4 text-sm text-muted-foreground">
-            Recent Threads
+            Recent conversations
           </span>
         </div>
       </div>

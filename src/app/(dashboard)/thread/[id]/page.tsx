@@ -1,8 +1,7 @@
 import { BackgroundElements } from '@/components/BackgroundElements';
-import ResumeContainer from '@/components/dashboard/ResumeContainer';
+import ResumeContainer from '@/components/dashboard/resume/ResumeContainer';
 import ResumeDropZone from '@/components/resume/ResumeDropzone';
 import { getThreadById } from '@/lib/actions/threads';
-// import { notFound } from 'next/navigation';
 import React from 'react';
 
 async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
@@ -31,12 +30,7 @@ async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
         )}
 
         <div className="mt-6">
-          {isResumeUploaded && (
-            <ResumeContainer
-              threadId={threadId}
-              resumeText={threadData.resumeText}
-            />
-          )}
+          {isResumeUploaded && <ResumeContainer threadId={threadId} />}
         </div>
       </div>
     </div>

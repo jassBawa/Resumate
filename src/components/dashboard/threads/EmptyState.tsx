@@ -1,4 +1,4 @@
-import { MessageSquarePlus } from "lucide-react"
+import { MessageSquarePlus } from 'lucide-react';
 
 export default function EmptyState() {
   return (
@@ -8,8 +8,8 @@ export default function EmptyState() {
       </div>
       <h3 className="text-xl font-semibold mb-2">No conversations yet</h3>
       <p className="text-muted-foreground max-w-sm mb-6">
-        Create your first thread to start a conversation. Your threads will appear here.
+        Create your first AI powered resume. Your chats will appear here.
       </p>
     </div>
-  )
+  );
 }

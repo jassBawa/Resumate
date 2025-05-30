@@ -9,7 +9,7 @@ import {
   Path,
   Line,
 } from '@react-pdf/renderer';
-import type { ResumeSections } from '@/config/parseSections';
+import type { ResumeSections } from '@/types';
 
 // Register fonts for more professional appearance
 Font.register({
@@ -279,36 +279,33 @@ const styles = StyleSheet.create({
 });
 
 export const PDFLinkIcon = () => (
-  <Svg
-  viewBox="0 0 24 24"
-  style={{ marginLeft: 5, width: 10, height: 10 }}
->
-  <Path
-    d="M9 17H7A5 5 0 0 1 7 7h2"
-    strokeWidth="2"
-    stroke="#000"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <Path
-    d="M15 7h2a5 5 0 1 1 0 10h-2"
-    strokeWidth="2"
-    stroke="#000"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  />
-  <Line
-    x1="8"
-    y1="12"
-    x2="16"
-    y2="12"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    stroke="#000"
-  />
-</Svg>
-)
+  <Svg viewBox="0 0 24 24" style={{ marginLeft: 5, width: 10, height: 10 }}>
+    <Path
+      d="M9 17H7A5 5 0 0 1 7 7h2"
+      strokeWidth="2"
+      stroke="#000"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M15 7h2a5 5 0 1 1 0 10h-2"
+      strokeWidth="2"
+      stroke="#000"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Line
+      x1="8"
+      y1="12"
+      x2="16"
+      y2="12"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      stroke="#000"
+    />
+  </Svg>
+);
 
 const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
   return (
@@ -389,14 +386,13 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
                     <Text style={styles.projectName}>{project.name}</Text>
                     {project.url && (
                       <Link src={project.url} style={styles.link}>
-                       <PDFLinkIcon />
+                        <PDFLinkIcon />
                       </Link>
                     )}
-
                   </View>
-                    <Text style={styles.projectDescription}>
-                      {project.description}
-                    </Text>
+                  <Text style={styles.projectDescription}>
+                    {project.description}
+                  </Text>
                   {project.technologies && project.technologies.length > 0 && (
                     <View style={styles.technologies}>
                       {project.technologies.map((tech, idx) => (
@@ -482,15 +478,13 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
                     wrap={false}
                   >
                     <View style={styles.projectHeader}>
-                    <Text style={styles.certificationName}>
-                      {cert.name}
-                    </Text>
+                      <Text style={styles.certificationName}>{cert.name}</Text>
                       {cert.url && (
                         <Link src={cert.url} style={styles.link}>
-                         <PDFLinkIcon />
+                          <PDFLinkIcon />
                         </Link>
                       )}
-                      </View>
+                    </View>
                     <Text style={styles.certificationIssuer}>
                       {cert.issuer}
                     </Text>
@@ -534,15 +528,13 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
               {sections.publications.data.map((pub, index) => (
                 <View key={index} style={styles.publicationItem} wrap={false}>
                   <View style={styles.projectHeader}>
-                  <Text style={styles.publicationTitle}>
-                    {pub.title}
-                  </Text>
+                    <Text style={styles.publicationTitle}>{pub.title}</Text>
                     {pub.url && (
                       <Link src={pub.url} style={styles.link}>
                         <PDFLinkIcon />
                       </Link>
                     )}
-                    </View>
+                  </View>
                   <Text style={styles.publicationName}>{pub.publication}</Text>
                   <Text style={styles.publicationDate}>{pub.date}</Text>
                 </View>

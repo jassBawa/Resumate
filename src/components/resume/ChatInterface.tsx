@@ -2,15 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { Loader2, Send, Bot, User } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { useResumeStore } from '@/hooks/useResumeStore';
 
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
-}
-
-interface ChatInterfaceProps {
-  resumeText: string;
-  onResumeUpdate: (resumseString: string) => void;
 }
 
 const commandSuggestions = [
@@ -24,16 +20,14 @@ const commandSuggestions = [
   },
 ];
 
-export function ChatInterface({
-  resumeText,
-  onResumeUpdate,
-}: ChatInterfaceProps) {
+export function ChatInterface() {
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [selectedSuggestion, setSelectedSuggestion] = useState(0);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const { setResumeSections, originalSections } = useResumeStore();
 
   const filteredSuggestions = chatInput.startsWith('/')
     ? commandSuggestions.filter((s) =>
@@ -56,57 +50,26 @@ export function ChatInterface({
     setShowSuggestions(false);
 
     try {
-      const response = await fetch('/api/chat', {
+      const resumeText = JSON.stringify(originalSections);
+      const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: messageToSend,
-          resumeText: resumeText,
           conversationHistory: chatMessages,
+          resumeText,
         }),
       });
 
-      const data = await response.json();
-      console.log(data);
-      if (!response.body) throw new Error('No response body returned');
-      const rawText: string = data.response;
-      let assistantMessage = '';
-      let parsed = null;
-
-      try {
-        const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          parsed = JSON.parse(jsonMatch[0]);
-        }
-        console.log(parsed);
-
-        // const parsed = JSON.parse(jsonMatch[0]);
-
-        if (parsed?.response) {
-          assistantMessage = parsed.response;
-        } else if (parsed?.coverLetter) {
-          assistantMessage = parsed.coverLetter;
-        } else {
-          assistantMessage = rawText;
-        }
-
-        if (parsed?.resume) {
-          const cleanResume = parsed.resume
-            .replace(/\\"/g, '"')
-            .replace(/\\n/g, '\n');
-          onResumeUpdate(cleanResume);
-        }
-      } catch (error) {
-        console.error('Parsing error or fallback:', error);
-        assistantMessage =
-          rawText ||
-          'Sorry, I couldn’t parse the response, but here’s the raw output:\n\n' +
-            rawText;
+      const data = await res.json();
+      const { response, parsedSections } = data;
+      if (parsedSections) {
+        setResumeSections(parsedSections);
       }
 
       setChatMessages((prev) => [
         ...prev,
-        { role: 'assistant', content: assistantMessage },
+        { role: 'assistant', content: response },
       ]);
     } catch (error: any) {
       console.error('Chat error:', error);
@@ -172,13 +135,13 @@ export function ChatInterface({
       transition={{ duration: 0.5, delay: 0.6 }}
       className="mt-12"
     >
-      <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
+      <h2 className="mb-4 text-xl font-semibold text-center text-gray-900 dark:text-white">
         Resume Chat Assistant
       </h2>
-      <div className="max-w-3xl mx-auto bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm border dark:border-zinc-700 rounded-xl shadow-xl p-6">
+      <div className="max-w-3xl p-6 mx-auto border shadow-xl bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm dark:border-zinc-700 rounded-xl">
         <div
           ref={chatContainerRef}
-          className="space-y-4 h-96 overflow-y-auto border-b border-gray-200 dark:border-gray-600 pb-4"
+          className="pb-4 space-y-4 overflow-y-auto border-b border-gray-200 h-96 dark:border-gray-600"
         >
           {chatMessages.map((msg, idx) => (
             <motion.div
@@ -199,9 +162,9 @@ export function ChatInterface({
               >
                 <div className="flex items-center gap-2 mb-2">
                   {msg.role === 'user' ? (
-                    <User className="h-4 w-4" />
+                    <User className="w-4 h-4" />
                   ) : (
-                    <Bot className="h-4 w-4" />
+                    <Bot className="w-4 h-4" />
                   )}
                   <span className="text-xs font-medium">
                     {msg.role === 'user' ? 'You' : 'Assistant'}
@@ -219,9 +182,9 @@ export function ChatInterface({
               animate={{ opacity: 1 }}
               className="flex justify-start"
             >
-              <div className="bg-gray-100 dark:bg-zinc-700 rounded-lg p-4">
+              <div className="p-4 bg-gray-100 rounded-lg dark:bg-zinc-700">
                 <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-gray-500 dark:text-gray-400" />
+                  <Loader2 className="w-4 h-4 text-gray-500 animate-spin dark:text-gray-400" />
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     Thinking...
                   </span>
@@ -239,12 +202,12 @@ export function ChatInterface({
             onChange={(e) => setChatInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about your resume or type / to see commands..."
-            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 bg-white dark:bg-zinc-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
+            className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg dark:border-gray-600 dark:bg-zinc-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400"
             disabled={chatLoading}
           />
 
           {showSuggestions && (
-            <div className="absolute z-10 mt-1 w-full bg-white dark:bg-zinc-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg">
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg dark:bg-zinc-800 dark:border-gray-700">
               {filteredSuggestions.map((s, idx) => (
                 <div
                   key={s.command}
@@ -272,7 +235,7 @@ export function ChatInterface({
             disabled={chatLoading || !chatInput.trim()}
             className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-purple-500 text-white rounded-lg px-3 py-1.5 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            <Send className="h-4 w-4" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </div>

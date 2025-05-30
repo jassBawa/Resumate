@@ -1,6 +1,6 @@
 import type React from 'react';
 import { Text, View, StyleSheet, Link } from '@react-pdf/renderer';
-import type { ResumeSections } from '@/config/parseSections';
+import type { ResumeSections } from '@/types';
 import { PDFLinkIcon } from './ModernTemplate';
 
 interface CreativeTemplateProps {
