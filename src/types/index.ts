@@ -1,8 +1,3 @@
-export type Section = {
-  data: any;
-  analysis: any;
-};
-
 export interface ResumeSections {
   contactInfo?: {
     data: {
@@ -113,8 +108,4 @@ export interface SectionAnalysis {
   weaknesses: string[];
   suggestions: string[];
   ATS_Fit_Score: number;
-}
-
-export interface ParsedResume {
-  sections: ResumeSections;
 }

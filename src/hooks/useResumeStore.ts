@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { ResumeSections } from '@/config/parseSections';
+import { ResumeSections } from '@/types';
 
 type SectionKey = keyof ResumeSections;
 

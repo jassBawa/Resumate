@@ -11,7 +11,6 @@ export async function PATCH(
   try {
     const { userId } = await auth();
     const { id: threadId, versionId } = await params;
-    console.log(threadId, versionId);
 
     if (!userId) {
       return NextResponse.json(

@@ -1,4 +1,4 @@
-import { SectionAnalysis } from '@/config/parseSections';
+import { SectionAnalysis } from '@/types';
 
 interface ResumeSectionProps {
   type: string;
@@ -22,7 +22,7 @@ export default function ResumeSection({
             <span className="text-xl">{icon}</span>
             <h2 className="text-xl font-semibold">{displayName}</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <p className="font-medium">{data.name}</p>
               <p className="text-sm text-muted-foreground">{data.email}</p>
@@ -67,7 +67,7 @@ export default function ResumeSection({
             {data.hardSkills.map((skill: string, index: number) => (
               <span
                 key={index}
-                className="px-3 py-1 bg-muted rounded-full text-sm"
+                className="px-3 py-1 text-sm rounded-full bg-muted"
               >
                 {skill}
               </span>
@@ -85,7 +85,7 @@ export default function ResumeSection({
           </div>
           {data.map((job: any, index: number) => (
             <div key={index} className="space-y-2">
-              <div className="flex justify-between items-start">
+              <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-medium">{job.title}</h3>
                   <p className="text-sm text-muted-foreground">{job.company}</p>
@@ -101,7 +101,7 @@ export default function ResumeSection({
 
               {Array.isArray(job.responsibilities) &&
                 job.responsibilities.length > 0 && (
-                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  <ul className="text-sm list-disc list-inside text-muted-foreground">
                     {job.responsibilities.map((item: string, idx: number) => (
                       <li key={idx}>{item}</li>
                     ))}
@@ -110,7 +110,7 @@ export default function ResumeSection({
 
               {Array.isArray(job.achievements) &&
                 job.achievements.length > 0 && (
-                  <ul className="list-disc list-inside text-sm text-muted-foreground">
+                  <ul className="text-sm list-disc list-inside text-muted-foreground">
                     {job.achievements.map(
                       (achievement: string, idx: number) => (
                         <li key={idx}>{achievement}</li>
@@ -131,7 +131,7 @@ export default function ResumeSection({
           </div>
           {data.map((edu: any, index: number) => (
             <div key={index} className="space-y-2">
-              <div className="flex justify-between items-start">
+              <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-medium">{edu.degree}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -172,7 +172,7 @@ export default function ResumeSection({
                   {project.technologies.map((tech: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-2 py-1 bg-muted rounded-full text-xs"
+                      className="px-2 py-1 text-xs rounded-full bg-muted"
                     >
                       {tech}
                     </span>

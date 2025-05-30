@@ -16,7 +16,6 @@ export async function POST(request: Request) {
       resumeText: string;
       sectionId: string;
     } = await request.json();
-    console.log('resumeText', resumeText);
 
     if (!message || !sectionId || !resumeText || !conversationHistory) {
       return NextResponse.json(

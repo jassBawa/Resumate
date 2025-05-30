@@ -1,5 +1,5 @@
 'use client';
-import { ResumeSections } from '@/config/parseSections';
+import { ResumeSections } from '@/types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Button } from '../ui/button';
@@ -59,7 +59,6 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
   };
 
   const handleEditSection = async (sectionId: keyof ResumeSections) => {
-    console.log(tempMessage, sectionId);
     setIsSubmitting(true);
     setAIResponse('');
 

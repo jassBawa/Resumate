@@ -110,8 +110,6 @@ export async function updateResumeSections(
 
   const diff = JSON.parse(JSON.stringify(createDiff(base, newSections)));
 
-  console.log(diff);
-
   // Skip if no meaningful diff
   if (!diff || Object.keys(diff).length === 0) {
     return { updatedAt: new Date().toISOString(), skipped: true };

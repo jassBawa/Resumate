@@ -72,7 +72,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-    console.log(responseContent);
     const parsed = JSON.parse(responseContent);
 
     return NextResponse.json({

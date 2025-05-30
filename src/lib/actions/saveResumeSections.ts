@@ -1,6 +1,6 @@
 'use server';
 // lib/actions/resume.ts
-import { ResumeSections } from '@/config/parseSections';
+import { ResumeSections } from '@/types';
 import { fetchWithAuth } from '../fetchWithAuth';
 
 interface SaveResumeResponse {

@@ -92,7 +92,7 @@ export function TemplateSelectionModal({
         <DialogHeader>
           <DialogTitle>Select a Template</DialogTitle>
         </DialogHeader>
-        <div className="overflow-scroll h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
+        <div className="scrollbar-hide overflow-y-auto h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
           {templates.map((template) => (
             <Card
               key={template.id}

@@ -1,7 +1,7 @@
 'use server';
 import { ResumeVersion } from '@prisma/client';
 import { fetchWithAuth } from '../fetchWithAuth';
-import { ResumeSections } from '@/config/parseSections';
+import { ResumeSections } from '@/types';
 
 export async function getResumeVersions(threadId: string) {
   try {
@@ -57,7 +57,6 @@ export async function revertToVersionAction(
       };
     }
     const data = await res.json();
-    console.log(data);
     return {
       success: true,
       data: data.parsedSections as ResumeSections,

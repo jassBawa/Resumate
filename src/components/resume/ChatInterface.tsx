@@ -62,9 +62,7 @@ export function ChatInterface() {
       });
 
       const data = await res.json();
-      console.log(data);
       const { response, parsedSections } = data;
-      console.log(parsedSections);
       if (parsedSections) {
         setResumeSections(parsedSections);
       }

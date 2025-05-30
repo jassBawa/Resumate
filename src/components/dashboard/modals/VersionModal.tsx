@@ -77,7 +77,6 @@ export function VersionModal({
         toast.error(error);
         return;
       }
-      console.log(data);
       toast.success('Successfully reverted to previous version');
       setResumeSections(data);
       setOriginalSections(data);
@@ -109,7 +108,7 @@ export function VersionModal({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="p-4 max-h-[60vh] overflow-y-auto">
+          <div className="p-4 max-h-[60vh] overflow-y-auto  scrollbar-hide">
             <VersionList
               versions={versions}
               loading={loading}

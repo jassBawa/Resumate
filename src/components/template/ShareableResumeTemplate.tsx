@@ -1,5 +1,5 @@
 'use client';
-import { ResumeSections } from '@/config/parseSections';
+import { ResumeSections } from '@/types';
 import ResumeSection from './ResumeSection';
 
 const sectionOrder: {

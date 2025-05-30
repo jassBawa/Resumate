@@ -29,15 +29,15 @@ export function VersionList({
     return (
       <div className="flex flex-col gap-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="border p-4 rounded-lg">
+          <div key={i} className="p-4 border rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <Skeleton className="h-5 w-32 mb-2" />
-                <Skeleton className="h-4 w-48" />
+                <Skeleton className="w-32 h-5 mb-2" />
+                <Skeleton className="w-48 h-4" />
               </div>
               <div className="flex gap-2">
-                <Skeleton className="h-8 w-16" />
-                <Skeleton className="h-8 w-16" />
+                <Skeleton className="w-16 h-8" />
+                <Skeleton className="w-16 h-8" />
               </div>
             </div>
           </div>
@@ -48,12 +48,12 @@ export function VersionList({
 
   if (versions.length === 0) {
     return (
-      <div className="text-center py-8">
-        <Clock className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+      <div className="py-8 text-center">
+        <Clock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
           No versions available yet.
         </p>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="mt-1 text-xs text-muted-foreground">
           Versions will appear here as you make changes to your resume.
         </p>
       </div>
@@ -113,7 +113,7 @@ export function VersionItem({
       <div className="flex items-center justify-between">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <p className="font-medium text-sm md:text-base">
+            <p className="text-sm font-medium md:text-base">
               v{versionNumber}: {version.title}
             </p>
           </div>
@@ -124,7 +124,7 @@ export function VersionItem({
 
         <div className="flex gap-2 ml-4">
           {isCurrent && (
-            <span className="flex items-center justify-center px-2 py-1 text-xs bg-primary text-primary-foreground rounded-full">
+            <span className="flex items-center justify-center px-2 py-1 text-xs rounded-full bg-primary text-primary-foreground">
               Current
             </span>
           )}
@@ -135,7 +135,7 @@ export function VersionItem({
             disabled={isReverting}
             className="flex items-center gap-1"
           >
-            <Eye className="h-3 w-3" />
+            <Eye className="w-3 h-3" />
             <span className="hidden sm:inline">View</span>
           </Button>
 
@@ -148,9 +148,9 @@ export function VersionItem({
               className="flex items-center gap-1"
             >
               {isReverting ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
+                <Loader2 className="w-3 h-3 animate-spin" />
               ) : (
-                <RotateCcw className="h-3 w-3" />
+                <RotateCcw className="w-3 h-3" />
               )}
               <span className="hidden sm:inline">
                 {isReverting ? 'Reverting...' : 'Revert'}
