@@ -16,7 +16,7 @@ import { useResumeStore } from '@/hooks/useResumeStore';
 import { pdf } from '@react-pdf/renderer';
 import FileSaver from 'file-saver';
 import Image, { StaticImageData } from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface TemplateSelectionModalProps {
   isOpen: boolean;
@@ -86,13 +86,21 @@ export function TemplateSelectionModal({
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) {
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 200);
+    }
+  }, [isOpen]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full max-w-sm mx-auto md:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Select a Template</DialogTitle>
         </DialogHeader>
-        <div className="scrollbar-hide overflow-y-auto h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
+        <div className="overflow-y-auto h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
           {templates.map((template) => (
             <Card
               key={template.id}

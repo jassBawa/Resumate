@@ -43,32 +43,6 @@ export function VersionModal({
 
   const { setResumeSections, setOriginalSections } = useResumeStore();
 
-  useEffect(() => {
-    const fetchVersions = async () => {
-      setLoading(true);
-      try {
-        const { data, error } = await getResumeVersions(threadId);
-        if (!data || error) {
-          toast.error(error || 'Failed to fetch versions');
-          return;
-        }
-        setVersions(data.versions);
-      } catch (err) {
-        console.error(err);
-        toast.error('An unexpected error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (isOpen) {
-      fetchVersions();
-    } else {
-      setVersions([]);
-      setRevertingId(null);
-      setConfirmRevert(null);
-    }
-  }, [isOpen, threadId]);
-
   const handleRevert = async (versionId: string) => {
     setRevertingId(versionId);
     try {
@@ -96,6 +70,40 @@ export function VersionModal({
     console.log(version);
     toast.info('View functionality coming soon');
   };
+
+  useEffect(() => {
+    const fetchVersions = async () => {
+      setLoading(true);
+      try {
+        const { data, error } = await getResumeVersions(threadId);
+        if (!data || error) {
+          toast.error(error || 'Failed to fetch versions');
+          return;
+        }
+        setVersions(data.versions);
+      } catch (err) {
+        console.error(err);
+        toast.error('An unexpected error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (isOpen) {
+      fetchVersions();
+    } else {
+      setVersions([]);
+      setRevertingId(null);
+      setConfirmRevert(null);
+    }
+  }, [isOpen, threadId]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto';
+      }, 200);
+    }
+  }, [isOpen]);
 
   return (
     <>

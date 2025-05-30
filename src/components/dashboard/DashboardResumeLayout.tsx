@@ -4,7 +4,7 @@ import type React from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 // Icons
@@ -94,27 +94,26 @@ export function ResumeLayout({
     }
   };
 
-  // Keyboard shortcuts
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Cmd/Ctrl + S for share
-    if ((e.metaKey || e.ctrlKey) && e.key === 's') {
-      e.preventDefault();
-      setIsShareResumeModalOpen(true);
-    }
-    // Cmd/Ctrl + E for export
-    if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
-      e.preventDefault();
-      setIsTemplateModalOpen(true);
-    }
-    // Cmd/Ctrl + V for versions
-    if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
-      e.preventDefault();
-      setIsVersionModalOpen(true);
-    }
-  };
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+        e.preventDefault();
+        setIsShareResumeModalOpen(true);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'e') {
+        e.preventDefault();
+        setIsTemplateModalOpen(true);
+      } else if ((e.metaKey || e.ctrlKey) && e.key === 'v') {
+        e.preventDefault();
+        setIsVersionModalOpen(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
-    <div className="p-3 md:p-6" onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className="p-3 md:p-6" tabIndex={0}>
       <div className="max-w-4xl mx-auto mb-6">
         {/* Back navigation */}
         <Link
