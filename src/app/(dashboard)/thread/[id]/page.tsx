@@ -18,10 +18,9 @@ async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
     threadData.fileId !== null && threadData.fileId !== '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-black py-12 pb-24 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden">
+    <div className=" bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-black pt-4 pb-24 px-4 sm:px-6 lg:px-8 transition-colors duration-300 relative overflow-hidden">
       <BackgroundElements />
-      <div className="max-w-7xl mx-auto">
-        <h1 className="text-2xl font-bold mb-4">Thread: {threadData.name}</h1>
+      <div className=" mx-auto">
         {!isResumeUploaded && (
           <div className="mt-6">
             <h2 className="text-xl font-semibold mb-2">Upload Resume</h2>
@@ -29,9 +28,7 @@ async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
           </div>
         )}
 
-        <div className="mt-6">
-          {isResumeUploaded && <ResumeContainer threadId={threadId} />}
-        </div>
+        {isResumeUploaded && <ResumeContainer threadId={threadId} />}
       </div>
     </div>
   );
