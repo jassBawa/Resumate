@@ -8,7 +8,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { useResumeViewStore } from '@/hooks/useResumeViewStore';
 import { deleteResume } from '@/lib/actions/resume';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -17,13 +16,13 @@ import { toast } from 'sonner';
 
 interface DeleteResumeModalProps {
   threadId: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function DeleteResumeModal({ threadId }: DeleteResumeModalProps) {
+export function DeleteResumeModal({ threadId, isOpen, onClose }: DeleteResumeModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
-
-  const { closeDeleteDialog, isDeleteDialogOpen } = useResumeViewStore();
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -33,7 +32,7 @@ export function DeleteResumeModal({ threadId }: DeleteResumeModalProps) {
       if (result.success) {
         toast.success('Resume deleted successfully');
         router.push('/dashboard');
-        closeDeleteDialog();
+        onClose();
       } else {
         toast.error(result.error || 'Failed to delete resume');
       }
@@ -45,15 +44,13 @@ export function DeleteResumeModal({ threadId }: DeleteResumeModalProps) {
     }
   };
   return (
-    <AlertDialog open={isDeleteDialogOpen} onOpenChange={closeDeleteDialog}>
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Are you sure you want to delete this resume?
-          </AlertDialogTitle>
+          <AlertDialogTitle>Are you sure you want to delete this resume?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            resume and all associated versions.
+            This action cannot be undone. This will permanently delete your resume and all
+            associated versions.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -65,7 +62,7 @@ export function DeleteResumeModal({ threadId }: DeleteResumeModalProps) {
           >
             {isDeleting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Deleting...
               </>
             ) : (

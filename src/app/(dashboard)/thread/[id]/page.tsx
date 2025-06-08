@@ -5,7 +5,6 @@ import DashboardLayout from './DashboardLayout';
 async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: threadId } = await params;
   const { data: threadData, error: threadError } = await getThreadById(threadId);
-  console.log(threadData, threadId);
   if (threadError) {
     <div> Something went wrong</div>;
   }

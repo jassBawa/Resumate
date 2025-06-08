@@ -6,14 +6,8 @@ import ModernResume from '@/assets/modern-resume-placeholder.png';
 import ResumePDF from '@/components/template/ResumePDF';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useResumeStore } from '@/hooks/useResumeStore';
-import { useResumeViewStore } from '@/hooks/useResumeViewStore';
 import { pdf } from '@react-pdf/renderer';
 import FileSaver from 'file-saver';
 import Image, { StaticImageData } from 'next/image';
@@ -54,16 +48,18 @@ const templates: Template[] = [
   },
 ];
 
-export function TemplateSelectionModal() {
+interface TemplateSectionProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function TemplateSelectionModal({ isOpen, onClose }: TemplateSectionProps) {
   const { resumeSections } = useResumeStore();
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<TemplateId>('modern');
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>('modern');
 
   const handleSelect = (templateId: TemplateId) => {
     setSelectedTemplate(templateId);
   };
-
-  const { isTemplateModalOpen, closeTemplateModal } = useResumeViewStore();
 
   const generatePdfDocument = async () => {
     try {
@@ -77,45 +73,43 @@ export function TemplateSelectionModal() {
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {
-      closeTemplateModal();
+      onClose();
     }
   };
 
   useEffect(() => {
-    if (!isTemplateModalOpen) {
+    if (!isOpen) {
       setTimeout(() => {
         document.body.style.pointerEvents = 'auto';
       }, 200);
     }
-  }, [isTemplateModalOpen]);
+  }, [isOpen]);
 
   return (
-    <Dialog open={isTemplateModalOpen} onOpenChange={closeTemplateModal}>
-      <DialogContent className="w-full max-w-sm mx-auto md:max-w-6xl">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="md:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Select a Template</DialogTitle>
         </DialogHeader>
-        <div className="overflow-y-auto h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
-          {templates.map((template) => (
+        <div className="mt-4 grid h-[70vh] grid-cols-1 gap-3 overflow-y-auto p-4 md:h-auto md:grid-cols-4">
+          {templates.map(template => (
             <Card
               key={template.id}
-              className={`p-4 gap-0 cursor-pointer transition-all ${
-                selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
+              className={`cursor-pointer gap-0 p-4 transition-all ${
+                selectedTemplate === template.id ? 'ring-primary ring-2' : ''
               }`}
               onClick={() => handleSelect(template.id)}
             >
-              <div className="relative flex items-center justify-center w-full h-auto rounded-lg aspect-square bg-muted">
+              <div className="bg-muted relative flex aspect-square h-auto w-full items-center justify-center rounded-lg">
                 <Image
                   src={template.preview}
                   alt={template.name}
                   fill
-                  className="absolute w-full h-full rounded-lg object-fit"
+                  className="object-fit absolute h-full w-full rounded-lg"
                 />
               </div>
               <h3 className="mt-2 text-lg font-semibold">{template.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {template.description}
-              </p>
+              <p className="text-muted-foreground text-sm">{template.description}</p>
             </Card>
           ))}
         </div>

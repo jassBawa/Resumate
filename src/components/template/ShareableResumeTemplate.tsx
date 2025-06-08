@@ -2,11 +2,12 @@
 import { ResumeSections } from '@/types';
 import ResumeSection from './ResumeSection';
 
+// todo: fix the limited section here
 const sectionOrder: {
   key: keyof ResumeSections;
   displayName: string;
   icon: string;
-  editable: boolean; // ✅ Add this
+  editable: boolean;
 }[] = [
   {
     key: 'contactInfo',
@@ -31,23 +32,18 @@ interface ShareableResumeTemplateProps {
 }
 function ShareableResumeTemplate({ sections }: ShareableResumeTemplateProps) {
   return (
-    <div className="max-w-3xl mx-auto flex items-center gap-4">
-      <div className="space-y-3 relative mt-4 bg-white/80 dark:bg-zinc-900 backdrop-blur-sm border dark:border-zinc-600 drop-shadow-2xl rounded-lg p-4">
+    <div className="mx-auto flex max-w-3xl items-center gap-4">
+      <div className="relative mt-4 space-y-3 rounded-lg border bg-white/80 p-4 drop-shadow-2xl backdrop-blur-sm dark:border-zinc-600 dark:bg-zinc-900">
         {sectionOrder.map(({ key, displayName, icon }) => {
           const section = sections[key];
           if (!section?.data) return null;
           return (
-            <div
-              key={key}
-              className={`relative transition-all duration-400 px-3 py-4`}
-            >
-              <ResumeSection
-                type={key}
-                data={section.data}
-                analysis={section.analysis}
-                displayName={displayName}
-                icon={icon}
-              />
+            <div key={key} className={`relative px-3 py-4 transition-all duration-400`}>
+              <div className="flex items-center gap-2">
+                <span>{icon}</span>
+                <h3>{displayName}</h3>
+              </div>
+              <ResumeSection type={key} data={section.data} />
             </div>
           );
         })}

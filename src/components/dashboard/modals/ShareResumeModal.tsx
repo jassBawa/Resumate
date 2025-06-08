@@ -1,16 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { useResumeViewStore } from '@/hooks/useResumeViewStore';
 import { updateResumeSharing } from '@/lib/actions/threads';
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
@@ -20,14 +14,17 @@ interface ShareResumeModalProps {
   isSharable: boolean;
   publicId: string;
   threadId: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function ShareResumeModal({
   isSharable,
   publicId,
   threadId,
+  isOpen,
+  onClose,
 }: ShareResumeModalProps) {
-  const { isShareModalOpen, closeShareModal } = useResumeViewStore();
   const [shareEnabled, setShareEnabled] = useState(isSharable);
   const [loading, setLoading] = useState(false);
 
@@ -54,10 +51,10 @@ export function ShareResumeModal({
   };
 
   return (
-    <Dialog open={isShareModalOpen} onOpenChange={closeShareModal}>
-      <DialogContent className="w-full max-w-sm mx-auto md:max-w-xl rounded-2xl shadow-lg">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="mx-auto w-full max-w-sm rounded-2xl shadow-lg md:max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-lg md:text-2xl font-semibold">
+          <DialogTitle className="text-lg font-semibold md:text-2xl">
             Change settings for resume access
           </DialogTitle>
         </DialogHeader>
@@ -81,7 +78,7 @@ export function ShareResumeModal({
             <div className="flex gap-2">
               <Input value={publicURL} readOnly className="flex-1" />
               <Button variant="outline" onClick={handleCopy}>
-                <Copy className="w-4 h-4" />
+                <Copy className="h-4 w-4" />
               </Button>
             </div>
           </div>

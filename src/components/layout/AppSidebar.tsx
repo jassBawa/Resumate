@@ -1,16 +1,18 @@
-import { Edit, Eye, FileText, Briefcase } from 'lucide-react';
+'use client';
+
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarHeader,
-  SidebarFooter,
 } from '@/components/ui/sidebar';
+import { Briefcase, Edit, Eye, FileText } from 'lucide-react';
 
 interface AppSidebarProps {
   activeSection: string;
@@ -55,50 +57,59 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
 
       <SidebarContent className="p-4">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-muted-foreground mb-4 text-xs font-semibold tracking-wider uppercase">
+          <SidebarGroupLabel className="mb-4 text-xs font-semibold tracking-wider text-[var(--muted-foreground)] uppercase">
             Sections
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2">
-              {sidebarItems.map(item => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={activeSection === item.id}
-                    className="w-full"
-                  >
-                    <button
+              {sidebarItems.map(item => {
+                const isActive = activeSection === item.id;
+
+                return (
+                  <SidebarMenuItem key={item.id}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      className="w-full"
                       onClick={() => setActiveSection(item.id)}
-                      className={`hover:bg-accent hover:text-accent-foreground flex items-center gap-3 rounded-lg p-3 transition-all duration-200 ${
-                        activeSection === item.id
-                          ? 'bg-primary text-primary-foreground shadow-md'
-                          : 'text-foreground'
-                      }`}
                     >
-                      <item.icon className="h-5 w-5" />
-                      <div className="text-left">
-                        <div className="font-medium">{item.title}</div>
-                        <div
-                          className={`text-xs ${
-                            activeSection === item.id
-                              ? 'text-primary-foreground/80'
-                              : 'text-muted-foreground'
+                      <div
+                        className={`group flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-3 transition-colors duration-200 ${
+                          isActive
+                            ? 'bg-indigo-600 text-white'
+                            : 'text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]'
+                        }`}
+                      >
+                        <item.icon
+                          className={`h-5 w-5 shrink-0 transition-colors duration-200 ${
+                            isActive
+                              ? 'text-white'
+                              : 'text-[var(--muted-foreground)] group-hover:text-[var(--sidebar-accent-foreground)]'
                           }`}
-                        >
-                          {item.description}
+                        />
+                        <div className="flex flex-col">
+                          <span className="leading-tight font-medium">{item.title}</span>
+                          <span
+                            className={`text-xs leading-tight transition-colors duration-200 ${
+                              isActive ? 'text-white/80' : 'text-[var(--muted-foreground)]'
+                            }`}
+                          >
+                            {item.description}
+                          </span>
                         </div>
                       </div>
-                    </button>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-4">
-        <div className="text-muted-foreground text-center text-xs">Dashboard v1.0</div>
+      <SidebarFooter className="border-t p-4 text-sm text-[var(--muted-foreground)]">
+        {/* Optional: Add footer actions here */}
+        <div className="text-center">Designed with ❤️</div>
       </SidebarFooter>
     </Sidebar>
   );

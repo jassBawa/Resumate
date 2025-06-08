@@ -6,19 +6,18 @@ import { PreviewSection } from '@/components/dashboard/sidebar-tabs/ResumePrevie
 import { JobDescriptionSection } from '@/components/dashboard/sidebar-tabs/JobDescription';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import CustomDarkToggle from '@/components/DarkToggle';
-import ResumeActionModals from '@/components/dashboard/resume/ResumeActionModals';
 import { useResumeData } from '@/hooks/useResumeData';
 
 const DashboardLayout = ({ threadId }: { threadId: string }) => {
   const [activeSection, setActiveSection] = useState('edit');
-  useResumeData(threadId);
+  const { threadData } = useResumeData(threadId);
 
   const renderActiveSection = () => {
     switch (activeSection) {
       case 'edit':
         return <EditSection />;
       case 'preview':
-        return <PreviewSection />;
+        return <PreviewSection threadData={threadData} threadId={threadId} />;
       case 'job-description':
         return <JobDescriptionSection />;
       default:
@@ -41,7 +40,6 @@ const DashboardLayout = ({ threadId }: { threadId: string }) => {
         </div>
         <div className="animate-fade-in flex-1 p-6">{renderActiveSection()}</div>
       </main>
-      <ResumeActionModals threadId={threadId} />
     </>
   );
 };
