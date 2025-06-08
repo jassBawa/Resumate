@@ -1,10 +1,9 @@
-import { Suspense } from 'react';
-import CustomDarkToggle from '@/components/DarkToggle';
 import {
+  CreateThreadButton,
   ThreadList,
   ThreadListSkeleton,
-  CreateThreadButton,
 } from '@/components/dashboard';
+import { Suspense } from 'react';
 
 export default function DashboardPage() {
   return (
@@ -16,7 +15,6 @@ export default function DashboardPage() {
             Manage and continue your resume conversations
           </p>
         </div>
-        <CustomDarkToggle />
       </div>
       <div className="relative">
         <div className="absolute inset-0 flex items-center" aria-hidden="true">

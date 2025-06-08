@@ -9,13 +9,6 @@ const getExamplesOutputPrompt = () => `
           "location": "New York, NY",
           "linkedin": "linkedin.com/in/janedoe"
         },
-        "analysis": {
-          "summary": "Contact details are complete and professional.",
-          "strengths": ["Includes LinkedIn and phone number."],
-          "weaknesses": [],
-          "suggestions": [],
-          "ATS_Fit_Score": 95
-        }
       }
 ,
     "summary":
@@ -23,13 +16,6 @@ const getExamplesOutputPrompt = () => `
       "data": {
         "summary": "Experienced Frontend Developer with a year in React.js, Redux, Next.js, JavaScript, and frontend development. Strong problem-solving skills, a commitment to clean code, and a collaborative approach. Seeking opportunities to contribute to innovative projects and deliver exceptional user experiences."
       },
-      "analysis": {
-        "summary": "Concise summary that showcases relevant experience and skills.",
-        "strengths": ["Clearly states the role and relevant technologies."],
-        "weaknesses": ["Could be more personalized with specific career goals."],
-        "suggestions": ["Mention specific types of projects or industries of interest."],
-        "ATS_Fit_Score": 90
-      }
     },
   "workExperience":
     {
@@ -46,13 +32,6 @@ const getExamplesOutputPrompt = () => `
           "duration": "August 2022 - February 2023"
         }
       ],
-      "analysis": {
-        "summary": "Experience shows progression from intern to developer, indicating growth.",
-        "strengths": ["Relevant roles that match the job target."],
-        "weaknesses": ["Lacks detailed descriptions of responsibilities or technologies used."],
-        "suggestions": ["Include specific responsibilities or impacts in roles."],
-        "ATS_Fit_Score": 87
-      }
     },
    "education":
     {
@@ -74,13 +53,6 @@ const getExamplesOutputPrompt = () => `
           "hardSkills": ["JavaScript", "React", "Node.js"],
           "softSkills": ["Communication", "Problem Solving"]
         },
-        "analysis": {
-          "summary": "Strong technical stack with good soft skills.",
-          "strengths": ["Covers popular frameworks and teamwork traits."],
-          "weaknesses": ["Could be grouped or prioritized better."],
-          "suggestions": ["Highlight top 5 most relevant skills."],
-          "ATS_Fit_Score": 88
-        }
       },
      "certifications":
     {
@@ -180,7 +152,7 @@ const getExamplesOutputPrompt = () => `
 `;
 
 export const getResumeSystemPrompt = () => `
-You are ResuMaster, an expert AI assistant with deep domain expertise in resume parsing, career profiling, and job market analysis.
+You are ResuMaster, an expert AI assistant with deep domain expertise in resume parsing, career profiling, and career coach.
 
 <system_capabilities>
   Your primary function is to analyze and extract structured information from unstructured resumes in a reliable, consistent, and human-readable format.
@@ -205,16 +177,9 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
   Each section should contain:
     {
       "data": {},
-      "analysis": {
-        "summary": "Brief impression",
-        "strengths": ["..."],
-        "weaknesses": ["..."],
-        "suggestions": ["..."],
-        "ATS_Fit_Score": 0-100
-      }
     }
 
-  Do not return separate <resumeAnalysis> blocks. Embed the analysis directly under each section tag for easier frontend linking.
+  Do not return separate <resumeAnalysis> blocks.
 
   IMPORTANT:
     - Maintain original formatting when quoting text.
@@ -230,7 +195,7 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
   When responding:
     - Always wrap the full response inside \`parsedResume\` tags.
     - Use nested tags for each section (e.g., \`workExperience\`, \`skills\`, etc.).
-    - Each section should include both "data" and "analysis" keys as described above.
+    - Each section should include both "data" key as described above.
     - Use Markdown or HTML only when specifically requested for UI rendering. Default to JSON for backend parsing.
 
   Example output:
@@ -244,17 +209,15 @@ You are ResuMaster, an expert AI assistant with deep domain expertise in resume 
 
   DO NOT include explanations of how you extracted the information unless requested.
 
-  Ensure consistency and clear separation between data and analysis for easy frontend access.
+  Ensure consistency and clear separation between data for easy frontend access.
 
-  Analysis should be inside each section's object so it can be shown on hover using floating cards.
 </ui_guidelines>
 
 Your task is to:
   1. Parse the input resume into structured JSON inside \`parsedResume\`.
-  2. Embed analysis directly under each section using the format:
+  2.
      {
        "data": {},
-       "analysis": { ... }
      }
 
 📌 Ensure the JSON is **valid**, **strict**, and **parsable**. No markdown, extra formatting, or explanations.
@@ -301,13 +264,6 @@ Your output must follow this structure:
   "response": "A short, friendly summary or introduction of the section.",
   "<SECTION_ID>": {
     "data": [...],
-    "analysis": {
-      "summary": "Brief overview of this section's effectiveness.",
-      "strengths": ["Clear, specific highlights"],
-      "weaknesses": ["Any key missing info or lack of detail"],
-      "suggestions": ["Actionable improvements"],
-      "ATS_Fit_Score": <integer from 0 to 100>
-    }
   }
 }
 
@@ -342,13 +298,6 @@ Your output must follow this structure:
         "duration": "Aug 2022 - Feb 2023"
       }
     ],
-    "analysis": {
-      "summary": "Demonstrates steady career growth and initiative.",
-      "strengths": ["Good progression in roles", "CI/CD experience"],
-      "weaknesses": ["Internship lacks technical details"],
-      "suggestions": ["Add technologies or impact statements to internship"],
-      "ATS_Fit_Score": 87
-    }
   }
 }
 
@@ -366,13 +315,6 @@ Your output must follow this structure:
         "cgpa": "8.6"
       }
     ],
-    "analysis": {
-      "summary": "Solid academic background with a strong GPA.",
-      "strengths": ["Well-known degree", "Clear dates"],
-      "weaknesses": ["No mention of coursework or projects"],
-      "suggestions": ["List a few relevant courses or academic projects"],
-      "ATS_Fit_Score": 82
-    }
   }
 }
 
@@ -390,13 +332,6 @@ Your output must follow this structure:
           "technologies": ["React", "Node.js", "GPT-4", "MongoDB"]
         }
       ],
-    "analysis": {
-      "summary": "Solid academic background with a strong GPA.",
-      "strengths": ["Well-known degree", "Clear dates"],
-      "weaknesses": ["No mention of coursework or projects"],
-      "suggestions": ["List a few relevant courses or academic projects"],
-      "ATS_Fit_Score": 82
-    }
   }
 }
 
@@ -422,7 +357,6 @@ You are ResuMaster, an AI resume optimizer trained in editing, enhancing, and ta
   You must:
     - Preserve the structure of the parsed resume JSON as returned by \`getResumeSystemPrompt\`
     - Only modify the sections relevant to the user's instructions
-    - Maintain all analysis blocks under each section and update them if the underlying data changes
     - Keep all text professionally written and formatted
     - Never invent new experience, dates, or skills unless the user explicitly asks you to
 

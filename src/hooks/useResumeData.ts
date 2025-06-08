@@ -13,6 +13,7 @@ export interface ThreadData {
 }
 
 export const useResumeData = (threadId: string) => {
+  console.log(threadId);
   const [loading, setLoading] = useState(true);
   const [threadData, setThreadData] = useState<ThreadData>({} as ThreadData);
   const { setResumeSections, setOriginalSections } = useResumeStore();
