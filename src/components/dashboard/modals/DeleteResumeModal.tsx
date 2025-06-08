@@ -8,24 +8,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useResumeViewStore } from '@/hooks/useResumeViewStore';
+import { deleteResume } from '@/lib/actions/resume';
 import { Loader2 } from 'lucide-react';
-import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DeleteResumeModalProps {
-  isDeleteDialogOpen: boolean;
-  isDeleting: boolean;
-  handleDelete: () => void;
-  setIsDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  threadId: string;
 }
 
-export function DeleteResumeModal({
-  isDeleteDialogOpen,
-  setIsDeleteDialogOpen,
-  isDeleting,
-  handleDelete,
-}: DeleteResumeModalProps) {
+export function DeleteResumeModal({ threadId }: DeleteResumeModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+
+  const { closeDeleteDialog, isDeleteDialogOpen } = useResumeViewStore();
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteResume(threadId);
+
+      if (result.success) {
+        toast.success('Resume deleted successfully');
+        router.push('/dashboard');
+        closeDeleteDialog();
+      } else {
+        toast.error(result.error || 'Failed to delete resume');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   return (
-    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+    <AlertDialog open={isDeleteDialogOpen} onOpenChange={closeDeleteDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>

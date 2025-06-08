@@ -13,15 +13,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useResumeStore } from '@/hooks/useResumeStore';
+import { useResumeViewStore } from '@/hooks/useResumeViewStore';
 import { pdf } from '@react-pdf/renderer';
 import FileSaver from 'file-saver';
 import Image, { StaticImageData } from 'next/image';
 import { useEffect, useState } from 'react';
-
-interface TemplateSelectionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 type TemplateId = 'modern' | 'classic' | 'minimal' | 'creative';
 
@@ -58,10 +54,7 @@ const templates: Template[] = [
   },
 ];
 
-export function TemplateSelectionModal({
-  isOpen,
-  onClose,
-}: TemplateSelectionModalProps) {
+export function TemplateSelectionModal() {
   const { resumeSections } = useResumeStore();
   const [selectedTemplate, setSelectedTemplate] =
     useState<TemplateId>('modern');
@@ -69,6 +62,8 @@ export function TemplateSelectionModal({
   const handleSelect = (templateId: TemplateId) => {
     setSelectedTemplate(templateId);
   };
+
+  const { isTemplateModalOpen, closeTemplateModal } = useResumeViewStore();
 
   const generatePdfDocument = async () => {
     try {
@@ -82,20 +77,20 @@ export function TemplateSelectionModal({
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {
-      onClose();
+      closeTemplateModal();
     }
   };
 
   useEffect(() => {
-    if (!isOpen) {
+    if (!isTemplateModalOpen) {
       setTimeout(() => {
         document.body.style.pointerEvents = 'auto';
       }, 200);
     }
-  }, [isOpen]);
+  }, [isTemplateModalOpen]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isTemplateModalOpen} onOpenChange={closeTemplateModal}>
       <DialogContent className="w-full max-w-sm mx-auto md:max-w-6xl">
         <DialogHeader>
           <DialogTitle>Select a Template</DialogTitle>

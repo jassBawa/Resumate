@@ -1,27 +1,13 @@
-import { SectionAnalysis } from '@/types';
-
 interface ResumeSectionProps {
   type: string;
   data: any;
-  analysis: SectionAnalysis | null;
-  displayName: string;
-  icon: string;
 }
 
-export default function ResumeSection({
-  type,
-  data,
-  displayName,
-  icon,
-}: ResumeSectionProps) {
+export default function ResumeSection({ type, data }: ResumeSectionProps) {
   switch (type) {
     case 'contactInfo':
       return (
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{icon}</span>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-          </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
               <p className="font-medium">{data.name}</p>
@@ -48,10 +34,6 @@ export default function ResumeSection({
     case 'summary':
       return (
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{icon}</span>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-          </div>
           <p className="text-muted-foreground">{data.summary}</p>
         </div>
       );
@@ -59,10 +41,6 @@ export default function ResumeSection({
     case 'skills':
       return (
         <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{icon}</span>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-          </div>
           <div className="flex flex-wrap gap-2">
             {data.hardSkills.map((skill: string, index: number) => (
               <span
@@ -79,10 +57,6 @@ export default function ResumeSection({
     case 'workExperience':
       return (
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{icon}</span>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-          </div>
           {data.map((job: any, index: number) => (
             <div key={index} className="space-y-2">
               <div className="flex items-start justify-between">
@@ -125,10 +99,6 @@ export default function ResumeSection({
     case 'education':
       return (
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{icon}</span>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-          </div>
           {data.map((edu: any, index: number) => (
             <div key={index} className="space-y-2">
               <div className="flex items-start justify-between">
@@ -155,10 +125,6 @@ export default function ResumeSection({
     case 'projects':
       return (
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">{icon}</span>
-            <h2 className="text-xl font-semibold">{displayName}</h2>
-          </div>
           {data.map((project: any, index: number) => (
             <div key={index} className="space-y-2">
               <div>

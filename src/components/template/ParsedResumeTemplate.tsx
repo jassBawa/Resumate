@@ -1,9 +1,7 @@
 'use client';
 import { ResumeSections } from '@/types';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Button } from '../ui/button';
-import AnalysisCard from './AnalysisCard';
 import ResumeSection from './ResumeSection';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useResumeStore } from '@/hooks/useResumeStore';
@@ -12,7 +10,7 @@ const sectionOrder: {
   key: keyof ResumeSections;
   displayName: string;
   icon: string;
-  editable: boolean; // ✅ Add this
+  editable: boolean;
 }[] = [
   {
     key: 'contactInfo',
@@ -32,13 +30,7 @@ const sectionOrder: {
   { key: 'education', displayName: 'Education', icon: '🎓', editable: false },
 ];
 
-interface ParsedResumeTemplateProps {
-  showAnalysis: boolean;
-}
-function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
-  const [hoveredSection, setHoveredSection] = useState<
-    keyof ResumeSections | null
-  >(null);
+function ParsedResumeTemplate() {
   const [editingSection, setEditingSection] = useState<
     keyof ResumeSections | null
   >(null);
@@ -75,9 +67,7 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
       });
 
       const data = await res.json();
-
       updateSection(sectionId, data.section);
-
       setAIResponse(data.response);
     } catch (err) {
       console.error(err);
@@ -100,48 +90,38 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
     editingSection &&
     JSON.stringify(resumeSections[editingSection]) !==
       JSON.stringify(originalSectionsMap[editingSection]);
+
   return (
-    <div className="flex items-center max-w-3xl gap-4 mx-auto">
-      <div className="relative p-4 mt-4 space-y-3 border rounded-lg bg-white/80 dark:bg-zinc-900 backdrop-blur-sm dark:border-zinc-600 drop-shadow-2xl">
+    <div className="mt-4 max-w-3xl mx-auto w-full px-2 sm:px-4 md:px-8">
+      <div className=" border-r border-l rounded-xl px-4 border-gray-200  divide-y divide-gray-200 dark:divide-zinc-800">
         {sectionOrder.map(({ key, displayName, icon, editable }) => {
           const section = resumeSections[key];
           if (!section?.data) return null;
 
           return (
-            <div
-              key={key}
-              onMouseEnter={() => setHoveredSection(key)}
-              onMouseLeave={() => setHoveredSection(null)}
-              className={`relative transition-all duration-400 px-3 py-4 ${
-                hoveredSection === key
-                  ? 'bg-gray-200 dark:bg-zinc-700/50 rounded-lg'
-                  : ''
-              }`}
-            >
+            <div key={key} className="relative py-8">
               {editable && (
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      setTempMessage('');
-                      setAIResponse('');
-                      setEditingSection(key);
-                      setOriginalSectionsMap((prev) => ({
-                        ...prev,
-                        [key]: resumeSections[key],
-                      }));
-                    }}
-                    className="absolute top-0 right-0 px-2 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-zinc-700"
-                    title="Edit this section"
-                  >
-                    ✏️
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    setTempMessage('');
+                    setAIResponse('');
+                    setEditingSection(key);
+                    setOriginalSectionsMap((prev) => ({
+                      ...prev,
+                      [key]: resumeSections[key],
+                    }));
+                  }}
+                  className="absolute top-4 right-0 p-2 text-sm rounded-full hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+                  title="Edit this section"
+                >
+                  ✏️
+                </button>
               )}
 
               {editable && editingSection === key && (
                 <div
                   ref={chatRef}
-                  className="absolute z-30 p-4 space-y-3 bg-white border shadow-xl top-2 right-2 dark:bg-zinc-800 dark:border-zinc-600 rounded-xl w-80"
+                  className="absolute z-30 p-4 space-y-3 bg-white dark:bg-zinc-800 border dark:border-zinc-700 shadow-xl top-12 right-0 rounded-xl w-80"
                 >
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Editing &quot;{displayName}&quot;
@@ -150,7 +130,7 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
                     type="text"
                     value={tempMessage}
                     onChange={(e) => setTempMessage(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border rounded dark:bg-zinc-700 dark:text-white"
+                    className="w-full px-3 py-2 text-sm border rounded dark:bg-zinc-700 dark:text-white dark:border-zinc-600"
                     placeholder="e.g. Improve bullet points, add more achievements"
                     disabled={isSubmitting}
                   />
@@ -201,29 +181,15 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
                   </div>
                 </div>
               )}
-              <ResumeSection
-                type={key}
-                data={section.data}
-                analysis={section.analysis}
-                displayName={displayName}
-                icon={icon}
-              />
 
-              <AnimatePresence>
-                {hoveredSection === key && section.analysis && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                    className="hidden transition-opacity sm:block absolute z-20 sm:left-1/2 md:left-[60%] top-0 lg:left-full lg:ml-8 w-72 shadow-2xl"
-                  >
-                    {showAnalysis && (
-                      <AnalysisCard analysis={section.analysis} />
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xl">{icon}</span>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  {displayName}
+                </h3>
+              </div>
+
+              <ResumeSection type={key} data={section.data} />
             </div>
           );
         })}

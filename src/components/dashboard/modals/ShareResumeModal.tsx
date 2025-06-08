@@ -10,26 +10,24 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { useResumeViewStore } from '@/hooks/useResumeViewStore';
 import { updateResumeSharing } from '@/lib/actions/threads';
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 interface ShareResumeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   isSharable: boolean;
   publicId: string;
   threadId: string;
 }
 
 export function ShareResumeModal({
-  isOpen,
-  onClose,
   isSharable,
   publicId,
   threadId,
 }: ShareResumeModalProps) {
+  const { isShareModalOpen, closeShareModal } = useResumeViewStore();
   const [shareEnabled, setShareEnabled] = useState(isSharable);
   const [loading, setLoading] = useState(false);
 
@@ -56,7 +54,7 @@ export function ShareResumeModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isShareModalOpen} onOpenChange={closeShareModal}>
       <DialogContent className="w-full max-w-sm mx-auto md:max-w-xl rounded-2xl shadow-lg">
         <DialogHeader>
           <DialogTitle className="text-lg md:text-2xl font-semibold">
