@@ -14,7 +14,6 @@ import { useResumeKeyboardShortcuts } from '@/hooks/useResumeKeyboardShortcuts';
 import { useResumeSave } from '@/hooks/useResumeSave';
 import { useResumeStore } from '@/hooks/useResumeStore';
 
-import { ChatInterface } from '../../resume/ChatInterface';
 import { ResumeSkeleton } from '../../resume/ResumeSkelton';
 import { ResumeHeader } from './ResumeHeader';
 import { ResumePreview } from './ResumePreview';
@@ -50,15 +49,8 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({ threadId }) => {
     switch (activeView) {
       case 'preview':
         return (
-          <div className="flex flex-col h-full">
-            <div className="">
-              <ResumePreview
-                // threadData={threadData}
-                // threadId={threadId}
-                isRefreshing={false}
-              />
-            </div>
-            <ChatInterface />
+          <div className="flex flex-col h-full py-8">
+            <ResumePreview isRefreshing={false} />
           </div>
         );
       case 'edit':
@@ -90,7 +82,7 @@ const ResumeContainer: React.FC<ResumeContainerProps> = ({ threadId }) => {
             setActiveView={setActiveView}
           />
         </div>
-        <div className="flex-1 min-w-0 bg-background dark:bg-neutral-900 shadow-[0_4px_16px_rgba(0,0,0,0.05)] rounded-xl">
+        <div className="flex-1 min-w-0 bg-white/90 dark:bg-zinc-900/60 border border-gray-200 dark:border-zinc-800 shadow-xl shadow-blue-900/20 backdrop-blur-md rounded-2xl text-zinc-900 dark:text-zinc-100 transition-all">
           {renderContent()}
         </div>
       </div>

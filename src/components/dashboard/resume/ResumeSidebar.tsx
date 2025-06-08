@@ -42,7 +42,7 @@ export const ResumeSidebar: React.FC<ResumeSidebarProps> = ({
     },
     {
       id: 'analysis',
-      label: 'Analysis',
+      label: 'JD (analysis)',
       icon: '📊',
     },
   ] as const;
@@ -76,7 +76,7 @@ export const ResumeSidebar: React.FC<ResumeSidebarProps> = ({
   ];
 
   return (
-    <div className="h-[calc(100vh-8rem)] bg-white dark:bg-neutral-900  border dark:border-neutral-600 flex flex-col p-4 backdrop-blur-sm rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.05)] dark:shadow-black/20">
+    <div className="h-[calc(100vh-8rem)] bg-white/90 dark:bg-zinc-900/70 border border-gray-200 dark:border-zinc-800 flex flex-col p-4 backdrop-blur-md rounded-2xl shadow-lg shadow-black/30 text-zinc-900 dark:text-zinc-100 transition-all">
       <div className=" backdrop-blur-sm rounded-lg p-2">
         <div className="px-3 py-2">
           <h2 className="text-lg font-semibold tracking-tight text-foreground">
