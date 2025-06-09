@@ -9,8 +9,14 @@ import { VersionModal } from '../modals/VersionModal';
 import { ShareResumeModal } from '../modals/ShareResumeModal';
 import { SaveTitleDialog } from '../resume/ResumeSaveModal';
 import { useHasUnsavedChanges } from '@/hooks/useHasUnsavedChanges';
+import { ThreadData } from '@/hooks/useResumeData';
 
-export function PreviewSection({ threadData, threadId }) {
+interface PreviewSectionProps {
+  threadData: ThreadData;
+  threadId: string;
+}
+
+export function PreviewSection({ threadData, threadId }: PreviewSectionProps) {
   const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [saveVersionOpen, setSaveVersionOpen] = useState(false);

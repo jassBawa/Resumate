@@ -1,126 +1,18 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import { Globe, Edit, Plus, Sparkles, Trash2 } from 'lucide-react';
-import { useResumeStore } from '@/hooks/useResumeStore';
-import { toast } from 'sonner';
+import { useState } from 'react';
 
-interface Project {
+import { useResumeStore } from '@/hooks/useResumeStore';
+import { Edit, Globe, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import ProjectModal from './ProjectModal';
+
+export interface Project {
   name: string;
   description: string;
   url?: string;
   technologies?: string[];
 }
-
-interface ProjectModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  project: Project | null;
-  onSave: (project: Project) => void;
-  index: number;
-}
-
-const ProjectModal = ({ isOpen, onClose, project, onSave, index }: ProjectModalProps) => {
-  const [formData, setFormData] = useState<Project>(
-    () =>
-      project || {
-        name: '',
-        description: '',
-        url: '',
-        technologies: [],
-      }
-  );
-
-  useEffect(() => {
-    if (project) {
-      setFormData(project);
-    }
-  }, [project]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-    onClose();
-    toast.success(`Project ${project ? 'updated' : 'added'} successfully`);
-  };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>{project ? 'Edit Project' : 'Add Project'}</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Project Name</Label>
-            <Input
-              id="name"
-              placeholder="My Awesome Project"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe your project and its key features..."
-              className="min-h-[100px]"
-              value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="url">Project URL</Label>
-            <Input
-              id="url"
-              placeholder="https://github.com/username/project"
-              value={formData.url || ''}
-              onChange={e => setFormData({ ...formData, url: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="technologies">Technologies Used</Label>
-            <Textarea
-              id="technologies"
-              placeholder="Enter technologies used, separated by commas"
-              className="min-h-[100px]"
-              value={formData.technologies?.join(', ') || ''}
-              onChange={e => {
-                const techs = e.target.value
-                  .split(',')
-                  .map(tech => tech.trim())
-                  .filter(tech => tech);
-                setFormData(prev => ({ ...prev, technologies: techs }));
-              }}
-            />
-            <p className="text-muted-foreground text-sm">
-              Type technologies and separate them with commas
-            </p>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit">Save Project</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-};
 
 export function ProjectsForm() {
   const { resumeSections, updateSection } = useResumeStore();

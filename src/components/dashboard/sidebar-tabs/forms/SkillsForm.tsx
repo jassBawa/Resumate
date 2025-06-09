@@ -6,9 +6,12 @@ import { useResumeStore } from '@/hooks/useResumeStore';
 import { toast } from 'sonner';
 import { SectionAnalysis } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
 
 export function SkillsForm() {
   const { resumeSections, updateSection } = useResumeStore();
+  const [hardSkillsInput, setHardSkillsInput] = useState('');
+  const [softSkillsInput, setSoftSkillsInput] = useState('');
 
   const defaultSkills = {
     hardSkills: [] as string[],
@@ -28,19 +31,54 @@ export function SkillsForm() {
     ...resumeSections.skills?.data,
   });
 
-  const handleSkillsChange = (type: 'hardSkills' | 'softSkills', value: string) => {
-    const skills = value
+  const processSkillsInput = (type: 'hardSkills' | 'softSkills', value: string) => {
+    const currentSkills = getCurrentSkills();
+    const newSkills = value
       .split(',')
       .map(skill => skill.trim())
       .filter(skill => skill.length > 0);
 
+    // Combine existing skills with new ones and remove duplicates
+    const combinedSkills = [...new Set([...currentSkills[type], ...newSkills])];
+
     updateSection('skills', {
       data: {
-        ...getCurrentSkills(),
-        [type]: skills,
+        ...currentSkills,
+        [type]: combinedSkills,
       },
       analysis: resumeSections.skills?.analysis || defaultAnalysis,
     });
+
+    // Clear the input after processing
+    if (type === 'hardSkills') {
+      setHardSkillsInput('');
+    } else {
+      setSoftSkillsInput('');
+    }
+  };
+
+  const handleSkillsChange = (type: 'hardSkills' | 'softSkills', value: string) => {
+    if (type === 'hardSkills') {
+      setHardSkillsInput(value);
+    } else {
+      setSoftSkillsInput(value);
+    }
+  };
+
+  const handleSkillsBlur = (type: 'hardSkills' | 'softSkills') => {
+    const value = type === 'hardSkills' ? hardSkillsInput : softSkillsInput;
+    processSkillsInput(type, value);
+  };
+
+  const handleKeyDown = (
+    type: 'hardSkills' | 'softSkills',
+    e: React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const value = type === 'hardSkills' ? hardSkillsInput : softSkillsInput;
+      processSkillsInput(type, value);
+    }
   };
 
   const handleRemoveSkill = (type: 'hardSkills' | 'softSkills', skillToRemove: string) => {
@@ -86,19 +124,15 @@ export function SkillsForm() {
             <Label className="text-base">Hard Skills</Label>
             <Textarea
               id="hardSkills"
-              placeholder="Enter hard skills, separated by commas"
+              placeholder="Type hard skills and press Enter or click outside to add them"
               className="min-h-[100px]"
-              value={getCurrentSkills().hardSkills.join(', ')}
-              onChange={e => {
-                const skills = e.target.value
-                  .split(',')
-                  .map(skill => skill.trim())
-                  .filter(skill => skill);
-                handleSkillsChange('hardSkills', skills.join(', '));
-              }}
+              value={hardSkillsInput}
+              onChange={e => handleSkillsChange('hardSkills', e.target.value)}
+              onBlur={() => handleSkillsBlur('hardSkills')}
+              onKeyDown={e => handleKeyDown('hardSkills', e)}
             />
             <p className="text-muted-foreground text-sm">
-              Type skills and separate them with commas
+              Type skills and press Enter or click outside to add them
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -120,19 +154,15 @@ export function SkillsForm() {
             <Label className="text-base">Soft Skills</Label>
             <Textarea
               id="softSkills"
-              placeholder="Enter soft skills, separated by commas"
+              placeholder="Type soft skills and press Enter or click outside to add them"
               className="min-h-[100px]"
-              value={getCurrentSkills().softSkills.join(', ')}
-              onChange={e => {
-                const skills = e.target.value
-                  .split(',')
-                  .map(skill => skill.trim())
-                  .filter(skill => skill);
-                handleSkillsChange('softSkills', skills.join(', '));
-              }}
+              value={softSkillsInput}
+              onChange={e => handleSkillsChange('softSkills', e.target.value)}
+              onBlur={() => handleSkillsBlur('softSkills')}
+              onKeyDown={e => handleKeyDown('softSkills', e)}
             />
             <p className="text-muted-foreground text-sm">
-              Type skills and separate them with commas
+              Type skills and press Enter or click outside to add them
             </p>
           </div>
           <div className="flex flex-wrap gap-2">

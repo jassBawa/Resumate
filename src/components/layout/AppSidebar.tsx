@@ -70,29 +70,15 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
                     <SidebarMenuButton
                       asChild
                       isActive={isActive}
-                      className="w-full"
+                      className="h-auto w-full"
                       onClick={() => setActiveSection(item.id)}
                     >
-                      <div
-                        className={`group flex w-full cursor-pointer items-center gap-3 rounded-md px-3 py-3 transition-colors duration-200 ${
-                          isActive
-                            ? 'bg-indigo-600 text-white'
-                            : 'text-[var(--sidebar-foreground)] hover:bg-[var(--sidebar-accent)] hover:text-[var(--sidebar-accent-foreground)]'
-                        }`}
-                      >
-                        <item.icon
-                          className={`h-5 w-5 shrink-0 transition-colors duration-200 ${
-                            isActive
-                              ? 'text-white'
-                              : 'text-[var(--muted-foreground)] group-hover:text-[var(--sidebar-accent-foreground)]'
-                          }`}
-                        />
+                      <div className={`group cursor-pointer`}>
+                        <item.icon className={`h-5 w-5 shrink-0 transition-colors duration-200`} />
                         <div className="flex flex-col">
-                          <span className="leading-tight font-medium">{item.title}</span>
+                          <span className="text-sm leading-tight font-medium">{item.title}</span>
                           <span
-                            className={`text-xs leading-tight transition-colors duration-200 ${
-                              isActive ? 'text-white/80' : 'text-[var(--muted-foreground)]'
-                            }`}
+                            className={`text-[10px] leading-tight transition-colors duration-200`}
                           >
                             {item.description}
                           </span>

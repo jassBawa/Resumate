@@ -31,7 +31,7 @@ interface EducationModalProps {
   index: number;
 }
 
-const EducationModal = ({ isOpen, onClose, education, onSave, index }: EducationModalProps) => {
+const EducationModal = ({ isOpen, onClose, education, onSave }: EducationModalProps) => {
   const [formData, setFormData] = useState<Education>(
     () =>
       education || {

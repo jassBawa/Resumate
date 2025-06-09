@@ -16,30 +16,26 @@ export function EditSection() {
       id: 'contactInfo',
       title: 'Contact Info',
       icon: User,
-      description: 'Personal contact information',
     },
-    { id: 'summary', title: 'Summary', icon: Edit, description: 'Professional summary' },
+    { id: 'summary', title: 'Summary', icon: Edit },
     {
       id: 'workExperience',
       title: 'Work Experience',
       icon: Briefcase,
-      description: 'Employment history',
     },
     {
       id: 'education',
       title: 'Education',
       icon: GraduationCap,
-      description: 'Academic background',
     },
-    { id: 'skills', title: 'Skills', icon: Award, description: 'Technical & soft skills' },
-    { id: 'projects', title: 'Projects', icon: Globe, description: 'Notable projects' },
+    { id: 'skills', title: 'Skills', icon: Award },
+    { id: 'projects', title: 'Projects', icon: Globe },
     {
       id: 'certifications',
       title: 'Certifications',
       icon: Award,
-      description: 'Professional certifications',
     },
-    { id: 'awards', title: 'Awards', icon: Award, description: 'Recognition & awards' },
+    { id: 'awards', title: 'Awards', icon: Award },
   ];
 
   const renderActiveForm = () => {
@@ -96,7 +92,6 @@ export function EditSection() {
                   <section.icon className="h-4 w-4" />
                   <div>
                     <p className="font-medium">{section.title}</p>
-                    <p className="text-muted-foreground text-sm">{section.description}</p>
                   </div>
                 </button>
               ))}
