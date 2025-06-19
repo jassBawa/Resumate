@@ -1,11 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Sparkles } from 'lucide-react';
-import { useResumeStore } from '@/hooks/useResumeStore';
-import { toast } from 'sonner';
-import { SectionAnalysis } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { useResumeStore } from '@/hooks/useResumeStore';
 import { useState } from 'react';
 
 export function SkillsForm() {
@@ -16,14 +12,6 @@ export function SkillsForm() {
   const defaultSkills = {
     hardSkills: [] as string[],
     softSkills: [] as string[],
-  };
-
-  const defaultAnalysis: SectionAnalysis = {
-    summary: '',
-    strengths: [],
-    weaknesses: [],
-    suggestions: [],
-    ATS_Fit_Score: 0,
   };
 
   const getCurrentSkills = () => ({
@@ -46,7 +34,6 @@ export function SkillsForm() {
         ...currentSkills,
         [type]: combinedSkills,
       },
-      analysis: resumeSections.skills?.analysis || defaultAnalysis,
     });
 
     // Clear the input after processing
@@ -89,7 +76,6 @@ export function SkillsForm() {
         ...currentSkills,
         [type]: updatedSkills,
       },
-      analysis: resumeSections.skills?.analysis || defaultAnalysis,
     });
   };
 
@@ -107,14 +93,14 @@ export function SkillsForm() {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Skills</h3>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => toast.info('AI optimization coming soon!')}
           >
             <Sparkles className="mr-2 h-4 w-4" />
             AI Optimize
-          </Button>
+          </Button> */}
         </div>
       </div>
 

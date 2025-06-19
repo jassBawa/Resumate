@@ -1,88 +1,77 @@
 import { NextResponse } from 'next/server';
 import openai from '@/lib/openai';
-import {
-  getCoverLetterSystemPrompt,
-  getDefaultSystemPrompt,
-  getResumeSystemPrompt,
-} from '@/config/prompts';
+import { prisma } from '@/lib/prisma';
 
-export async function POST(request: Request) {
+const ASSISTANT_ID = 'asst_NmnAT6X8r7W50310h1Mm56S2';
+
+export async function POST(req: Request) {
   try {
-    const { message, conversationHistory, resumeText } = await request.json();
+    const { message, threadId } = await req.json();
 
-    if (!resumeText || !message) {
-      return NextResponse.json(
-        { error: 'Fields are missing' },
-        { status: 400 }
-      );
+    if (!message || !threadId) {
+      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
-
-    let systemPrompt = getDefaultSystemPrompt();
-    const userPrompt = `Here is the resume content for context:\n\n${resumeText}`;
-    let commandInstruction = '';
-    const isModify = message.startsWith('/modify');
-    const isCoverLetter = message.startsWith('/cover-letter');
-
-    if (isModify) {
-      systemPrompt = getResumeSystemPrompt();
-      commandInstruction = `
-        ${message}
-        Return a JSON object with:
-        {
-          "response": "Short summary message",
-          "parsedResume": { ...parsed content... }
-        }
-      `;
-    } else if (isCoverLetter) {
-      systemPrompt = getCoverLetterSystemPrompt();
-      commandInstruction = `
-        ${message}
-        Return a JSON object with:
-        {
-          "response": "Tailored cover letter as a string"
-        }
-      `;
-    } else {
-      commandInstruction = `
-        ${message}
-        Return a JSON object with:
-        {
-          "response": "Answer as a string"
-        }
-      `;
-    }
-
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userPrompt },
-      ...conversationHistory,
-      { role: 'user', content: commandInstruction },
-    ];
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages,
-      temperature: 0.7,
+    const thread = await prisma.thread.findUnique({
+      where: { id: threadId },
     });
 
-    const responseContent = completion.choices[0].message.content;
-    if (!responseContent) {
-      return NextResponse.json(
-        { error: 'No response from OpenAI' },
-        { status: 500 }
-      );
+    if (!thread) {
+      return;
     }
-    const parsed = JSON.parse(responseContent);
+    // const openaiThread = await openai.beta.threads.create();
+    // console.log(JSON);
+    // const openaiThreadId = thread.openaiThreadId as string;
+    // console.log(openaiThreadId);
+    const openaiThreadId = 'thread_YCi6ThGpqyE9myCxK5obpMTi';
+    // // Step 1: Add user message to the assistant thread
+    // const result = await openai.beta.threads.messages.create(openaiThreadId, {
+    //   role: 'user',
+    //   content: message,
+    // });
 
-    return NextResponse.json({
-      response: parsed.response,
-      parsedSections: parsed.parsedResume || undefined,
+    // if(result.content[0].type);
+
+    // // Step 2: Run the assistant
+    const run = await openai.beta.threads.runs.create(openaiThreadId, {
+      assistant_id: ASSISTANT_ID,
     });
+
+    // // Step 3: Poll for completion
+    let status = run.status;
+    let runResult = run;
+
+    while (status === 'queued' || status === 'in_progress') {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      runResult = await openai.beta.threads.runs.retrieve(openaiThreadId, run.id);
+      status = runResult.status;
+    }
+
+    if (status !== 'completed') {
+      return NextResponse.json({ error: 'Assistant failed to complete' }, { status: 500 });
+    }
+
+    // // Step 4: Fetch messages from the thread
+    const messages = await openai.beta.threads.messages.list(openaiThreadId, { limit: 1 });
+    const last = messages.data[0]?.content?.[0];
+    console.log(message, last);
+
+    if (!last || last.type !== 'text') {
+      return NextResponse.json({ error: 'Invalid response format' }, { status: 500 });
+    }
+
+    // // Step 5: Parse assistant response
+    const contentRes = last.text.value.trim();
+    const parsed = JSON.parse(contentRes);
+    console.log(parsed);
+    if (!parsed || typeof parsed !== 'object') {
+      return NextResponse.json({ error: 'Failed to parse assistant response' }, { status: 500 });
+    }
+
+    const { type, content, parsedResume } = parsed;
+    console.log(parsedResume);
+    return NextResponse.json({ type, content, parsedResume });
   } catch (error: any) {
     console.error('Error in chat API:', error);
-    return NextResponse.json(
-      { error: error.message || 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }

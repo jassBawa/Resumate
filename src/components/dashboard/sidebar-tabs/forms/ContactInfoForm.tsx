@@ -1,9 +1,7 @@
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, MapPin, Phone, Sparkles } from 'lucide-react';
 import { useResumeStore } from '@/hooks/useResumeStore';
-import { toast } from 'sonner';
+import { Mail, MapPin, Phone } from 'lucide-react';
 
 interface ContactInfo {
   name: string;
@@ -33,10 +31,10 @@ export function ContactInfoForm() {
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-medium">Contact Information</h3>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => toast.info('AI editing coming soon!')}>
+          {/* <Button variant="outline" size="sm" onClick={() => toast.info('AI editing coming soon!')}>
             <Sparkles className="mr-2 h-4 w-4" />
             AI Edit
-          </Button>
+          </Button> */}
         </div>
       </div>
 

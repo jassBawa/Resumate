@@ -31,24 +31,24 @@ export default function CreateThreadButton() {
     try {
       await createThread(title);
       toast('Thread created', {
-        description: 'Your new thread has been created successfully.',
+        description: 'Your new resume has been created successfully.',
       });
       setOpen(false);
     } catch (error) {
       console.error('Error: ', error);
-      toast.error('Failed to create thread. Please try again.');
+      toast.error('Failed to create resume. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="fixed bottom-6 right-6">
+    <div className="fixed right-6 bottom-6">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button size="lg" className="rounded-full h-14 w-14 shadow-lg">
+          <Button size="lg" className="h-14 w-14 rounded-full shadow-lg">
             <Plus className="h-6 w-6" />
-            <span className="sr-only">Create new thread</span>
+            <span className="sr-only">Create new resume</span>
           </Button>
         </DialogTrigger>
         <DialogContent>
@@ -66,7 +66,7 @@ export default function CreateThreadButton() {
                   id="title"
                   placeholder="Full-Stack Developer"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+                  onChange={e => setTitle(e.target.value)}
                   autoFocus
                 />
               </div>

@@ -37,7 +37,7 @@ export async function parseAndStoreResume(threadId: string) {
     thread.fileId
   );
 
-  const resumeText = fileContent?.data.map((item) => item.text).join('\n');
+  const resumeText = fileContent?.data.map(item => item.text).join('\n');
   if (!resumeText) {
     throw new Error('Resume text not found');
   }
@@ -64,24 +64,31 @@ export async function parseAndStoreResume(threadId: string) {
     throw new Error('Failed to parse <parsedResume> block');
   }
 
-  // Save parsed sections to the database
-  await prisma.thread.update({
-    where: { id: thread.id },
-    data: {
-      parsedSections: parsedResumeJSON,
-      resumeText: resumeText,
-    },
-  });
-
   // Create first diff version (from empty object {})
-  const initialDiff = JSON.parse(
-    JSON.stringify(createDiff({}, parsedResumeJSON))
-  );
+  const initialDiff = JSON.parse(JSON.stringify(createDiff({}, parsedResumeJSON)));
   const version = await prisma.resumeVersion.create({
     data: {
       threadId: thread.id,
       diff: initialDiff,
       title: 'Initial full version',
+    },
+  });
+
+  // Create new assistant thread
+  const openaiThread = await openai.beta.threads.create();
+  // Add the new parsedSections as first message to thread
+
+  const openaiThreadRes = await openai.beta.threads.messages.create(openaiThread.id, {
+    role: 'user',
+    content: `This is my updated resume in JSON:\n\n${JSON.stringify(parsedResumeJSON)}`,
+  });
+
+  await prisma.thread.update({
+    where: { id: thread.id },
+    data: {
+      parsedSections: parsedResumeJSON,
+      resumeText: resumeText,
+      openaiThreadId: openaiThreadRes.thread_id,
     },
   });
 
@@ -115,6 +122,15 @@ export async function updateResumeSections(
     return { updatedAt: new Date().toISOString(), skipped: true };
   }
 
+  // Create new assistant thread
+  const openaiThread = await openai.beta.threads.create();
+
+  // Add the new parsedSections as first message to thread
+  const openaiRes = await openai.beta.threads.messages.create(openaiThread.id, {
+    role: 'user',
+    content: `This is my updated resume in JSON:\n\n${JSON.stringify(newSections)}`,
+  });
+
   await prisma.resumeVersion.create({
     data: {
       threadId,
@@ -125,7 +141,11 @@ export async function updateResumeSections(
 
   const result = await prisma.thread.update({
     where: { id: threadId },
-    data: { parsedSections: newSections, updatedAt: new Date() },
+    data: {
+      parsedSections: newSections,
+      updatedAt: new Date(),
+      openaiThreadId: openaiRes.thread_id,
+    },
   });
 
   return { updatedAt: result.updatedAt.toISOString(), skipped: false };
@@ -143,7 +163,7 @@ export async function revertToVersion(threadId: string, versionId: string) {
 
   if (!thread) throw new Error('Thread not found');
 
-  const targetIndex = thread.versions.findIndex((v) => v.id === versionId);
+  const targetIndex = thread.versions.findIndex(v => v.id === versionId);
   if (targetIndex === -1) throw new Error('Version not found');
 
   // Start reconstruction from empty object
@@ -171,9 +191,7 @@ export async function revertToVersion(threadId: string, versionId: string) {
   const now = new Date();
 
   const currentState = thread.parsedSections ?? {};
-  const revertDiff = JSON.parse(
-    JSON.stringify(createDiff(currentState, reconstructed))
-  );
+  const revertDiff = JSON.parse(JSON.stringify(createDiff(currentState, reconstructed)));
 
   // Save new version only if state changed
   if (Object.keys(revertDiff).length > 0) {

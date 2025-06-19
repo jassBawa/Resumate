@@ -1,16 +1,16 @@
 'use client';
-import { useState } from 'react';
-import { AppSidebar } from '@/components/layout/AppSidebar';
-import { EditSection } from '@/components/dashboard/sidebar-tabs/EditSection';
-import { PreviewSection } from '@/components/dashboard/sidebar-tabs/ResumePreviewSectiont';
-import { JobDescriptionSection } from '@/components/dashboard/sidebar-tabs/JobDescription';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import CustomDarkToggle from '@/components/DarkToggle';
+import { EditSection } from '@/components/dashboard/sidebar-tabs/EditSection';
+import { JobDescriptionSection } from '@/components/dashboard/sidebar-tabs/JobDescription';
+import { PreviewSection } from '@/components/dashboard/sidebar-tabs/ResumePreviewSectiont';
+import { AppSidebar } from '@/components/layout/AppSidebar';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useResumeData } from '@/hooks/useResumeData';
+import { useState } from 'react';
 
 const DashboardLayout = ({ threadId }: { threadId: string }) => {
   const [activeSection, setActiveSection] = useState('edit');
-  const { threadData } = useResumeData(threadId);
+  const { loading, threadData } = useResumeData(threadId);
 
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -24,6 +24,10 @@ const DashboardLayout = ({ threadId }: { threadId: string }) => {
         return <EditSection />;
     }
   };
+
+  if (loading) {
+    return <h2>loading</h2>;
+  }
 
   return (
     <>
@@ -39,6 +43,7 @@ const DashboardLayout = ({ threadId }: { threadId: string }) => {
           </div>
         </div>
         <div className="animate-fade-in flex-1 p-6">{renderActiveSection()}</div>
+        {/* <ChatWidget threadId={threadId} /> */}
       </main>
     </>
   );

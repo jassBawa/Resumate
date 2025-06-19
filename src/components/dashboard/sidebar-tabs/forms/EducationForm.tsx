@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from '@/components/ui/dialog';
-import { GraduationCap, Edit, Plus, Sparkles, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useResumeStore } from '@/hooks/useResumeStore';
+import { Edit, GraduationCap, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 interface Education {
@@ -182,14 +182,14 @@ export function EducationForm() {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Education</h3>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => toast.info('AI optimization coming soon!')}
           >
             <Sparkles className="mr-2 h-4 w-4" />
             AI Optimize
-          </Button>
+          </Button> */}
           <Button
             variant="outline"
             size="sm"

@@ -1,58 +1,123 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Search, BarChart3, FileText, Target, TrendingUp } from 'lucide-react';
+import { useAnalysisStore } from '@/hooks/useAnalysisStore';
+import { useResumeStore } from '@/hooks/useResumeStore';
+import { analyseResumeSections } from '@/services/analysis.services';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { CoverLetterSection } from './CoverLetterSection';
+import { AnalysisResultDisplay } from './job-analysis/AnalysisResultDisplay';
+import { JobDetailsForm } from './job-analysis/JobDetailsForm';
+import { JobExamples } from './job-analysis/JobExamples';
+import { PlatformFeaturesCard } from './job-analysis/PlatformFeaturesCard';
 
 export function JobDescriptionSection() {
-  const [selectedJob, setSelectedJob] = useState('');
-  const [manualDescription, setManualDescription] = useState('');
+  const { resumeSections } = useResumeStore();
+  const {
+    jobDetails,
+    analysisResult,
+    isAnalyzing,
+    setJobDetails,
+    setAnalysisResult,
+    setIsAnalyzing,
+    clearAnalysis,
+    resetJobDetails,
+  } = useAnalysisStore();
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState('setup');
 
   const exampleJobs = [
     {
       id: 1,
       title: 'Senior Frontend Developer',
       company: 'Tech Corp',
-      skills: ['React', 'TypeScript', 'CSS', 'JavaScript'],
+      skills: ['React', 'TypeScript', 'CSS'],
       level: 'Senior',
       type: 'Full-time',
+      description:
+        'We are looking for a Senior Frontend Developer to join our dynamic team. You will be responsible for developing user-facing features using React.js and ensuring great user experience.\n\nRequirements:\n- 5+ years experience with React.js\n- Strong TypeScript skills\n- Experience with modern CSS frameworks\n- Knowledge of state management (Redux/Zustand)\n- Experience with testing frameworks',
     },
     {
       id: 2,
       title: 'Full Stack Engineer',
       company: 'StartupXYZ',
-      skills: ['Node.js', 'React', 'PostgreSQL', 'AWS'],
+      skills: ['Node.js', 'React', 'PostgreSQL'],
       level: 'Mid-level',
       type: 'Full-time',
+      description:
+        "Join our fast-growing startup as a Full Stack Engineer. You'll work on both frontend and backend systems.\n\nRequirements:\n- 3+ years full-stack development\n- Node.js and React experience\n- Database design skills\n- AWS/cloud experience\n- Agile development experience",
     },
     {
       id: 3,
       title: 'UX/UI Designer',
       company: 'Design Studio',
-      skills: ['Figma', 'Adobe Creative', 'Prototyping', 'User Research'],
+      skills: ['Figma', 'Adobe Creative', 'Prototyping'],
       level: 'Senior',
       type: 'Contract',
+      description:
+        "We're seeking a creative UX/UI Designer to lead design initiatives.\n\nRequirements:\n- 4+ years design experience\n- Expert in Figma and Adobe Creative Suite\n- User research experience\n- Prototyping skills\n- Portfolio showcasing mobile and web designs",
     },
     {
       id: 4,
       title: 'DevOps Engineer',
       company: 'Cloud Solutions',
-      skills: ['Docker', 'Kubernetes', 'AWS', 'CI/CD'],
+      skills: ['Docker', 'Kubernetes', 'AWS'],
       level: 'Senior',
       type: 'Full-time',
+      description:
+        'Looking for a DevOps Engineer to manage our cloud infrastructure.\n\nRequirements:\n- 4+ years DevOps experience\n- Docker and Kubernetes expertise\n- AWS certification preferred\n- CI/CD pipeline experience\n- Infrastructure as Code (Terraform)',
     },
   ];
 
-  const analysisMetrics = [
-    { label: 'Match Score', value: '85%', trend: 'up' },
-    { label: 'Skill Match', value: '78%', trend: 'up' },
-    { label: 'Experience Match', value: '92%', trend: 'up' },
-    { label: 'Keyword Density', value: '65%', trend: 'down' },
-  ];
+  const handleJobSelect = (job: (typeof exampleJobs)[0]) => {
+    setJobDetails({
+      selectedJobId: job.id,
+      jobDescription: job.description,
+      jobTitle: job.title,
+      company: job.company,
+    });
+    clearAnalysis();
+  };
+
+  const handleAnalyze = async () => {
+    const { jobDescription, company, jobTitle } = jobDetails;
+
+    if (!jobDescription || !company || !jobTitle) {
+      toast.error('Please provide job description, company name, and job title.');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    try {
+      const result = await analyseResumeSections(resumeSections, {
+        jobDescription,
+        company,
+        role: jobTitle,
+      });
+
+      if ('error' in result) {
+        toast.error(result.error);
+      } else {
+        setAnalysisResult(result);
+        setActiveTab('analysis'); // Auto-switch to analysis tab
+        toast.success('Analysis complete!');
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to analyze resume. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleNewAnalysis = () => {
+    clearAnalysis();
+    resetJobDetails();
+    setActiveTab('setup');
+  };
 
   return (
     <div className="animate-fade-in space-y-6">
@@ -60,281 +125,85 @@ export function JobDescriptionSection() {
         <div>
           <h2 className="text-foreground text-3xl font-bold">Job Analysis</h2>
           <p className="text-muted-foreground mt-1">
-            Analyze job descriptions and optimize your resume
+            Select a job template or enter your own job details for AI analysis
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Search className="mr-2 h-4 w-4" />
-            Search Jobs
-          </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={handleNewAnalysis}>
             <Plus className="mr-2 h-4 w-4" />
             New Analysis
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="examples" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="examples">Job Examples</TabsTrigger>
-          <TabsTrigger value="analysis">Analysis</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="setup">Job Setup</TabsTrigger>
+          <TabsTrigger value="analysis" disabled={!analysisResult}>
+            Analysis
+          </TabsTrigger>
+          <TabsTrigger value="cover-letter" disabled={!analysisResult}>
+            Cover Letter
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="examples" className="space-y-6">
+        <TabsContent value="setup" className="space-y-6">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="space-y-6 lg:col-span-2">
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle>Select Job Description</CardTitle>
-                  <CardDescription>Choose from examples or add your own</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {exampleJobs.map(job => (
-                      <Card
-                        key={job.id}
-                        className={`cursor-pointer transition-all hover:shadow-md ${
-                          selectedJob === job.id.toString() ? 'ring-primary ring-2' : ''
-                        }`}
-                        onClick={() => setSelectedJob(job.id.toString())}
-                      >
-                        <CardContent className="pt-4">
-                          <div className="space-y-2">
-                            <h3 className="font-semibold">{job.title}</h3>
-                            <p className="text-muted-foreground text-sm">{job.company}</p>
-                            <div className="flex gap-2">
-                              <Badge variant="secondary">{job.level}</Badge>
-                              <Badge variant="outline">{job.type}</Badge>
-                            </div>
-                            <div className="flex flex-wrap gap-1">
-                              {job.skills.slice(0, 3).map(skill => (
-                                <span
-                                  key={skill}
-                                  className="bg-primary/10 text-primary rounded px-2 py-1 text-xs"
-                                >
-                                  {skill}
-                                </span>
-                              ))}
-                              {job.skills.length > 3 && (
-                                <span className="text-muted-foreground text-xs">
-                                  +{job.skills.length - 3} more
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle>Manual Job Description</CardTitle>
-                  <CardDescription>Paste or type a job description for analysis</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="job-title">Job Title</Label>
-                      <Input id="job-title" placeholder="e.g. Senior Software Engineer" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="company">Company</Label>
-                      <Input id="company" placeholder="Company name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Job Description</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Paste the full job description here..."
-                        value={manualDescription}
-                        onChange={e => setManualDescription(e.target.value)}
-                        className="min-h-[200px]"
-                      />
-                    </div>
-                    <Button className="w-full">
-                      <BarChart3 className="mr-2 h-4 w-4" />
-                      Analyze Job Description
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <JobExamples
+                exampleJobs={exampleJobs}
+                selectedJob={exampleJobs.find(job => job.id === jobDetails.selectedJobId) || null}
+                onJobSelect={handleJobSelect}
+              />
+              <JobDetailsForm
+                jobTitle={jobDetails.jobTitle}
+                setJobTitle={title => setJobDetails({ jobTitle: title })}
+                company={jobDetails.company}
+                setCompany={company => setJobDetails({ company })}
+                jobDescription={jobDetails.jobDescription}
+                setJobDescription={description => setJobDetails({ jobDescription: description })}
+                onAnalyze={handleAnalyze}
+                isAnalyzing={isAnalyzing}
+              />
             </div>
-
             <div className="space-y-4">
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Import from URL
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Search className="mr-2 h-4 w-4" />
-                    Search LinkedIn
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Target className="mr-2 h-4 w-4" />
-                    Skill Matcher
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg">Recent Analyses</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="space-y-2 text-sm">
-                    <div className="border-primary border-l-2 pl-3">
-                      <div className="font-medium">Frontend Developer</div>
-                      <div className="text-muted-foreground">Tech Startup</div>
-                      <div className="text-muted-foreground text-xs">Match: 87%</div>
-                    </div>
-                    <div className="border-l-2 border-orange-400 pl-3">
-                      <div className="font-medium">Full Stack Engineer</div>
-                      <div className="text-muted-foreground">Enterprise Corp</div>
-                      <div className="text-muted-foreground text-xs">Match: 72%</div>
-                    </div>
+              <PlatformFeaturesCard />
+              {analysisResult && (
+                <Card className="border-green-200 bg-green-50 shadow-sm">
+                  <div className="p-4">
+                    <h3 className="font-semibold text-green-800">Analysis Complete!</h3>
+                    <p className="mt-1 text-sm text-green-700">
+                      Switch to the Analysis tab to view detailed results.
+                    </p>
                   </div>
-                </CardContent>
-              </Card>
+                </Card>
+              )}
             </div>
           </div>
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <div className="space-y-6 lg:col-span-2">
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle>Resume Match Analysis</CardTitle>
-                  <CardDescription>
-                    How well your resume matches the job requirements
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-                    {analysisMetrics.map(metric => (
-                      <div key={metric.label} className="text-center">
-                        <div className="mb-1 flex items-center justify-center gap-1">
-                          <span className="text-2xl font-bold">{metric.value}</span>
-                          <TrendingUp
-                            className={`h-4 w-4 ${
-                              metric.trend === 'up' ? 'text-green-500' : 'text-orange-500'
-                            }`}
-                          />
-                        </div>
-                        <div className="text-muted-foreground text-sm">{metric.label}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="mb-2 font-semibold">Missing Keywords</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {['Docker', 'Kubernetes', 'GraphQL', 'Python'].map(keyword => (
-                          <Badge key={keyword} variant="destructive" className="text-xs">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h3 className="mb-2 font-semibold">Matching Skills</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {['React', 'TypeScript', 'JavaScript', 'Node.js', 'AWS'].map(skill => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle>Recommendations</CardTitle>
-                  <CardDescription>Suggestions to improve your resume match</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-3 rounded-lg bg-blue-50 p-3">
-                      <div className="mt-2 h-2 w-2 rounded-full bg-blue-500"></div>
-                      <div>
-                        <h4 className="font-medium">Add Docker experience</h4>
-                        <p className="text-muted-foreground text-sm">
-                          Consider adding Docker projects to your experience section
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3 rounded-lg bg-green-50 p-3">
-                      <div className="mt-2 h-2 w-2 rounded-full bg-green-500"></div>
-                      <div>
-                        <h4 className="font-medium">Highlight React expertise</h4>
-                        <p className="text-muted-foreground text-sm">
-                          Your React skills are well-matched. Consider emphasizing them more
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3 rounded-lg bg-orange-50 p-3">
-                      <div className="mt-2 h-2 w-2 rounded-full bg-orange-500"></div>
-                      <div>
-                        <h4 className="font-medium">Include Python projects</h4>
-                        <p className="text-muted-foreground text-sm">
-                          Add Python experience to match the job requirements better
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+          {analysisResult ? (
+            <AnalysisResultDisplay analysisResult={analysisResult} />
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-muted-foreground">
+                Run an analysis first to see detailed results here.
+              </p>
             </div>
+          )}
+        </TabsContent>
 
-            <div className="space-y-4">
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg">Overall Score</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <div className="text-primary mb-2 text-4xl font-bold">85%</div>
-                  <div className="text-muted-foreground">Resume Match</div>
-                  <div className="mt-4 h-2 w-full rounded-full bg-gray-200">
-                    <div className="bg-primary h-2 rounded-full" style={{ width: '85%' }}></div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-lg">Action Items</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Target className="mr-2 h-4 w-4" />
-                    Update Skills
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Add Keywords
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    Re-analyze
-                  </Button>
-                </CardContent>
-              </Card>
+        <TabsContent value="cover-letter" className="space-y-6">
+          {analysisResult ? (
+            <CoverLetterSection coverLetter={analysisResult.coverLetter} />
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-muted-foreground">
+                Complete an analysis to generate a personalized cover letter.
+              </p>
             </div>
-          </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

@@ -18,7 +18,6 @@ export interface ResumeSections {
       hardSkills: string[];
       softSkills: string[];
     };
-    analysis: SectionAnalysis;
   };
   workExperience?: {
     data: Array<{
@@ -91,10 +90,14 @@ export interface ResumeSections {
   };
 }
 
-export interface SectionAnalysis {
+export interface JDAnalysis {
+  overallScore: number;
+  skillMatchScore: number;
+  experienceMatch: number;
   summary: string;
   strengths: string[];
   weaknesses: string[];
-  suggestions: string[];
+  recommnedations: string[];
+  missingKeywords: string[];
   ATS_Fit_Score: number;
 }

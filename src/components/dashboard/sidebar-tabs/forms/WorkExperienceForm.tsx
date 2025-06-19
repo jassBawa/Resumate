@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
 
-import { Briefcase, Edit, Plus, Sparkles, Trash2 } from 'lucide-react';
 import { useResumeStore } from '@/hooks/useResumeStore';
+import { Briefcase, Edit, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import WorkExperienceModal from './WorkExperienceModal';
 
@@ -58,14 +58,14 @@ export function WorkExperienceForm() {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Work Experience</h3>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={() => toast.info('AI optimization coming soon!')}
           >
             <Sparkles className="mr-2 h-4 w-4" />
             AI Optimize
-          </Button>
+          </Button> */}
           <Button
             variant="outline"
             size="sm"
