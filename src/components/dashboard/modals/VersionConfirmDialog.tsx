@@ -26,17 +26,13 @@ export function ConfirmRevertDialog({
   onConfirm,
 }: ConfirmRevertDialogProps) {
   return (
-    <AlertDialog
-      open={!!confirmRevert}
-      onOpenChange={(open) => !open && onCancel()}
-    >
+    <AlertDialog open={!!confirmRevert} onOpenChange={open => !open && onCancel()}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm Version Revert</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to revert to &quot;{confirmRevert?.title}
-            &quot;? This will overwrite your current resume and cannot be
-            undone.
+            Are you sure you want to revert to "{confirmRevert?.title}
+            "? This will overwrite your current resume and cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -48,7 +44,7 @@ export function ConfirmRevertDialog({
           >
             {revertingId ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Reverting...
               </>
             ) : (

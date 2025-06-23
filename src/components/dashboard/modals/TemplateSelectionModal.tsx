@@ -87,38 +87,57 @@ export function TemplateSelectionModal({ isOpen, onClose }: TemplateSectionProps
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="md:max-w-6xl">
-        <DialogHeader>
-          <DialogTitle>Select a Template</DialogTitle>
-        </DialogHeader>
-        <div className="mt-4 grid h-[70vh] grid-cols-1 gap-3 overflow-y-auto p-4 md:h-auto md:grid-cols-4">
-          {templates.map(template => (
-            <Card
-              key={template.id}
-              className={`cursor-pointer gap-0 p-4 transition-all ${
-                selectedTemplate === template.id ? 'ring-primary ring-2' : ''
-              }`}
-              onClick={() => handleSelect(template.id)}
-            >
-              <div className="bg-muted relative flex aspect-square h-auto w-full items-center justify-center rounded-lg">
-                <Image
-                  src={template.preview}
-                  alt={template.name}
-                  fill
-                  className="object-fit absolute h-full w-full rounded-lg"
-                />
-              </div>
-              <h3 className="mt-2 text-lg font-semibold">{template.name}</h3>
-              <p className="text-muted-foreground text-sm">{template.description}</p>
-            </Card>
-          ))}
-        </div>
-        <div className="flex items-center justify-end">
-          {resumeSections && (
-            <Button className="" onClick={generatePdfDocument}>
-              Download PDF
+      <DialogContent className="mx-auto w-full max-w-5xl rounded-3xl border-0 bg-white p-0 shadow-2xl dark:bg-gray-900">
+        <div className="p-6">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-center text-xl font-semibold text-gray-900 dark:text-white">
+              Select a Template
+            </DialogTitle>
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+              Choose a resume template to preview and download as PDF
+            </p>
+          </DialogHeader>
+          <div className="mt-2 grid h-[60vh] grid-cols-1 gap-4 overflow-y-auto md:h-auto md:grid-cols-4">
+            {templates.map(template => (
+              <Card
+                key={template.id}
+                className={`group cursor-pointer gap-0 rounded-2xl border p-4 shadow-md transition-all duration-200 ${
+                  selectedTemplate === template.id
+                    ? 'border-blue-500 bg-gradient-to-br from-blue-50/80 to-blue-100/60 ring-2 ring-blue-400/40 dark:border-blue-400 dark:bg-gradient-to-br dark:from-blue-900/40 dark:to-blue-800/30 dark:ring-2 dark:ring-blue-400/40'
+                    : 'hover:border-blue-300 hover:shadow-lg dark:hover:border-blue-500'
+                } `}
+                onClick={() => handleSelect(template.id)}
+              >
+                <div className="bg-muted relative flex aspect-square h-auto w-full items-center justify-center overflow-hidden rounded-lg">
+                  <Image
+                    src={template.preview}
+                    alt={template.name}
+                    fill
+                    className="absolute h-full w-full rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="mt-3 text-center text-lg font-semibold text-gray-900 dark:text-white">
+                  {template.name}
+                </h3>
+                <p className="text-muted-foreground text-center text-sm dark:text-gray-400">
+                  {template.description}
+                </p>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6 flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={onClose} className="rounded-xl">
+              Cancel
             </Button>
-          )}
+            {resumeSections && (
+              <Button
+                className="rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                onClick={generatePdfDocument}
+              >
+                Download PDF
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

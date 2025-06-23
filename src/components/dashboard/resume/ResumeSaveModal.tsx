@@ -147,8 +147,8 @@ export const SaveTitleDialog: React.FC<SaveTitleDialogProps> = ({ threadId, isOp
                 <div>
                   <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Pro Tip</p>
                   <p className="text-xs text-blue-700 dark:text-blue-300">
-                    Use descriptive titles like &quot;Added New Project - Resume Analyser&quot; to
-                    easily track changes
+                    Use descriptive titles like "Added New Project - Resume Analyser" to easily
+                    track changes
                   </p>
                 </div>
               </div>

@@ -169,10 +169,12 @@ export function JobDescriptionSection() {
             <div className="space-y-4">
               <PlatformFeaturesCard />
               {analysisResult && (
-                <Card className="border-green-200 bg-green-50 shadow-sm">
+                <Card className="border-blue-200 bg-blue-50 shadow-lg dark:border-blue-900/40 dark:bg-[#232c3b]/80 dark:shadow-2xl">
                   <div className="p-4">
-                    <h3 className="font-semibold text-green-800">Analysis Complete!</h3>
-                    <p className="mt-1 text-sm text-green-700">
+                    <h3 className="font-semibold text-blue-900 dark:text-blue-200">
+                      Analysis Complete!
+                    </h3>
+                    <p className="mt-1 text-sm text-blue-800 dark:text-blue-300">
                       Switch to the Analysis tab to view detailed results.
                     </p>
                   </div>

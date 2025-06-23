@@ -200,11 +200,11 @@ export function ChatWidget({ threadId }: { threadId: string }) {
           <Button
             onClick={toggleChat}
             size="lg"
-            className={`${isMobile ? 'h-16 w-16' : 'h-18 w-18'} group relative rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25`}
+            className={`${isMobile ? 'h-16 w-16' : 'h-16 w-16'} group relative rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25`}
           >
             <div className="relative">
               <Sparkles
-                className={`${isMobile ? 'h-7 w-7' : 'h-8 w-8'} transition-transform group-hover:scale-110 group-hover:rotate-12`}
+                className={`${isMobile ? 'h-7 w-7' : 'h-14 w-14'} text-white transition-transform group-hover:scale-110 group-hover:rotate-12`}
               />
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent" />
             </div>
@@ -212,24 +212,24 @@ export function ChatWidget({ threadId }: { threadId: string }) {
         </div>
       ) : (
         <Card
-          className={`${chatSize.width} ${chatSize.height} flex flex-col border-0 bg-white/95 p-0 shadow-2xl ring-1 ring-gray-200/50 backdrop-blur-xl`}
+          className={`${chatSize.width} ${chatSize.height} flex flex-col border-0 bg-white/95 p-0 shadow-2xl ring-1 ring-gray-200/50 backdrop-blur-xl dark:bg-[#23272f] dark:ring-1 dark:ring-[#353945]`}
         >
-          <CardHeader className="flex-shrink-0 rounded-t-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 p-4 text-white">
+          <CardHeader className="flex-shrink-0 rounded-t-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 p-4 text-white dark:from-indigo-700 dark:via-purple-800 dark:to-pink-900">
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-3 text-lg font-semibold">
                 <div className="relative">
                   <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
-                    <Wand2 className="h-5 w-5" />
+                    <Wand2 className="h-5 w-5 text-white" />
                   </div>
                   <Sparkles className="absolute -top-1 -right-1 h-3 w-3 animate-pulse text-yellow-300" />
                 </div>
-                AI Resume Assistant
+                <span className="text-white">AI Resume Assistant</span>
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={toggleChat}
-                className="h-8 w-8 rounded-full bg-white/10 p-0 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+                className="h-8 w-8 rounded-full bg-white/10 p-0 text-white backdrop-blur-sm transition-colors hover:bg-white/20 dark:bg-white/10 dark:hover:bg-white/20"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -241,22 +241,22 @@ export function ChatWidget({ threadId }: { threadId: string }) {
             <div className="flex h-full flex-col p-4">
               {/* Messages */}
               <div className="mb-4 min-h-0 flex-1">
-                <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 h-full space-y-4 overflow-y-auto pr-2">
+                <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 dark:scrollbar-track-[#23272f] dark:scrollbar-thumb-[#353945] h-full space-y-4 overflow-y-auto pr-2">
                   {messages.map(msg => (
                     <div
                       key={msg.id}
                       className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm transition-colors duration-200 ${
                           msg.sender === 'user'
-                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
-                            : 'border border-gray-200 bg-gray-50 text-gray-800'
-                        }`}
+                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:from-indigo-700 dark:to-purple-800'
+                            : 'border border-gray-200 bg-gray-50 text-gray-800 dark:border-[#353945] dark:bg-[#181a20] dark:text-gray-100'
+                        } `}
                       >
                         <div className="flex items-start gap-3">
                           {msg.sender === 'bot' && (
-                            <div className="mt-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 p-1">
+                            <div className="mt-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 p-1 dark:from-indigo-700 dark:to-purple-800">
                               <Zap className="h-3 w-3 text-white" />
                             </div>
                           )}
@@ -267,9 +267,9 @@ export function ChatWidget({ threadId }: { threadId: string }) {
                   ))}
                   {isLoading && (
                     <div className="flex justify-start">
-                      <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 shadow-sm">
+                      <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 shadow-sm dark:border-[#353945] dark:bg-[#181a20] dark:text-gray-100">
                         <div className="flex items-center gap-3">
-                          <div className="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 p-1">
+                          <div className="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 p-1 dark:from-indigo-700 dark:to-purple-800">
                             <Sparkles className="h-3 w-3 animate-spin text-white" />
                           </div>
                           <span>AI is crafting your response...</span>
@@ -284,7 +284,7 @@ export function ChatWidget({ threadId }: { threadId: string }) {
 
               {/* Quick Actions */}
               <div className="mb-4 flex-shrink-0">
-                <p className="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase">
+                <p className="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400">
                   Quick Actions
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -293,7 +293,7 @@ export function ChatWidget({ threadId }: { threadId: string }) {
                       key={index}
                       variant="outline"
                       size="sm"
-                      className="h-8 rounded-full border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50 text-xs font-medium text-indigo-700 transition-all hover:from-indigo-100 hover:to-purple-100 hover:shadow-sm"
+                      className="h-8 rounded-full border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50 text-xs font-medium text-indigo-700 transition-all hover:from-indigo-100 hover:to-purple-100 hover:shadow-sm dark:border-[#353945] dark:bg-[#23272f] dark:from-indigo-500 dark:to-purple-600 dark:text-indigo-200 dark:hover:bg-[#232c3b]"
                       onClick={() => setQuickAction(action)}
                     >
                       {action}
@@ -303,22 +303,22 @@ export function ChatWidget({ threadId }: { threadId: string }) {
               </div>
 
               {/* Input */}
-              <div className="flex flex-shrink-0 gap-3 rounded-xl bg-gray-50 p-3">
+              <div className="flex flex-shrink-0 gap-3 rounded-xl bg-gray-50 p-3 dark:bg-[#181a20]">
                 <Input
                   placeholder="Ask AI to enhance your resume..."
                   value={message}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="flex-1 border-0 bg-white shadow-sm focus:ring-2 focus:ring-indigo-500/20"
+                  className="flex-1 border-0 border-none bg-white shadow-sm dark:bg-[#23272f] dark:text-white dark:placeholder:text-gray-400"
                   disabled={isLoading}
                 />
                 <Button
                   size="sm"
                   onClick={handleSendMessage}
                   disabled={isLoading || !message.trim()}
-                  className="h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-0 shadow-sm transition-all hover:from-indigo-600 hover:to-purple-700 hover:shadow-md disabled:opacity-50"
+                  className="h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-0 shadow-sm transition-all hover:from-indigo-600 hover:to-purple-700 hover:shadow-md disabled:opacity-50 dark:from-indigo-700 dark:to-purple-800"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-4 w-4 text-white" />
                 </Button>
               </div>
             </div>

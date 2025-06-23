@@ -12,7 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Briefcase, Edit, Eye, FileText } from 'lucide-react';
+import { FileText, Edit, Eye } from 'lucide-react';
 
 interface AppSidebarProps {
   activeSection: string;
@@ -42,22 +42,26 @@ const sidebarItems = [
 
 export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps) {
   return (
-    <Sidebar className="border-r">
-      <SidebarHeader className="border-b p-6">
+    <Sidebar className="border-r border-gray-200 bg-white dark:border-[#353945] dark:bg-[#23272f]">
+      <SidebarHeader className="border-b border-gray-200 bg-white p-6 dark:border-[#353945] dark:bg-[#23272f]">
         <div className="flex items-center gap-3">
-          <div className="bg-primary flex h-10 w-10 items-center justify-center rounded-lg">
-            <Briefcase className="text-primary-foreground h-6 w-6" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
+            <FileText className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-foreground text-lg font-bold">WorkSpace</h2>
-            <p className="text-muted-foreground text-sm">Content Management</p>
+            <h2 className="text-foreground text-lg font-bold tracking-tight dark:text-white">
+              ResuMate
+            </h2>
+            <p className="text-muted-foreground text-xs leading-tight font-medium dark:text-gray-400">
+              Your AI-Powered Resume Wingman
+            </p>
           </div>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="p-4">
+      <SidebarContent className="bg-white p-4 dark:bg-[#23272f]">
         <SidebarGroup>
-          <SidebarGroupLabel className="mb-4 text-xs font-semibold tracking-wider text-[var(--muted-foreground)] uppercase">
+          <SidebarGroupLabel className="mb-4 text-xs font-semibold tracking-wider text-[var(--muted-foreground)] uppercase dark:text-gray-400">
             Sections
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -76,9 +80,11 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
                       <div className={`group cursor-pointer`}>
                         <item.icon className={`h-5 w-5 shrink-0 transition-colors duration-200`} />
                         <div className="flex flex-col">
-                          <span className="text-sm leading-tight font-medium">{item.title}</span>
+                          <span className="text-sm leading-tight font-medium dark:text-white">
+                            {item.title}
+                          </span>
                           <span
-                            className={`text-[10px] leading-tight transition-colors duration-200`}
+                            className={`text-[10px] leading-tight transition-colors duration-200 dark:text-gray-400`}
                           >
                             {item.description}
                           </span>
@@ -93,7 +99,7 @@ export function AppSidebar({ activeSection, setActiveSection }: AppSidebarProps)
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t p-4 text-sm text-[var(--muted-foreground)]">
+      <SidebarFooter className="border-t border-gray-200 bg-white p-4 text-sm text-[var(--muted-foreground)] dark:border-[#353945] dark:bg-[#23272f] dark:text-gray-400">
         {/* Optional: Add footer actions here */}
         <div className="text-center">Designed with ❤️</div>
       </SidebarFooter>

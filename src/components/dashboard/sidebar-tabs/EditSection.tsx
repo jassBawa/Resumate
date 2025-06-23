@@ -75,7 +75,7 @@ export function EditSection() {
     <div className="animate-fade-in space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-foreground text-3xl font-bold">Edit Resume</h2>
+          <h2 className="text-foreground text-3xl font-bold tracking-tight">Edit Resume</h2>
           <p className="text-muted-foreground mt-1">
             Build your professional resume with AI assistance
           </p>
@@ -84,25 +84,26 @@ export function EditSection() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         <div className="lg:col-span-1">
-          <Card className="border shadow-sm">
+          <Card className="border shadow-lg dark:border-[#353945] dark:bg-[#23272f]">
             <CardHeader>
-              <CardTitle className="text-lg">Resume Sections</CardTitle>
+              <CardTitle className="text-lg dark:text-white">Resume Sections</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {resumeSections_list.map(section => (
                 <button
                   key={section.id}
                   onClick={() => setActiveTab(section.id)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-200 ${
                     activeTab === section.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'hover:bg-muted'
-                  }`}
+                      ? 'scale-[1.03] border border-neutral-200 font-semibold dark:border-neutral-600 dark:bg-[#232c3b]'
+                      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-[#232c3b]'
+                  } `}
+                  style={{ outline: 'none' }}
                 >
-                  <section.icon className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">{section.title}</p>
-                  </div>
+                  <section.icon
+                    className={`h-5 w-5 flex-shrink-0 text-blue-400 dark:text-blue-300`}
+                  />
+                  <span>{section.title}</span>
                 </button>
               ))}
             </CardContent>
@@ -110,7 +111,7 @@ export function EditSection() {
         </div>
 
         <div className="lg:col-span-3">
-          <Card className="border shadow-sm">
+          <Card className="border shadow-lg dark:border-[#353945] dark:bg-[#23272f]">
             <CardContent className="pt-6">{renderActiveForm()}</CardContent>
           </Card>
         </div>

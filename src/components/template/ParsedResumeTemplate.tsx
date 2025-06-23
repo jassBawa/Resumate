@@ -120,7 +120,7 @@ function ParsedResumeTemplate() {
                 className="absolute top-12 right-0 z-30 w-80 space-y-3 rounded-xl border bg-white p-4 shadow-xl dark:border-zinc-700 dark:bg-zinc-800"
               >
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Editing &quot;{displayName}&quot;
+                  Editing "{displayName}"
                 </label>
                 <input
                   type="text"

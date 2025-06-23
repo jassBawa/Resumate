@@ -13,7 +13,7 @@ async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
 
   return (
     <>
-      <div className="relative z-10 mx-auto">
+      <div className="relative">
         {!isResumeUploaded && (
           <div className="mt-6">
             <h2 className="mb-2 text-xl font-semibold">Upload Resume</h2>
