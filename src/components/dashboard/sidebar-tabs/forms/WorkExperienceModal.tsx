@@ -46,8 +46,12 @@ const WorkExperienceModal = ({ isOpen, onClose, experience, onSave }: WorkExperi
     onClose();
     toast.success(`Work experience ${experience ? 'updated' : 'added'} successfully`);
   };
+  const handleClose = () => {
+    setFormData({ company: '', title: '', duration: '', responsibilities: [] });
+    onClose();
+  };
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{experience ? 'Edit Experience' : 'Add Experience'}</DialogTitle>

@@ -44,8 +44,13 @@ const PublicationModal = ({ isOpen, onClose, publication, onSave }: PublicationM
     toast.success(`Publication ${publication ? 'updated' : 'added'} successfully`);
   };
 
+  const handleClose = () => {
+    setFormData({ title: '', publication: '', date: '', url: '' });
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{publication ? 'Edit Publication' : 'Add Publication'}</DialogTitle>

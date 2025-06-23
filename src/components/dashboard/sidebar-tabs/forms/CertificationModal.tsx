@@ -49,8 +49,13 @@ const CertificationModal = ({
     toast.success(`Certification ${certification ? 'updated' : 'added'} successfully`);
   };
 
+  const handleClose = () => {
+    setFormData({ name: '', issuer: '', date: '', url: '' });
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{certification ? 'Edit Certification' : 'Add Certification'}</DialogTitle>

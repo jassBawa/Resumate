@@ -57,8 +57,20 @@ const EducationModal = ({ isOpen, onClose, education, onSave }: EducationModalPr
     toast.success(`Education ${education ? 'updated' : 'added'} successfully`);
   };
 
+  const handleClose = () => {
+    setFormData({
+      institution: '',
+      degree: '',
+      startDate: '',
+      endDate: '',
+      cgpa: '',
+      percentage: '',
+    });
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{education ? 'Edit Education' : 'Add Education'}</DialogTitle>

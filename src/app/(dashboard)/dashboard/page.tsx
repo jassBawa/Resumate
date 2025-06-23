@@ -1,37 +1,43 @@
-import {
-  CreateThreadButton,
-  ThreadList,
-  ThreadListSkeleton,
-} from '@/components/dashboard';
+import { CreateThreadButton, ThreadList, ThreadListSkeleton } from '@/components/dashboard';
 import { Suspense } from 'react';
 
 export default function DashboardPage() {
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Your Resumes</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage and continue your resume conversations
-          </p>
+    <main className="min-h-screen bg-[#f6f8fa] dark:bg-[#181a20]">
+      <div className="container mx-auto px-6 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+                Your Resumes
+              </h1>
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                Manage and continue your resume conversations
+              </p>
+            </div>
+            <div className="hidden sm:block">
+              <div className="rounded-xl bg-white/60 px-4 py-2 shadow-sm backdrop-blur-sm dark:bg-[#23272f]/60">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  AI-Powered Resume Builder
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Thread List Section */}
+        <div className="space-y-6">
+          <Suspense fallback={<ThreadListSkeleton />}>
+            <ThreadList />
+          </Suspense>
+        </div>
+
+        {/* Create Thread Button */}
+        <div className="mt-12 flex justify-center">
+          <CreateThreadButton />
         </div>
       </div>
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-border/50" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-background px-4 text-sm text-muted-foreground">
-            Recent conversations
-          </span>
-        </div>
-      </div>
-      <div className="mt-8">
-        <Suspense fallback={<ThreadListSkeleton />}>
-          <ThreadList />
-        </Suspense>
-      </div>
-      <CreateThreadButton />
     </main>
   );
 }

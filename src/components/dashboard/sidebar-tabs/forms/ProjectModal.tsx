@@ -58,8 +58,13 @@ const ProjectModal = ({ isOpen, onClose, project, onSave }: ProjectModalProps) =
     toast.success(`Project ${project ? 'updated' : 'added'} successfully`);
   };
 
+  const handleClose = () => {
+    setFormData({ name: '', description: '', url: '', technologies: [] });
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{project ? 'Edit Project' : 'Add Project'}</DialogTitle>
