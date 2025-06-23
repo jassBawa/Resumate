@@ -2,98 +2,180 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
-// import { useResumeStore } from '@/hooks/useResumeStore';
+import { useResumeStore } from '@/hooks/useResumeStore';
+import { ResumeSections } from '@/types';
 import { Send, Sparkles, Wand2, X, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
-export function ChatWidget({ threadId }: { threadId: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  // const { updateSection } = useResumeStore();
-  const isMobile = useIsMobile();
-  const [messages, setMessages] = useState([
-    {
-      id: 1,
-      text: "👋 Welcome to your AI Resume Assistant! I can help you:\n\n✨ Add projects and experiences\n🎯 Optimize for specific roles\n🚀 Enhance any section\n📝 Improve content quality\n\nTry: 'Add a React project' or 'Optimize for senior developer'",
-      sender: 'bot',
-      timestamp: new Date(),
-    },
-  ]);
+// Types for better type safety (Interface Segregation Principle)
+interface Message {
+  id: number;
+  text: string;
+  sender: 'user' | 'bot';
+  timestamp: Date;
+}
 
-  const handleSendMessage = async () => {
-    if (!message.trim() || isLoading) return;
+interface ChatState {
+  isOpen: boolean;
+  message: string;
+  isLoading: boolean;
+  messages: Message[];
+}
 
-    const currentMessage = message;
-    setMessage('');
-    setIsLoading(true);
-
-    // Add user message to UI immediately
-    setMessages(prev => [
-      ...prev,
+// Custom hook for chat logic (Single Responsibility Principle)
+function useChatLogic(threadId: string) {
+  const [state, setState] = useState<ChatState>({
+    isOpen: false,
+    message: '',
+    isLoading: false,
+    messages: [
       {
-        id: prev.length + 1,
-        text: currentMessage,
-        sender: 'user',
+        id: 1,
+        text: "👋 Welcome to your AI Resume Assistant! I can help you:\n\n✨ Add projects and experiences\n🎯 Optimize for specific roles\n🚀 Enhance any section\n📝 Improve content quality\n\nTry: 'Add a React project' or 'Optimize for senior developer'",
+        sender: 'bot',
         timestamp: new Date(),
       },
-    ]);
+    ],
+  });
+
+  const { updateSection } = useResumeStore();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll to bottom (Single Responsibility)
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  // Effect for auto-scrolling when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [state.messages, scrollToBottom]);
+
+  // Message handling logic (Single Responsibility)
+  const addMessage = useCallback((text: string, sender: 'user' | 'bot') => {
+    setState(prev => ({
+      ...prev,
+      messages: [
+        ...prev.messages,
+        {
+          id: prev.messages.length + 1,
+          text,
+          sender,
+          timestamp: new Date(),
+        },
+      ],
+    }));
+  }, []);
+
+  // API call logic (Single Responsibility)
+  const sendMessageToAPI = useCallback(
+    async (message: string) => {
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message,
+            threadId,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to get response from AI');
+        }
+
+        const data = await response.json();
+
+        // Handle edit responses (Dependency Inversion - depends on abstraction)
+        if (data.type === 'edit') {
+          const parsedResume = data.data.parsedResume as ResumeSections;
+          Object.entries(parsedResume).forEach(([sectionKey, sectionValue]) => {
+            const key = sectionKey as keyof ResumeSections;
+            if (sectionValue) {
+              updateSection(key, sectionValue);
+            }
+          });
+        }
+
+        return data.content;
+      } catch (error) {
+        console.error('Error in chat:', error);
+        throw new Error("😔 I'm having trouble processing your request. Please try again.");
+      }
+    },
+    [threadId, updateSection]
+  );
+
+  // Main send message handler (Open/Closed Principle)
+  const handleSendMessage = useCallback(async () => {
+    const currentMessage = state.message.trim();
+    if (!currentMessage || state.isLoading) return;
+
+    // Clear input and set loading
+    setState(prev => ({
+      ...prev,
+      message: '',
+      isLoading: true,
+    }));
+
+    // Add user message immediately
+    addMessage(currentMessage, 'user');
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: currentMessage,
-          threadId,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response from AI');
-      }
-
-      const data = await response.json();
-
-      if (data.type === 'edit') {
-        console.log(data.parsedResume);
-        // updateSection(data.section, data.response);
-      }
-
-      // Add AI response to UI
-      setMessages(prev => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: data.content,
-          sender: 'bot',
-          timestamp: new Date(),
-        },
-      ]);
+      const response = await sendMessageToAPI(currentMessage);
+      addMessage(response, 'bot');
     } catch (error) {
-      console.error('Error in chat:', error);
-      setMessages(prev => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          text: "😔 I'm having trouble processing your request. Please try again.",
-          sender: 'bot',
-          timestamp: new Date(),
-        },
-      ]);
+      addMessage(error instanceof Error ? error.message : 'Something went wrong', 'bot');
     } finally {
-      setIsLoading(false);
+      setState(prev => ({ ...prev, isLoading: false }));
     }
-  };
+  }, [state.message, state.isLoading, addMessage, sendMessageToAPI]);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
+  return {
+    ...state,
+    messagesEndRef,
+    setState,
+    handleSendMessage,
+    addMessage,
   };
+}
+
+export function ChatWidget({ threadId }: { threadId: string }) {
+  const isMobile = useIsMobile();
+  const { isOpen, message, isLoading, messages, messagesEndRef, setState, handleSendMessage } =
+    useChatLogic(threadId);
+
+  // Input handlers (Single Responsibility)
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setState(prev => ({ ...prev, message: e.target.value }));
+    },
+    [setState]
+  );
+
+  const toggleChat = useCallback(() => {
+    setState(prev => ({ ...prev, isOpen: !prev.isOpen }));
+  }, [setState]);
+
+  const setQuickAction = useCallback(
+    (action: string) => {
+      setState(prev => ({ ...prev, message: action }));
+    },
+    [setState]
+  );
+
+  // Keyboard handler
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    },
+    [handleSendMessage]
+  );
 
   const quickActions = [
     'Add React project',
@@ -109,96 +191,110 @@ export function ChatWidget({ threadId }: { threadId: string }) {
   return (
     <div className={`fixed ${isMobile ? 'right-4 bottom-4 left-4' : 'right-6 bottom-6'} z-50`}>
       {!isOpen ? (
-        <div className="flex flex-col items-end space-y-2">
+        <div className="flex flex-col items-end space-y-3">
           {/* Feature badge */}
-          <div className="animate-bounce rounded-full bg-gradient-to-r from-purple-500 to-blue-500 px-3 py-1 text-xs font-medium text-white">
+          <div className="animate-bounce rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 py-2 text-xs font-semibold text-white shadow-lg backdrop-blur-sm">
             ✨ AI Assistant
           </div>
 
           <Button
-            onClick={() => setIsOpen(true)}
+            onClick={toggleChat}
             size="lg"
-            className={`${isMobile ? 'h-16 w-16' : 'h-16 w-16'} group relative rounded-full bg-gradient-to-r from-purple-600 to-blue-600 shadow-xl transition-all duration-300 hover:from-purple-700 hover:to-blue-700 hover:shadow-2xl`}
+            className={`${isMobile ? 'h-16 w-16' : 'h-18 w-18'} group relative rounded-full bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25`}
           >
             <div className="relative">
               <Sparkles
-                className={`${isMobile ? 'h-7 w-7' : 'h-8 w-8'} transition-transform group-hover:scale-110`}
+                className={`${isMobile ? 'h-7 w-7' : 'h-8 w-8'} transition-transform group-hover:scale-110 group-hover:rotate-12`}
               />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 to-transparent" />
             </div>
           </Button>
         </div>
       ) : (
         <Card
-          className={`${chatSize.width} ${chatSize.height} border-gradient-to-r border-2 bg-gradient-to-br from-purple-200 to-gray-50 p-0 shadow-2xl`}
+          className={`${chatSize.width} ${chatSize.height} flex flex-col border-0 bg-white/95 p-0 shadow-2xl ring-1 ring-gray-200/50 backdrop-blur-xl`}
         >
-          <CardHeader className="rounded-t-lg bg-gradient-to-r from-purple-500 to-blue-500 pb-3 text-white">
+          <CardHeader className="flex-shrink-0 rounded-t-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 p-4 text-white">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-lg">
+              <CardTitle className="flex items-center gap-3 text-lg font-semibold">
                 <div className="relative">
-                  <Wand2 className="h-6 w-6" />
-                  <Sparkles className="absolute -top-1 -right-1 h-3 w-3 animate-pulse" />
+                  <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
+                    <Wand2 className="h-5 w-5" />
+                  </div>
+                  <Sparkles className="absolute -top-1 -right-1 h-3 w-3 animate-pulse text-yellow-300" />
                 </div>
                 AI Resume Assistant
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsOpen(false)}
-                className="h-8 w-8 p-0 text-white hover:bg-white/20"
+                onClick={toggleChat}
+                className="h-8 w-8 rounded-full bg-white/10 p-0 text-white backdrop-blur-sm transition-colors hover:bg-white/20"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <p className="mt-1 text-xs text-purple-100">Your intelligent resume companion</p>
+            <p className="mt-2 text-sm text-white/80">Your intelligent resume companion</p>
           </CardHeader>
 
-          <CardContent className="flex h-full flex-col overflow-y-scroll p-4">
-            <div className="flex flex-1 flex-col">
+          <CardContent className="flex flex-1 flex-col overflow-hidden p-0">
+            <div className="flex h-full flex-col p-4">
               {/* Messages */}
-              <div className="mb-4 flex-1 space-y-4 overflow-y-auto pr-2">
-                {messages.map(msg => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
+              <div className="mb-4 min-h-0 flex-1">
+                <div className="scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-300 h-full space-y-4 overflow-y-auto pr-2">
+                  {messages.map(msg => (
                     <div
-                      className={`max-w-[85%] rounded-xl px-4 py-3 text-sm shadow-md ${
-                        msg.sender === 'user'
-                          ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white'
-                          : 'border bg-white text-gray-800'
-                      }`}
+                      key={msg.id}
+                      className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className="flex items-start gap-2">
-                        {msg.sender === 'bot' && (
-                          <Zap className="mt-0.5 h-4 w-4 flex-shrink-0 text-purple-500" />
-                        )}
-                        <div className="whitespace-pre-wrap">{msg.text}</div>
+                      <div
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
+                          msg.sender === 'user'
+                            ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                            : 'border border-gray-200 bg-gray-50 text-gray-800'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          {msg.sender === 'bot' && (
+                            <div className="mt-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 p-1">
+                              <Zap className="h-3 w-3 text-white" />
+                            </div>
+                          )}
+                          <div className="leading-relaxed whitespace-pre-wrap">{msg.text}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="rounded-xl border bg-white px-4 py-3 text-sm text-gray-800 shadow-md">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 animate-spin text-purple-500" />
-                        <span>AI is crafting your response...</span>
+                  ))}
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className="rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 p-1">
+                            <Sparkles className="h-3 w-3 animate-spin text-white" />
+                          </div>
+                          <span>AI is crafting your response...</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                  {/* Auto-scroll anchor */}
+                  <div ref={messagesEndRef} />
+                </div>
               </div>
 
               {/* Quick Actions */}
-              <div className="mb-4">
+              <div className="mb-4 flex-shrink-0">
+                <p className="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase">
+                  Quick Actions
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {quickActions.map((action, index) => (
                     <Button
                       key={index}
                       variant="outline"
                       size="sm"
-                      className="h-7 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50 text-xs hover:from-purple-100 hover:to-blue-100"
-                      onClick={() => setMessage(action)}
+                      className="h-8 rounded-full border-indigo-200 bg-gradient-to-r from-indigo-50 to-purple-50 text-xs font-medium text-indigo-700 transition-all hover:from-indigo-100 hover:to-purple-100 hover:shadow-sm"
+                      onClick={() => setQuickAction(action)}
                     >
                       {action}
                     </Button>
@@ -207,20 +303,20 @@ export function ChatWidget({ threadId }: { threadId: string }) {
               </div>
 
               {/* Input */}
-              <div className="flex gap-2">
+              <div className="flex flex-shrink-0 gap-3 rounded-xl bg-gray-50 p-3">
                 <Input
                   placeholder="Ask AI to enhance your resume..."
                   value={message}
-                  onChange={e => setMessage(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyPress={handleKeyPress}
-                  className="flex-1 border-purple-200 focus:border-purple-400"
+                  className="flex-1 border-0 bg-white shadow-sm focus:ring-2 focus:ring-indigo-500/20"
                   disabled={isLoading}
                 />
                 <Button
                   size="sm"
                   onClick={handleSendMessage}
-                  disabled={isLoading}
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                  disabled={isLoading || !message.trim()}
+                  className="h-10 w-10 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 p-0 shadow-sm transition-all hover:from-indigo-600 hover:to-purple-700 hover:shadow-md disabled:opacity-50"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

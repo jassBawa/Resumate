@@ -1,5 +1,6 @@
 'use client';
 import CustomDarkToggle from '@/components/DarkToggle';
+import { ChatWidget } from '@/components/dashboard/chat-widget';
 import { EditSection } from '@/components/dashboard/sidebar-tabs/EditSection';
 import { JobDescriptionSection } from '@/components/dashboard/sidebar-tabs/JobDescription';
 import { PreviewSection } from '@/components/dashboard/sidebar-tabs/ResumePreviewSectiont';
@@ -43,7 +44,7 @@ const DashboardLayout = ({ threadId }: { threadId: string }) => {
           </div>
         </div>
         <div className="animate-fade-in flex-1 p-6">{renderActiveSection()}</div>
-        {/* <ChatWidget threadId={threadId} /> */}
+        <ChatWidget threadId={threadId} />
       </main>
     </>
   );

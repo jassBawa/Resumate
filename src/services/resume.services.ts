@@ -77,7 +77,6 @@ export async function parseAndStoreResume(threadId: string) {
   // Create new assistant thread
   const openaiThread = await openai.beta.threads.create();
   // Add the new parsedSections as first message to thread
-
   const openaiThreadRes = await openai.beta.threads.messages.create(openaiThread.id, {
     role: 'user',
     content: `This is my updated resume in JSON:\n\n${JSON.stringify(parsedResumeJSON)}`,

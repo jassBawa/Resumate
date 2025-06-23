@@ -28,6 +28,8 @@ const sectionOrder: {
   },
   { key: 'projects', displayName: 'Projects', icon: '📚', editable: true },
   { key: 'education', displayName: 'Education', icon: '🎓', editable: false },
+  { key: 'certifications', displayName: 'Certifications', icon: '🏆', editable: false },
+  { key: 'publications', displayName: 'Publications', icon: '📄', editable: false },
 ];
 
 function ParsedResumeTemplate() {

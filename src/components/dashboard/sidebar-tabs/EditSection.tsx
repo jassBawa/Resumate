@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Edit, Briefcase, GraduationCap, Award, Globe } from 'lucide-react';
+import { User, Edit, Briefcase, GraduationCap, Award, Globe, BookOpen } from 'lucide-react';
 import { ContactInfoForm } from './forms/ContactInfoForm';
 import { SummaryForm } from './forms/SummaryForm';
 import { WorkExperienceForm } from './forms/WorkExperienceForm';
 import { EducationForm } from './forms/EducationForm';
 import { SkillsForm } from './forms/SkillsForm';
 import { ProjectsForm } from './forms/ProjectsForm';
+import { CertificationsForm } from './forms/CertificationsForm';
+import { PublicationsForm } from './forms/PublicationsForm';
 
 export function EditSection() {
   const [activeTab, setActiveTab] = useState('contactInfo');
@@ -35,7 +37,11 @@ export function EditSection() {
       title: 'Certifications',
       icon: Award,
     },
-    { id: 'awards', title: 'Awards', icon: Award },
+    {
+      id: 'publications',
+      title: 'Publications',
+      icon: BookOpen,
+    },
   ];
 
   const renderActiveForm = () => {
@@ -52,6 +58,10 @@ export function EditSection() {
         return <SkillsForm />;
       case 'projects':
         return <ProjectsForm />;
+      case 'certifications':
+        return <CertificationsForm />;
+      case 'publications':
+        return <PublicationsForm />;
       default:
         return (
           <div className="text-muted-foreground py-8 text-center">

@@ -47,17 +47,21 @@ export function CoverLetterSection({ coverLetter }: CoverLetterSectionProps) {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2 rounded bg-blue-50 p-2">
-                <FileText className="h-4 w-4 text-blue-600" />
-                <span>Personalized to job requirements</span>
+              <div className="flex items-center gap-2 rounded bg-blue-50 p-2 dark:bg-blue-900/20">
+                <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-900 dark:text-blue-100">
+                  Personalized to job requirements
+                </span>
               </div>
-              <div className="flex items-center gap-2 rounded bg-green-50 p-2">
-                <Sparkles className="h-4 w-4 text-green-600" />
-                <span>Highlights your key strengths</span>
+              <div className="flex items-center gap-2 rounded bg-green-50 p-2 dark:bg-green-900/20">
+                <Sparkles className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-green-900 dark:text-green-100">
+                  Highlights your key strengths
+                </span>
               </div>
-              <div className="flex items-center gap-2 rounded bg-purple-50 p-2">
-                <Clock className="h-4 w-4 text-purple-600" />
-                <span>Professional format</span>
+              <div className="flex items-center gap-2 rounded bg-purple-50 p-2 dark:bg-purple-900/20">
+                <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                <span className="text-purple-900 dark:text-purple-100">Professional format</span>
               </div>
             </div>
           </CardContent>
@@ -69,16 +73,29 @@ export function CoverLetterSection({ coverLetter }: CoverLetterSectionProps) {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span>Word Count:</span>
-              <Badge variant="secondary">{editedLetter.split(' ').length}</Badge>
+              <span className="text-gray-700 dark:text-gray-300">Word Count:</span>
+              <Badge
+                variant="secondary"
+                className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              >
+                {editedLetter.split(' ').length}
+              </Badge>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Character Count:</span>
-              <Badge variant="secondary">{editedLetter.length}</Badge>
+              <span className="text-gray-700 dark:text-gray-300">Character Count:</span>
+              <Badge
+                variant="secondary"
+                className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              >
+                {editedLetter.length}
+              </Badge>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Reading Time:</span>
-              <Badge variant="secondary">
+              <span className="text-gray-700 dark:text-gray-300">Reading Time:</span>
+              <Badge
+                variant="secondary"
+                className="bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              >
                 ~{Math.ceil(editedLetter.split(' ').length / 200)} min
               </Badge>
             </div>

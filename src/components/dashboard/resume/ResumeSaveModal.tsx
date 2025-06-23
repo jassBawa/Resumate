@@ -6,7 +6,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -14,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useResumeStore } from '@/hooks/useResumeStore';
 import { saveResumeSections } from '@/lib/actions/saveResumeSections';
-import { AlertCircle, Loader2, FileText, Save } from 'lucide-react';
+import { AlertCircle, Lightbulb, Loader2, Save } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 interface SaveTitleDialogProps {
@@ -62,6 +61,7 @@ export const SaveTitleDialog: React.FC<SaveTitleDialogProps> = ({ threadId, isOp
         toast.success('Resume saved successfully!');
         setOriginalSections(resumeSections);
         setTitle('');
+        onClose();
       } else {
         toast.error(result.error || 'Failed to save changes');
       }
@@ -85,65 +85,111 @@ export const SaveTitleDialog: React.FC<SaveTitleDialogProps> = ({ threadId, isOp
       handleSaveConfirm();
     }
   };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm md:max-w-lg">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-slate-600" />
-            Save Resume Version
-          </DialogTitle>
-          <DialogDescription>
-            Give this resume version a descriptive title to help you identify it later.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="mx-auto w-full max-w-md rounded-3xl border-0 bg-white p-0 shadow-2xl dark:bg-gray-900">
+        <div className="p-6">
+          <DialogHeader className="space-y-3">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-50 dark:bg-green-900/20">
+              <Save className="h-6 w-6 text-green-600 dark:text-green-400" />
+            </div>
+            <DialogTitle className="text-center text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Save Resume Version
+            </DialogTitle>
+            <DialogDescription className="text-center text-sm text-gray-600 dark:text-gray-400">
+              Give this resume version a descriptive title to help you identify it later.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="resume-title" className="text-sm font-medium">
-              Resume Title
-            </Label>
-            <Input
-              id="resume-title"
-              value={title}
-              onChange={handleTitleChange}
-              onKeyDown={handleKeyDown}
-              placeholder="e.g., Software Engineer Resume - Tech Companies"
-              className={titleError ? 'border-red-500 focus-visible:ring-red-500' : ''}
-              disabled={saving}
-              autoFocus
-            />
-            {titleError && (
-              <p className="flex items-center gap-1 text-sm text-red-500">
-                <AlertCircle className="h-3 w-3" />
-                {titleError}
-              </p>
-            )}
+          <div className="mt-6 space-y-6">
+            {/* Title Input Section */}
+            <div className="space-y-3">
+              <Label
+                htmlFor="resume-title"
+                className="text-sm font-medium text-gray-900 dark:text-gray-100"
+              >
+                Resume Title
+              </Label>
+              <div className="relative">
+                <Input
+                  id="resume-title"
+                  value={title}
+                  onChange={handleTitleChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder="e.g., Software Engineer Resume - Tech Companies"
+                  className={`h-11 rounded-xl border-gray-200 bg-gray-50 text-sm dark:border-gray-700 dark:bg-gray-800 ${
+                    titleError ? 'border-red-500 focus-visible:ring-red-500' : ''
+                  }`}
+                  disabled={saving}
+                  autoFocus
+                />
+                {saving && (
+                  <div className="absolute top-1/2 right-3 -translate-y-1/2">
+                    <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                  </div>
+                )}
+              </div>
+              {titleError && (
+                <div className="flex items-center space-x-2 rounded-lg bg-red-50 p-3 dark:bg-red-900/20">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+                  <p className="text-sm text-red-700 dark:text-red-300">{titleError}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Tip Section */}
+            <div className="rounded-xl bg-blue-50 p-4 dark:bg-blue-900/20">
+              <div className="flex items-start space-x-3">
+                <div className="rounded-lg bg-blue-100 p-1 dark:bg-blue-800/50">
+                  <Lightbulb className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100">Pro Tip</p>
+                  <p className="text-xs text-blue-700 dark:text-blue-300">
+                    Use descriptive titles like &quot;Added New Project - Resume Analyser&quot; to
+                    easily track changes
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Character Count */}
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>Minimum 3 characters</span>
+              <span className={title.length > 100 ? 'text-red-500' : ''}>{title.length}/100</span>
+            </div>
           </div>
-          <div className="text-xs text-slate-500">
-            💡 <strong>Tip:</strong> Use descriptive titles like &quot;Added New Project - Resume
-            Analyser&quot;
+
+          {/* Action Buttons */}
+          <div className="mt-8 flex space-x-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={saving}
+              className="flex-1 rounded-xl border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveConfirm}
+              disabled={saving || !title.trim() || title.length < 3 || title.length > 100}
+              className="flex-1 rounded-xl bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Resume
+                </>
+              )}
+            </Button>
           </div>
         </div>
-
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button onClick={handleSaveConfirm} disabled={saving || !title.trim()}>
-            {saving ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Resume
-              </>
-            )}
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

@@ -45,14 +45,12 @@ export async function analyseResumeSections(
 
     const content = completion.choices[0].message.content;
 
-    console.log(content);
     if (!content) {
       return { error: 'No response from OpenAI' };
     }
 
     // Parse the JSON response directly
     const analysisResult = JSON.parse(content);
-    console.log(analysisResult);
 
     // Basic validation
     if (!analysisResult) {

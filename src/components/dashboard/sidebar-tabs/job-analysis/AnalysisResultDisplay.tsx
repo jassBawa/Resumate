@@ -53,8 +53,9 @@ export function AnalysisResultDisplay({ analysisResult }: AnalysisResultDisplayP
   };
 
   const getAIRecommendations = () => {
+    const colors = ['blue', 'green', 'orange', 'purple'] as const;
     return Object.values(analysisResult.sectionAnalysis).map((section, idx) => ({
-      color: ['blue', 'green', 'orange', 'purple'][idx % 4],
+      color: colors[idx % colors.length],
       title: `Improve ${Object.keys(analysisResult.sectionAnalysis)[idx]}`,
       description: section.areasOfImprovement,
     }));

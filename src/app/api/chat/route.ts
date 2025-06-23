@@ -18,25 +18,19 @@ export async function POST(req: Request) {
     if (!thread) {
       return;
     }
-    // const openaiThread = await openai.beta.threads.create();
-    // console.log(JSON);
-    // const openaiThreadId = thread.openaiThreadId as string;
-    // console.log(openaiThreadId);
-    const openaiThreadId = 'thread_YCi6ThGpqyE9myCxK5obpMTi';
-    // // Step 1: Add user message to the assistant thread
-    // const result = await openai.beta.threads.messages.create(openaiThreadId, {
-    //   role: 'user',
-    //   content: message,
-    // });
 
-    // if(result.content[0].type);
+    const openaiThreadId = thread.openaiThreadId as string;
 
-    // // Step 2: Run the assistant
+    // Step 1: Add user message to the assistant thread
+    await openai.beta.threads.messages.create(openaiThreadId, {
+      role: 'user',
+      content: message,
+    });
+
     const run = await openai.beta.threads.runs.create(openaiThreadId, {
       assistant_id: ASSISTANT_ID,
     });
 
-    // // Step 3: Poll for completion
     let status = run.status;
     let runResult = run;
 
@@ -50,10 +44,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Assistant failed to complete' }, { status: 500 });
     }
 
-    // // Step 4: Fetch messages from the thread
     const messages = await openai.beta.threads.messages.list(openaiThreadId, { limit: 1 });
     const last = messages.data[0]?.content?.[0];
-    console.log(message, last);
 
     if (!last || last.type !== 'text') {
       return NextResponse.json({ error: 'Invalid response format' }, { status: 500 });
@@ -61,15 +53,15 @@ export async function POST(req: Request) {
 
     // // Step 5: Parse assistant response
     const contentRes = last.text.value.trim();
+
     const parsed = JSON.parse(contentRes);
-    console.log(parsed);
     if (!parsed || typeof parsed !== 'object') {
       return NextResponse.json({ error: 'Failed to parse assistant response' }, { status: 500 });
     }
 
-    const { type, content, parsedResume } = parsed;
-    console.log(parsedResume);
-    return NextResponse.json({ type, content, parsedResume });
+    const { type, content, data } = parsed;
+
+    return NextResponse.json({ type, content, data });
   } catch (error: any) {
     console.error('Error in chat API:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
