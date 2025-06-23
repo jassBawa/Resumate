@@ -25,25 +25,30 @@ export async function getThreadById(threadId: string) {
       next: {
         tags: [`thread-${threadId}`],
       },
-    }); // Assuming this is a GET request for a specific thread
+    });
     const result = await response.json();
 
-    if (!result.success) {
-      console.error(
-        `Failed to fetch thread with ID ${threadId}:`,
-        result.error
-      );
-      return { data: null, error: 'Failed to fetch thread' }; // Return null if no thread found
+    if (!response.ok) {
+      if (response.status === 404) {
+        console.warn(`Thread not found with ID ${threadId}`);
+        return { data: null, error: 'Thread not found', status: 404 };
+      }
+      console.error(`Failed to fetch thread with ID ${threadId}:`, result);
+      return { data: null, error: 'Failed to fetch thread', status: response.status };
     }
-    return { data: result.data, error: null };
+
+    if (!result.success) {
+      console.error(`Failed to fetch thread with ID ${threadId}:`, result);
+      return { data: null, error: 'Failed to fetch thread', status: 500 };
+    }
+
+    return { data: result.data, error: null, status: 200 };
   } catch (error) {
-    console.error(
-      `Unexpected error fetching thread with ID ${threadId}:`,
-      error
-    );
+    console.error(`Unexpected error fetching thread with ID ${threadId}:`, error);
     return {
       data: null,
       error: `Unexpected error fetching thread with ID ${threadId}: ${error}`,
+      status: 500,
     };
   }
 }
@@ -83,10 +88,7 @@ export async function getShareableResumeById(publicId: string) {
     }
     return { data: result.data, error: null, status: 200 };
   } catch (error) {
-    console.error(
-      `Unexpected error fetching  resume with public ID ${publicId}:`,
-      error
-    );
+    console.error(`Unexpected error fetching  resume with public ID ${publicId}:`, error);
     return {
       data: null,
       error: `Unexpected error fetching public ID ${publicId}: ${error}`,
@@ -95,10 +97,7 @@ export async function getShareableResumeById(publicId: string) {
   }
 }
 
-export async function updateResumeSharing(
-  threadId: string,
-  isSharable: boolean
-) {
+export async function updateResumeSharing(threadId: string, isSharable: boolean) {
   try {
     const response = await fetchWithAuth(`/api/threads/${threadId}`, {
       method: 'PATCH',
@@ -120,10 +119,7 @@ export async function updateResumeSharing(
       success: true,
     };
   } catch (error) {
-    console.error(
-      `Unexpected error updating resume with thread ID ${threadId}:`,
-      error
-    );
+    console.error(`Unexpected error updating resume with thread ID ${threadId}:`, error);
     return {
       data: null,
       error: `Unexpected error: ${error}`,

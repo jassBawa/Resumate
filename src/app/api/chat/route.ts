@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import openai from '@/lib/openai';
 import { prisma } from '@/lib/prisma';
+import { ENV_CONFIG } from '@/config/config';
 
-const ASSISTANT_ID = 'asst_NmnAT6X8r7W50310h1Mm56S2';
+const ASSISTANT_ID = ENV_CONFIG.OPENAI_ASSISTANT_ID;
 
 export async function POST(req: Request) {
   try {
