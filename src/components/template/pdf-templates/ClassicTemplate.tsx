@@ -288,20 +288,11 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
         <View style={styles.header}>
           <Text style={styles.name}>{sections.contactInfo.data.name}</Text>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactItem}>
-              {sections.contactInfo.data.email}
-            </Text>
-            <Text style={styles.contactItem}>
-              {sections.contactInfo.data.phone}
-            </Text>
-            <Text style={styles.contactItem}>
-              {sections.contactInfo.data.location}
-            </Text>
+            <Text style={styles.contactItem}>{sections.contactInfo.data.email}</Text>
+            <Text style={styles.contactItem}>{sections.contactInfo.data.phone}</Text>
+            <Text style={styles.contactItem}>{sections.contactInfo.data.location}</Text>
             {sections.contactInfo.data.linkedin && (
-              <Link
-                src={sections.contactInfo.data.linkedin}
-                style={styles.link}
-              >
+              <Link src={sections.contactInfo.data.linkedin} style={styles.link}>
                 <Text style={styles.contactItem}>LinkedIn</Text>
               </Link>
             )}
@@ -321,32 +312,26 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
       {sections.skills && (
         <View style={styles.section} wrap={false}>
           <Text style={styles.sectionTitle}>Skills</Text>
-          {sections.skills.data.hardSkills &&
-            sections.skills.data.hardSkills.length > 0 && (
-              <View style={styles.row}>
-                <View style={styles.leftColumn}>
-                  <Text style={styles.skillCategory}>Technical Skills:</Text>
-                </View>
-                <View style={styles.rightColumn}>
-                  <Text style={styles.description}>
-                    {sections.skills.data.hardSkills.join(', ')}
-                  </Text>
-                </View>
+          {sections.skills.data.skills && sections.skills.data.skills.length > 0 && (
+            <View style={styles.row}>
+              <View style={styles.leftColumn}>
+                <Text style={styles.skillCategory}>Skills:</Text>
               </View>
-            )}
-          {sections.skills.data.softSkills &&
-            sections.skills.data.softSkills.length > 0 && (
-              <View style={styles.row}>
-                <View style={styles.leftColumn}>
-                  <Text style={styles.skillCategory}>Soft Skills:</Text>
-                </View>
-                <View style={styles.rightColumn}>
-                  <Text style={styles.description}>
-                    {sections.skills.data.softSkills.join(', ')}
-                  </Text>
-                </View>
+              <View style={styles.rightColumn}>
+                <Text style={styles.description}>{sections.skills.data.skills.join(', ')}</Text>
               </View>
-            )}
+            </View>
+          )}
+          {sections.skills.data.skills && sections.skills.data.skills.length > 0 && (
+            <View style={styles.row}>
+              <View style={styles.leftColumn}>
+                <Text style={styles.skillCategory}>Soft Skills:</Text>
+              </View>
+              <View style={styles.rightColumn}>
+                <Text style={styles.description}>{sections.skills.data.skills.join(', ')}</Text>
+              </View>
+            </View>
+          )}
         </View>
       )}
 
@@ -363,9 +348,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
                 <View style={styles.rightColumn}>
                   <Text style={styles.jobTitle}>{job.title}</Text>
                   <Text style={styles.company}>{job.company}</Text>
-                  {job.description && (
-                    <Text style={styles.description}>{job.description}</Text>
-                  )}
+                  {job.description && <Text style={styles.description}>{job.description}</Text>}
                   {job.responsibilities && job.responsibilities.length > 0 && (
                     <View style={styles.bulletContainer}>
                       {job.responsibilities.map((responsibility, idx) => (
@@ -397,13 +380,9 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
                 <View style={styles.rightColumn}>
                   <Text style={styles.institution}>{edu.institution}</Text>
                   <Text style={styles.degree}>{edu.degree}</Text>
-                  {edu.cgpa && (
-                    <Text style={styles.description}>CGPA: {edu.cgpa}</Text>
-                  )}
+                  {edu.cgpa && <Text style={styles.description}>CGPA: {edu.cgpa}</Text>}
                   {edu.percentage && (
-                    <Text style={styles.description}>
-                      Percentage: {edu.percentage}
-                    </Text>
+                    <Text style={styles.description}>Percentage: {edu.percentage}</Text>
                   )}
                 </View>
               </View>
@@ -426,9 +405,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
                   </Link>
                 )}
               </View>
-              <Text style={styles.projectDescription}>
-                {project.description}
-              </Text>
+              <Text style={styles.projectDescription}>{project.description}</Text>
               {project.technologies && project.technologies.length > 0 && (
                 <Text style={styles.description}>
                   <Text
@@ -524,9 +501,7 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
       {sections.hobbies && sections.hobbies.data.length > 0 && (
         <View style={styles.section} wrap={false}>
           <Text style={styles.sectionTitle}>Interests</Text>
-          <Text style={styles.description}>
-            {sections.hobbies.data.join(', ')}
-          </Text>
+          <Text style={styles.description}>{sections.hobbies.data.join(', ')}</Text>
         </View>
       )}
 
@@ -539,17 +514,11 @@ const ClassicTemplate: React.FC<ClassicTemplateProps> = ({ sections }) => {
               {customSec.entries.map((entry, idx) => (
                 <View key={idx} style={styles.customEntryItem} wrap={false}>
                   {entry.organization && (
-                    <Text style={styles.customEntryOrg}>
-                      {entry.organization}
-                    </Text>
+                    <Text style={styles.customEntryOrg}>{entry.organization}</Text>
                   )}
-                  {entry.role && (
-                    <Text style={styles.customEntryRole}>{entry.role}</Text>
-                  )}
+                  {entry.role && <Text style={styles.customEntryRole}>{entry.role}</Text>}
                   {entry.description && (
-                    <Text style={styles.customEntryDesc}>
-                      {entry.description}
-                    </Text>
+                    <Text style={styles.customEntryDesc}>{entry.description}</Text>
                   )}
                 </View>
               ))}

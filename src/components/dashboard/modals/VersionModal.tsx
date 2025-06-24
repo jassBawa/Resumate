@@ -130,8 +130,8 @@ export function VersionModal({ threadId, currentVersionId, isOpen, onClose }: Ve
                   </p>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-gray-200 bg-gray-50/50 dark:border-gray-700 dark:bg-gray-800/50">
-                  <div className="max-h-[60vh] overflow-y-auto rounded-2xl">
+                <div className="rounded-2xl bg-gray-50/50 dark:bg-gray-800/50">
+                  <div className="max-h-[60vh] overflow-y-auto">
                     <VersionList
                       versions={versions}
                       loading={loading}

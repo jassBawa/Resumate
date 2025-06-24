@@ -3,8 +3,9 @@
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
-export default function CustomDarkToggle() {
+export default function CustomDarkToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -17,7 +18,10 @@ export default function CustomDarkToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      className="relative flex cursor-pointer items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1.5 transition-all duration-300 dark:border-gray-700 dark:bg-zinc-900"
+      className={cn(
+        'relative flex cursor-pointer items-center gap-2 rounded-full border border-neutral-200 px-3 py-1.5 transition-all duration-300 dark:border-gray-700',
+        className
+      )}
     >
       <motion.div
         className="relative flex h-6 w-6 items-center justify-center rounded-full bg-yellow-300 dark:bg-indigo-600"

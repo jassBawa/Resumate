@@ -1,14 +1,5 @@
 import type React from 'react';
-import {
-  Text,
-  View,
-  StyleSheet,
-  Link,
-  Font,
-  Svg,
-  Path,
-  Line,
-} from '@react-pdf/renderer';
+import { Text, View, StyleSheet, Link, Font, Svg, Path, Line } from '@react-pdf/renderer';
 import type { ResumeSections } from '@/types';
 
 // Register fonts for more professional appearance
@@ -315,20 +306,11 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
         <View style={styles.header}>
           <Text style={styles.name}>{sections.contactInfo.data.name}</Text>
           <View style={styles.contactInfo}>
-            <Text style={styles.contactItem}>
-              {sections.contactInfo.data.email}
-            </Text>
-            <Text style={styles.contactItem}>
-              {sections.contactInfo.data.phone}
-            </Text>
-            <Text style={styles.contactItem}>
-              {sections.contactInfo.data.location}
-            </Text>
+            <Text style={styles.contactItem}>{sections.contactInfo.data.email}</Text>
+            <Text style={styles.contactItem}>{sections.contactInfo.data.phone}</Text>
+            <Text style={styles.contactItem}>{sections.contactInfo.data.location}</Text>
             {sections.contactInfo.data.linkedin && (
-              <Link
-                src={sections.contactInfo.data.linkedin}
-                style={styles.link}
-              >
+              <Link src={sections.contactInfo.data.linkedin} style={styles.link}>
                 <Text style={styles.contactItem}>LinkedIn</Text>
               </Link>
             )}
@@ -342,39 +324,33 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
           {sections.summary && (
             <View style={styles.section} wrap={false}>
               <Text style={styles.sectionTitle}>Professional Summary</Text>
-              <Text style={styles.summary}>
-                {sections.summary.data.summary}
-              </Text>
+              <Text style={styles.summary}>{sections.summary.data.summary}</Text>
             </View>
           )}
 
           {/* Work Experience Section */}
-          {sections.workExperience &&
-            sections.workExperience.data.length > 0 && (
-              <View style={styles.section} wrap={false}>
-                <Text style={styles.sectionTitle}>Work Experience</Text>
-                {sections.workExperience.data.map((job, index) => (
-                  <View key={index} style={styles.experienceItem} wrap={false}>
-                    <Text style={styles.jobTitle}>{job.title}</Text>
-                    <Text style={styles.company}>{job.company}</Text>
-                    <Text style={styles.duration}>{job.duration}</Text>
-                    {job.description && (
-                      <Text style={styles.description}>{job.description}</Text>
-                    )}
-                    {job.responsibilities &&
-                      job.responsibilities.length > 0 && (
-                        <View style={styles.bulletContainer}>
-                          {job.responsibilities.map((responsibility, idx) => (
-                            <Text key={idx} style={styles.bulletPoint}>
-                              • {responsibility}
-                            </Text>
-                          ))}
-                        </View>
-                      )}
-                  </View>
-                ))}
-              </View>
-            )}
+          {sections.workExperience && sections.workExperience.data.length > 0 && (
+            <View style={styles.section} wrap={false}>
+              <Text style={styles.sectionTitle}>Work Experience</Text>
+              {sections.workExperience.data.map((job, index) => (
+                <View key={index} style={styles.experienceItem} wrap={false}>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                  <Text style={styles.company}>{job.company}</Text>
+                  <Text style={styles.duration}>{job.duration}</Text>
+                  {job.description && <Text style={styles.description}>{job.description}</Text>}
+                  {job.responsibilities && job.responsibilities.length > 0 && (
+                    <View style={styles.bulletContainer}>
+                      {job.responsibilities.map((responsibility, idx) => (
+                        <Text key={idx} style={styles.bulletPoint}>
+                          • {responsibility}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Projects Section */}
           {sections.projects && sections.projects.data.length > 0 && (
@@ -390,9 +366,7 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
                       </Link>
                     )}
                   </View>
-                  <Text style={styles.projectDescription}>
-                    {project.description}
-                  </Text>
+                  <Text style={styles.projectDescription}>{project.description}</Text>
                   {project.technologies && project.technologies.length > 0 && (
                     <View style={styles.technologies}>
                       {project.technologies.map((tech, idx) => (
@@ -418,13 +392,9 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
                   <Text style={styles.dates}>
                     {edu.startDate} - {edu.endDate}
                   </Text>
-                  {edu.cgpa && (
-                    <Text style={styles.description}>CGPA: {edu.cgpa}</Text>
-                  )}
+                  {edu.cgpa && <Text style={styles.description}>CGPA: {edu.cgpa}</Text>}
                   {edu.percentage && (
-                    <Text style={styles.description}>
-                      Percentage: {edu.percentage}
-                    </Text>
+                    <Text style={styles.description}>Percentage: {edu.percentage}</Text>
                   )}
                 </View>
               ))}
@@ -437,62 +407,41 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
           {sections.skills && (
             <View style={styles.section} wrap={false}>
               <Text style={styles.sectionTitle}>Skills</Text>
-              {sections.skills.data.hardSkills &&
-                sections.skills.data.hardSkills.length > 0 && (
-                  <View style={{ marginBottom: 8 }}>
-                    <Text style={styles.skillCategory}>Technical Skills</Text>
-                    <View style={styles.skillsContainer}>
-                      {sections.skills.data.hardSkills.map((skill, index) => (
-                        <Text key={index} style={styles.skillItem}>
-                          {skill}
-                        </Text>
-                      ))}
-                    </View>
+              {sections.skills.data.skills && sections.skills.data.skills.length > 0 && (
+                <View style={{ marginBottom: 8 }}>
+                  <Text style={styles.skillCategory}>Skills</Text>
+                  <View style={styles.skillsContainer}>
+                    {sections.skills.data.skills.map((skill, index) => (
+                      <Text key={index} style={styles.skillItem}>
+                        {skill}
+                      </Text>
+                    ))}
                   </View>
-                )}
-              {sections.skills.data.softSkills &&
-                sections.skills.data.softSkills.length > 0 && (
-                  <View>
-                    <Text style={styles.skillCategory}>Soft Skills</Text>
-                    <View style={styles.skillsContainer}>
-                      {sections.skills.data.softSkills.map((skill, index) => (
-                        <Text key={index} style={styles.skillItem}>
-                          {skill}
-                        </Text>
-                      ))}
-                    </View>
-                  </View>
-                )}
+                </View>
+              )}
             </View>
           )}
 
           {/* Certifications Section */}
-          {sections.certifications &&
-            sections.certifications.data.length > 0 && (
-              <View style={styles.section} wrap={false}>
-                <Text style={styles.sectionTitle}>Certifications</Text>
-                {sections.certifications.data.map((cert, index) => (
-                  <View
-                    key={index}
-                    style={styles.certificationItem}
-                    wrap={false}
-                  >
-                    <View style={styles.projectHeader}>
-                      <Text style={styles.certificationName}>{cert.name}</Text>
-                      {cert.url && (
-                        <Link src={cert.url} style={styles.link}>
-                          <PDFLinkIcon />
-                        </Link>
-                      )}
-                    </View>
-                    <Text style={styles.certificationIssuer}>
-                      {cert.issuer}
-                    </Text>
-                    <Text style={styles.certificationDate}>{cert.date}</Text>
+          {sections.certifications && sections.certifications.data.length > 0 && (
+            <View style={styles.section} wrap={false}>
+              <Text style={styles.sectionTitle}>Certifications</Text>
+              {sections.certifications.data.map((cert, index) => (
+                <View key={index} style={styles.certificationItem} wrap={false}>
+                  <View style={styles.projectHeader}>
+                    <Text style={styles.certificationName}>{cert.name}</Text>
+                    {cert.url && (
+                      <Link src={cert.url} style={styles.link}>
+                        <PDFLinkIcon />
+                      </Link>
+                    )}
                   </View>
-                ))}
-              </View>
-            )}
+                  <Text style={styles.certificationIssuer}>{cert.issuer}</Text>
+                  <Text style={styles.certificationDate}>{cert.date}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Languages Section */}
           {sections.languages && sections.languages.data.length > 0 && (
@@ -565,17 +514,11 @@ const ModernTemplate: React.FC<ModernTemplateProps> = ({ sections }) => {
               {customSec.entries.map((entry, idx) => (
                 <View key={idx} style={styles.customEntryItem} wrap={false}>
                   {entry.organization && (
-                    <Text style={styles.customEntryOrg}>
-                      {entry.organization}
-                    </Text>
+                    <Text style={styles.customEntryOrg}>{entry.organization}</Text>
                   )}
-                  {entry.role && (
-                    <Text style={styles.customEntryRole}>{entry.role}</Text>
-                  )}
+                  {entry.role && <Text style={styles.customEntryRole}>{entry.role}</Text>}
                   {entry.description && (
-                    <Text style={styles.customEntryDesc}>
-                      {entry.description}
-                    </Text>
+                    <Text style={styles.customEntryDesc}>{entry.description}</Text>
                   )}
                 </View>
               ))}

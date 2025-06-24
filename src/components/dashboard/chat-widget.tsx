@@ -87,7 +87,7 @@ function useChatLogic(threadId: string) {
         }
 
         const data = await response.json();
-
+        console.log(data);
         // Handle edit responses (Dependency Inversion - depends on abstraction)
         if (data.type === 'edit') {
           const parsedResume = data.data.parsedResume as ResumeSections;

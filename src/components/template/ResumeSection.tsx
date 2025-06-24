@@ -39,11 +39,10 @@ export default function ResumeSection({ type, data }: ResumeSectionProps) {
       );
 
     case 'skills':
-      const allSkills = [...data.hardSkills, ...data.softSkills];
       return (
         <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
-            {allSkills.map((skill: string, index: number) => (
+            {data.skills.map((skill: string, index: number) => (
               <span key={index} className="bg-muted rounded-full px-3 py-1 text-sm">
                 {skill}
               </span>

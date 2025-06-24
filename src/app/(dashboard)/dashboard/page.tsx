@@ -1,5 +1,13 @@
-import { CreateThreadButton, ThreadList, ThreadListSkeleton } from '@/components/dashboard';
+import { ThreadList, ThreadListSkeleton } from '@/components/dashboard';
 import { Suspense } from 'react';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dashboard - ResuMate | Manage Your Resumes',
+  description:
+    'Manage and continue your resume conversations. View all your resume projects, track progress, and access AI-powered resume building tools.',
+  robots: 'noindex, nofollow', // Dashboard should not be indexed
+};
 
 export default function DashboardPage() {
   return (
@@ -31,11 +39,6 @@ export default function DashboardPage() {
           <Suspense fallback={<ThreadListSkeleton />}>
             <ThreadList />
           </Suspense>
-        </div>
-
-        {/* Create Thread Button */}
-        <div className="mt-12 flex justify-center">
-          <CreateThreadButton />
         </div>
       </div>
     </main>

@@ -30,7 +30,7 @@ export default function CreateThreadButton() {
 
     try {
       await createThread(title);
-      toast('Thread created', {
+      toast.success('Thread created', {
         description: 'Your new resume has been created successfully.',
       });
       setOpen(false);
@@ -39,6 +39,7 @@ export default function CreateThreadButton() {
       toast.error('Failed to create resume. Please try again.');
     } finally {
       setIsLoading(false);
+      setTitle('');
     }
   };
 

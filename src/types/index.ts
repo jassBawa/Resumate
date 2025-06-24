@@ -15,8 +15,7 @@ export interface ResumeSections {
   };
   skills?: {
     data: {
-      hardSkills: string[];
-      softSkills: string[];
+      skills: string[];
     };
   };
   workExperience?: {

@@ -52,8 +52,7 @@ const getExamplesOutputPrompt = () => `
     "skills":
       {
         "data": {
-          "hardSkills": ["JavaScript", "React", "Node.js"], // string[]
-          "softSkills": ["Communication", "Problem Solving"]
+          "skills": ["JavaScript", "React", "Node.js", "Communication", "Problem Solving"], // string[]
         },
       },
      "certifications":

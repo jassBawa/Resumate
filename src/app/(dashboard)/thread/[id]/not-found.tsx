@@ -1,6 +1,14 @@
-import Link from 'next/link';
-import { FileText, ArrowLeft, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FileText, Home } from 'lucide-react';
+import { Metadata } from 'next';
+import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Resume Project Not Found - ResuMate',
+  description:
+    'The resume project you are looking for does not exist or may have been moved. Return to your dashboard to view all available projects.',
+  robots: 'noindex, nofollow',
+};
 
 export default function NotFound() {
   return (

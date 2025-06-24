@@ -2,6 +2,14 @@ import Link from 'next/link';
 import { FileX, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Resume Not Found - ResuMate',
+  description:
+    'The resume you are looking for does not exist or is no longer available. It may have been made private or deleted.',
+  robots: 'noindex, nofollow',
+};
 
 export default function ResumeNotFound() {
   return (

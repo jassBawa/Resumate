@@ -23,9 +23,7 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ sections }) => {
       {/* Header */}
       {sections.contactInfo && (
         <View style={styles.section}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-            {sections.contactInfo.data.name}
-          </Text>
+          <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{sections.contactInfo.data.name}</Text>
           <Text style={styles.text}>{jobTitle}</Text>
           <Text style={styles.text}>{sections.contactInfo.data.email}</Text>
           <Text style={styles.text}>{sections.contactInfo.data.phone}</Text>
@@ -79,9 +77,7 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ sections }) => {
                 {edu.startDate} - {edu.endDate}
               </Text>
               {edu.cgpa && <Text style={styles.text}>CGPA: {edu.cgpa}</Text>}
-              {edu.percentage && (
-                <Text style={styles.text}>Percentage: {edu.percentage}</Text>
-              )}
+              {edu.percentage && <Text style={styles.text}>Percentage: {edu.percentage}</Text>}
             </View>
           ))}
         </View>
@@ -101,9 +97,7 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ sections }) => {
                 </Link>
               )}
               {proj.technologies && proj.technologies?.length > 0 && (
-                <Text style={styles.text}>
-                  Tech: {proj.technologies.join(', ')}
-                </Text>
+                <Text style={styles.text}>Tech: {proj.technologies.join(', ')}</Text>
               )}
             </View>
           ))}
@@ -114,15 +108,8 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ sections }) => {
       {sections.skills && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Skills</Text>
-          {sections.skills.data.hardSkills && (
-            <Text style={styles.text}>
-              Hard: {sections.skills.data.hardSkills.join(', ')}
-            </Text>
-          )}
-          {sections.skills.data.softSkills && (
-            <Text style={styles.text}>
-              Soft: {sections.skills.data.softSkills.join(', ')}
-            </Text>
+          {sections.skills.data.skills && (
+            <Text style={styles.text}>Hard: {sections.skills.data.skills.join(', ')}</Text>
           )}
         </View>
       )}
@@ -192,13 +179,9 @@ const MinimalTemplate: React.FC<MinimalTemplateProps> = ({ sections }) => {
               <Text style={styles.sectionTitle}>{custom.sectionTitle}</Text>
               {custom.entries.map((entry, j) => (
                 <View key={j}>
-                  {entry.organization && (
-                    <Text style={styles.text}>{entry.organization}</Text>
-                  )}
+                  {entry.organization && <Text style={styles.text}>{entry.organization}</Text>}
                   {entry.role && <Text style={styles.text}>{entry.role}</Text>}
-                  {entry.description && (
-                    <Text style={styles.text}>{entry.description}</Text>
-                  )}
+                  {entry.description && <Text style={styles.text}>{entry.description}</Text>}
                 </View>
               ))}
             </View>
