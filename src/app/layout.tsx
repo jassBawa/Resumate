@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/themeProvider';
-import CustomDarkToggle from '@/components/DarkToggle';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from '@/components/ui/sonner';
 
@@ -41,7 +40,6 @@ export default function RootLayout({
           >
             {children}
 
-            <CustomDarkToggle />
             <Toaster richColors={true} />
           </ThemeProvider>
         </body>

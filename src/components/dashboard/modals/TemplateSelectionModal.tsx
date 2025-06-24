@@ -6,22 +6,12 @@ import ModernResume from '@/assets/modern-resume-placeholder.png';
 import ResumePDF from '@/components/template/ResumePDF';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useResumeStore } from '@/hooks/useResumeStore';
 import { pdf } from '@react-pdf/renderer';
 import FileSaver from 'file-saver';
 import Image, { StaticImageData } from 'next/image';
 import { useEffect, useState } from 'react';
-
-interface TemplateSelectionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 type TemplateId = 'modern' | 'classic' | 'minimal' | 'creative';
 
@@ -58,13 +48,14 @@ const templates: Template[] = [
   },
 ];
 
-export function TemplateSelectionModal({
-  isOpen,
-  onClose,
-}: TemplateSelectionModalProps) {
+interface TemplateSectionProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function TemplateSelectionModal({ isOpen, onClose }: TemplateSectionProps) {
   const { resumeSections } = useResumeStore();
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<TemplateId>('modern');
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>('modern');
 
   const handleSelect = (templateId: TemplateId) => {
     setSelectedTemplate(templateId);
@@ -96,40 +87,57 @@ export function TemplateSelectionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-sm mx-auto md:max-w-6xl">
-        <DialogHeader>
-          <DialogTitle>Select a Template</DialogTitle>
-        </DialogHeader>
-        <div className="overflow-y-auto h-[70vh] md:h-auto grid grid-cols-1 md:grid-cols-4 gap-3 mt-4 p-4">
-          {templates.map((template) => (
-            <Card
-              key={template.id}
-              className={`p-4 gap-0 cursor-pointer transition-all ${
-                selectedTemplate === template.id ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => handleSelect(template.id)}
-            >
-              <div className="relative flex items-center justify-center w-full h-auto rounded-lg aspect-square bg-muted">
-                <Image
-                  src={template.preview}
-                  alt={template.name}
-                  fill
-                  className="absolute w-full h-full rounded-lg object-fit"
-                />
-              </div>
-              <h3 className="mt-2 text-lg font-semibold">{template.name}</h3>
-              <p className="text-sm text-muted-foreground">
-                {template.description}
-              </p>
-            </Card>
-          ))}
-        </div>
-        <div className="flex items-center justify-end">
-          {resumeSections && (
-            <Button className="" onClick={generatePdfDocument}>
-              Download PDF
+      <DialogContent className="mx-auto w-full max-w-5xl rounded-3xl border-0 bg-white p-0 shadow-2xl dark:bg-gray-900">
+        <div className="p-6">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-center text-xl font-semibold text-gray-900 dark:text-white">
+              Select a Template
+            </DialogTitle>
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+              Choose a resume template to preview and download as PDF
+            </p>
+          </DialogHeader>
+          <div className="mt-2 grid h-[60vh] grid-cols-1 gap-4 overflow-y-auto md:h-auto md:grid-cols-4">
+            {templates.map(template => (
+              <Card
+                key={template.id}
+                className={`group cursor-pointer gap-0 rounded-2xl border p-4 shadow-md transition-all duration-200 ${
+                  selectedTemplate === template.id
+                    ? 'border-blue-500 bg-gradient-to-br from-blue-50/80 to-blue-100/60 ring-2 ring-blue-400/40 dark:border-blue-400 dark:bg-gradient-to-br dark:from-blue-900/40 dark:to-blue-800/30 dark:ring-2 dark:ring-blue-400/40'
+                    : 'hover:border-blue-300 hover:shadow-lg dark:hover:border-blue-500'
+                } `}
+                onClick={() => handleSelect(template.id)}
+              >
+                <div className="bg-muted relative flex aspect-square h-auto w-full items-center justify-center overflow-hidden rounded-lg">
+                  <Image
+                    src={template.preview}
+                    alt={template.name}
+                    fill
+                    className="absolute h-full w-full rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                  />
+                </div>
+                <h3 className="mt-3 text-center text-lg font-semibold text-gray-900 dark:text-white">
+                  {template.name}
+                </h3>
+                <p className="text-muted-foreground text-center text-sm dark:text-gray-400">
+                  {template.description}
+                </p>
+              </Card>
+            ))}
+          </div>
+          <div className="mt-6 flex items-center justify-end gap-2">
+            <Button variant="outline" onClick={onClose} className="rounded-xl">
+              Cancel
             </Button>
-          )}
+            {resumeSections && (
+              <Button
+                className="rounded-xl bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                onClick={generatePdfDocument}
+              >
+                Download PDF
+              </Button>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

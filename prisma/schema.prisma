@@ -17,20 +17,20 @@ model User {
 }
 
 model Thread {
-  id             String   @id @default(cuid())
+  id             String          @id @default(cuid())
   title          String
   userId         String
   fileId         String
-  publicId       String   @unique @default(cuid())
-  isSharable     Boolean  @default(false)
-  viewerCount    Int      @default(0)
+  publicId       String          @unique @default(cuid())
+  isSharable     Boolean         @default(false)
+  viewerCount    Int             @default(0)
   resumeText     String
   parsedSections Json
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id])
-
-  versions ResumeVersion[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  user           User            @relation(fields: [userId], references: [id])
+  openaiThreadId String?
+  versions       ResumeVersion[]
 }
 
 model ResumeVersion {

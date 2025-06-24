@@ -1,30 +1,30 @@
 import Link from 'next/link';
 import { FileX, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Resume Not Found - ResuMate',
+  description:
+    'The resume you are looking for does not exist or is no longer available. It may have been made private or deleted.',
+  robots: 'noindex, nofollow',
+};
 
 export default function ResumeNotFound() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-background to-muted p-4">
-      <Card className="mx-auto max-w-md border-muted-foreground/20 shadow-lg">
+    <div className="from-background to-muted flex min-h-screen items-center justify-center bg-gradient-to-b p-4">
+      <Card className="border-muted-foreground/20 mx-auto max-w-md shadow-lg">
         <CardHeader className="flex flex-col items-center space-y-2 text-center">
-          <div className="rounded-full bg-muted p-4">
-            <FileX className="h-12 w-12 text-muted-foreground" />
+          <div className="bg-muted rounded-full p-4">
+            <FileX className="text-muted-foreground h-12 w-12" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Resume Not Found
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Resume Not Found</h1>
           <p className="text-muted-foreground">
-            The resume you&apos;re looking for doesn&apos;t exist or is no
-            longer shared.
+            The resume you're looking for doesn't exist or is no longer shared.
           </p>
         </CardHeader>
-        <CardContent className="text-center text-sm text-muted-foreground">
+        <CardContent className="text-muted-foreground text-center text-sm">
           <p>This could be because:</p>
           <ul className="mt-2 space-y-1">
             <li>• The resume link is incorrect</li>

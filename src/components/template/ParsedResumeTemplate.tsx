@@ -1,9 +1,7 @@
 'use client';
 import { ResumeSections } from '@/types';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Button } from '../ui/button';
-import AnalysisCard from './AnalysisCard';
 import ResumeSection from './ResumeSection';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useResumeStore } from '@/hooks/useResumeStore';
@@ -12,7 +10,7 @@ const sectionOrder: {
   key: keyof ResumeSections;
   displayName: string;
   icon: string;
-  editable: boolean; // ✅ Add this
+  editable: boolean;
 }[] = [
   {
     key: 'contactInfo',
@@ -30,26 +28,17 @@ const sectionOrder: {
   },
   { key: 'projects', displayName: 'Projects', icon: '📚', editable: true },
   { key: 'education', displayName: 'Education', icon: '🎓', editable: false },
+  { key: 'certifications', displayName: 'Certifications', icon: '🏆', editable: false },
+  { key: 'publications', displayName: 'Publications', icon: '📄', editable: false },
 ];
 
-interface ParsedResumeTemplateProps {
-  showAnalysis: boolean;
-}
-function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
-  const [hoveredSection, setHoveredSection] = useState<
-    keyof ResumeSections | null
-  >(null);
-  const [editingSection, setEditingSection] = useState<
-    keyof ResumeSections | null
-  >(null);
+function ParsedResumeTemplate() {
+  const [editingSection, setEditingSection] = useState<keyof ResumeSections | null>(null);
   const [tempMessage, setTempMessage] = useState('');
   const [aiResponse, setAIResponse] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { resumeSections, setResumeSections, updateSection, originalSections } =
-    useResumeStore();
-  const [originalSectionsMap, setOriginalSectionsMap] = useState<
-    Partial<ResumeSections>
-  >({});
+  const { resumeSections, setResumeSections, updateSection, originalSections } = useResumeStore();
+  const [originalSectionsMap, setOriginalSectionsMap] = useState<Partial<ResumeSections>>({});
 
   const handleRevertChanges = () => {
     setResumeSections(originalSectionsMap);
@@ -75,9 +64,7 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
       });
 
       const data = await res.json();
-
       updateSection(sectionId, data.section);
-
       setAIResponse(data.response);
     } catch (err) {
       console.error(err);
@@ -100,134 +87,100 @@ function ParsedResumeTemplate({ showAnalysis }: ParsedResumeTemplateProps) {
     editingSection &&
     JSON.stringify(resumeSections[editingSection]) !==
       JSON.stringify(originalSectionsMap[editingSection]);
+
   return (
-    <div className="flex items-center max-w-3xl gap-4 mx-auto">
-      <div className="relative p-4 mt-4 space-y-3 border rounded-lg bg-white/80 dark:bg-zinc-900 backdrop-blur-sm dark:border-zinc-600 drop-shadow-2xl">
-        {sectionOrder.map(({ key, displayName, icon, editable }) => {
-          const section = resumeSections[key];
-          if (!section?.data) return null;
+    <div className="divide-y divide-gray-200 dark:divide-zinc-800">
+      {sectionOrder.map(({ key, displayName, icon, editable }) => {
+        const section = resumeSections[key];
+        if (!section?.data) return null;
 
-          return (
-            <div
-              key={key}
-              onMouseEnter={() => setHoveredSection(key)}
-              onMouseLeave={() => setHoveredSection(null)}
-              className={`relative transition-all duration-400 px-3 py-4 ${
-                hoveredSection === key
-                  ? 'bg-gray-200 dark:bg-zinc-700/50 rounded-lg'
-                  : ''
-              }`}
-            >
-              {editable && (
-                <div className="relative">
-                  <button
-                    onClick={() => {
-                      setTempMessage('');
-                      setAIResponse('');
-                      setEditingSection(key);
-                      setOriginalSectionsMap((prev) => ({
-                        ...prev,
-                        [key]: resumeSections[key],
-                      }));
-                    }}
-                    className="absolute top-0 right-0 px-2 py-1 text-sm rounded hover:bg-gray-200 dark:hover:bg-zinc-700"
-                    title="Edit this section"
-                  >
-                    ✏️
-                  </button>
-                </div>
-              )}
+        return (
+          <div key={key} className="relative py-8">
+            {editable && (
+              <button
+                onClick={() => {
+                  setTempMessage('');
+                  setAIResponse('');
+                  setEditingSection(key);
+                  setOriginalSectionsMap(prev => ({
+                    ...prev,
+                    [key]: resumeSections[key],
+                  }));
+                }}
+                className="absolute top-4 right-0 rounded-full p-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-zinc-700"
+                title="Edit this section"
+              >
+                ✏️
+              </button>
+            )}
 
-              {editable && editingSection === key && (
-                <div
-                  ref={chatRef}
-                  className="absolute z-30 p-4 space-y-3 bg-white border shadow-xl top-2 right-2 dark:bg-zinc-800 dark:border-zinc-600 rounded-xl w-80"
-                >
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Editing &quot;{displayName}&quot;
-                  </label>
-                  <input
-                    type="text"
-                    value={tempMessage}
-                    onChange={(e) => setTempMessage(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border rounded dark:bg-zinc-700 dark:text-white"
-                    placeholder="e.g. Improve bullet points, add more achievements"
-                    disabled={isSubmitting}
-                  />
-                  {aiResponse && (
-                    <div className="mt-1 text-xs italic text-green-600 dark:text-green-400">
-                      ✅ Changes applied. You can Regenerate or Revert.
-                    </div>
+            {editable && editingSection === key && (
+              <div
+                ref={chatRef}
+                className="absolute top-12 right-0 z-30 w-80 space-y-3 rounded-xl border bg-white p-4 shadow-xl dark:border-zinc-700 dark:bg-zinc-800"
+              >
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Editing "{displayName}"
+                </label>
+                <input
+                  type="text"
+                  value={tempMessage}
+                  onChange={e => setTempMessage(e.target.value)}
+                  className="w-full rounded border px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-700 dark:text-white"
+                  placeholder="e.g. Improve bullet points, add more achievements"
+                  disabled={isSubmitting}
+                />
+                {aiResponse && (
+                  <div className="mt-1 text-xs text-green-600 italic dark:text-green-400">
+                    ✅ Changes applied. You can Regenerate or Revert.
+                  </div>
+                )}
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  {hasChanges && (
+                    <Button
+                      variant="ghost"
+                      onClick={handleRevertChanges}
+                      className="text-xs text-gray-600 hover:text-red-500 hover:underline"
+                    >
+                      ⟲ Revert
+                    </Button>
                   )}
-                  <div className="flex flex-wrap items-center justify-between gap-2 mt-2">
-                    {hasChanges && (
-                      <Button
-                        variant="ghost"
-                        onClick={handleRevertChanges}
-                        className="text-xs text-gray-600 hover:text-red-500 hover:underline"
-                      >
-                        ⟲ Revert
-                      </Button>
-                    )}
 
-                    <div className="flex gap-2 ml-auto">
-                      <Button
-                        size="sm"
-                        disabled={
-                          isSubmitting ||
-                          !tempMessage ||
-                          tempMessage.trim().length < 3
-                        }
-                        onClick={() => handleEditSection(key)}
-                        className="text-white bg-blue-600 hover:bg-blue-700"
-                      >
-                        {isSubmitting
-                          ? 'Thinking...'
-                          : aiResponse
-                          ? 'Regenerate'
-                          : 'Submit'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setEditingSection(null);
-                          setAIResponse('');
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+                  <div className="ml-auto flex gap-2">
+                    <Button
+                      size="sm"
+                      disabled={isSubmitting || !tempMessage || tempMessage.trim().length < 3}
+                      onClick={() => handleEditSection(key)}
+                      className="bg-blue-600 text-white hover:bg-blue-700"
+                    >
+                      {isSubmitting ? 'Thinking...' : aiResponse ? 'Regenerate' : 'Submit'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingSection(null);
+                        setAIResponse('');
+                      }}
+                    >
+                      Cancel
+                    </Button>
                   </div>
                 </div>
-              )}
-              <ResumeSection
-                type={key}
-                data={section.data}
-                analysis={section.analysis}
-                displayName={displayName}
-                icon={icon}
-              />
+              </div>
+            )}
 
-              <AnimatePresence>
-                {hoveredSection === key && section.analysis && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                    className="hidden transition-opacity sm:block absolute z-20 sm:left-1/2 md:left-[60%] top-0 lg:left-full lg:ml-8 w-72 shadow-2xl"
-                  >
-                    {showAnalysis && (
-                      <AnalysisCard analysis={section.analysis} />
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="text-xl">{icon}</span>
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                {displayName}
+              </h3>
             </div>
-          );
-        })}
-      </div>
+
+            <ResumeSection type={key} data={section.data} />
+          </div>
+        );
+      })}
     </div>
   );
 }

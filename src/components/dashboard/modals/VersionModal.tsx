@@ -1,38 +1,23 @@
 'use client';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Clock } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useResumeStore } from '@/hooks/useResumeStore';
+import { getResumeVersions, revertToVersionAction } from '@/lib/actions/getResumeVersions';
+import type { ResumeVersion } from '@prisma/client';
+import { Clock, History, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import {
-  getResumeVersions,
-  revertToVersionAction,
-} from '@/lib/actions/getResumeVersions';
-import type { ResumeVersion } from '@prisma/client';
-import { VersionList } from './VersionList';
 import { ConfirmRevertDialog } from './VersionConfirmDialog';
-import { useResumeStore } from '@/hooks/useResumeStore';
+import { VersionList } from './VersionList';
 
 interface VersionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   threadId: string;
   currentVersionId: string;
-  onRevert: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function VersionModal({
-  isOpen,
-  onClose,
-  threadId,
-  currentVersionId,
-  onRevert,
-}: VersionModalProps) {
+export function VersionModal({ threadId, currentVersionId, isOpen, onClose }: VersionModalProps) {
   const [versions, setVersions] = useState<ResumeVersion[]>([]);
   const [loading, setLoading] = useState(false);
   const [revertingId, setRevertingId] = useState<string | null>(null);
@@ -54,7 +39,6 @@ export function VersionModal({
       toast.success('Successfully reverted to previous version');
       setResumeSections(data);
       setOriginalSections(data);
-      onRevert();
       onClose();
     } catch (err) {
       console.error(err);
@@ -108,25 +92,73 @@ export function VersionModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="w-full max-w-sm mx-auto shadow-lg md:max-w-2xl rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-lg font-semibold md:text-2xl">
-              <Clock className="w-5 h-5" />
-              Version History
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="mx-auto w-full max-w-2xl rounded-3xl border-0 bg-white p-0 shadow-2xl dark:bg-gray-900">
+          <div className="p-6">
+            <DialogHeader className="space-y-3">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-50 dark:bg-purple-900/20">
+                <History className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              </div>
+              <DialogTitle className="text-center text-xl font-semibold text-gray-900 dark:text-gray-100">
+                Version History
+              </DialogTitle>
+              <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+                View and manage your resume versions
+              </p>
+            </DialogHeader>
 
-          <div className="p-4 max-h-[60vh] overflow-y-auto  scrollbar-hide">
-            <VersionList
-              versions={versions}
-              loading={loading}
-              currentVersionId={currentVersionId}
-              revertingId={revertingId}
-              onView={handleView}
-              onConfirmRevert={(id, title) =>
-                setConfirmRevert({ versionId: id, title })
-              }
-            />
+            <div className="mt-6">
+              {loading ? (
+                <div className="space-y-4">
+                  {/* Loading skeleton */}
+                  <div className="flex items-center justify-center py-8">
+                    <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-purple-600 border-t-transparent"></div>
+                      <span className="text-sm">Loading versions...</span>
+                    </div>
+                  </div>
+                </div>
+              ) : versions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
+                    <FileText className="h-8 w-8 text-gray-400" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-gray-100">
+                    No versions found
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Resume versions will appear here as you make changes
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-2xl bg-gray-50/50 dark:bg-gray-800/50">
+                  <div className="max-h-[60vh] overflow-y-auto">
+                    <VersionList
+                      versions={versions}
+                      loading={loading}
+                      currentVersionId={currentVersionId}
+                      revertingId={revertingId}
+                      onView={handleView}
+                      onConfirmRevert={(id, title) => setConfirmRevert({ versionId: id, title })}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Version count footer */}
+              {versions.length > 0 && (
+                <div className="mt-4 flex items-center justify-between rounded-xl bg-purple-50 px-4 py-3 dark:bg-purple-900/10">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                    <span className="text-sm font-medium text-purple-900 dark:text-purple-100">
+                      {versions.length} version{versions.length !== 1 ? 's' : ''} available
+                    </span>
+                  </div>
+                  <div className="text-xs text-purple-700 dark:text-purple-300">
+                    Current: {versions.find(v => v.id === currentVersionId)?.title || 'Latest'}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

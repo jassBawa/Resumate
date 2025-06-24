@@ -19,7 +19,6 @@ export async function fetchWithAuth(path: string, options: RequestInit = {}) {
       ...(options.headers || {}),
       Authorization: `Bearer ${token}`,
     },
-    cache: 'no-store',
   });
 
   return response;

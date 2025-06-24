@@ -328,20 +328,11 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
 
               <View style={styles.contactInfo}>
                 <Text style={styles.contactTitle}>Contact</Text>
-                <Text style={styles.contactItem}>
-                  {sections.contactInfo.data.email}
-                </Text>
-                <Text style={styles.contactItem}>
-                  {sections.contactInfo.data.phone}
-                </Text>
-                <Text style={styles.contactItem}>
-                  {sections.contactInfo.data.location}
-                </Text>
+                <Text style={styles.contactItem}>{sections.contactInfo.data.email}</Text>
+                <Text style={styles.contactItem}>{sections.contactInfo.data.phone}</Text>
+                <Text style={styles.contactItem}>{sections.contactInfo.data.location}</Text>
                 {sections.contactInfo.data.linkedin && (
-                  <Link
-                    src={sections.contactInfo.data.linkedin}
-                    style={styles.link}
-                  >
+                  <Link src={sections.contactInfo.data.linkedin} style={styles.link}>
                     <Text style={styles.contactItem}>LinkedIn</Text>
                   </Link>
                 )}
@@ -353,44 +344,21 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
           {sections.skills && (
             <View style={styles.sidebarSection}>
               <Text style={styles.sidebarSectionTitle}>Skills</Text>
-              {sections.skills.data.hardSkills &&
-                sections.skills.data.hardSkills.length > 0 && (
-                  <View style={styles.skillsContainer}>
-                    <Text style={styles.skillCategory}>Technical Skills</Text>
-                    {sections.skills.data.hardSkills.map((skill, index) => (
-                      <View key={index} style={{ marginBottom: 6 }}>
-                        <Text style={styles.skillItem}>{skill}</Text>
-                        <View style={styles.skillBar}>
-                          <View
-                            style={[
-                              styles.skillFill,
-                              { width: `${Math.random() * 40 + 60}%` },
-                            ]}
-                          />
-                        </View>
+              {sections.skills.data.skills && sections.skills.data.skills.length > 0 && (
+                <View style={styles.skillsContainer}>
+                  <Text style={styles.skillCategory}>Skills</Text>
+                  {sections.skills.data.skills.map((skill, index) => (
+                    <View key={index} style={{ marginBottom: 6 }}>
+                      <Text style={styles.skillItem}>{skill}</Text>
+                      <View style={styles.skillBar}>
+                        <View
+                          style={[styles.skillFill, { width: `${Math.random() * 40 + 60}%` }]}
+                        />
                       </View>
-                    ))}
-                  </View>
-                )}
-              {sections.skills.data.softSkills &&
-                sections.skills.data.softSkills.length > 0 && (
-                  <View style={styles.skillsContainer}>
-                    <Text style={styles.skillCategory}>Soft Skills</Text>
-                    {sections.skills.data.softSkills.map((skill, index) => (
-                      <View key={index} style={{ marginBottom: 6 }}>
-                        <Text style={styles.skillItem}>{skill}</Text>
-                        <View style={styles.skillBar}>
-                          <View
-                            style={[
-                              styles.skillFill,
-                              { width: `${Math.random() * 30 + 70}%` },
-                            ]}
-                          />
-                        </View>
-                      </View>
-                    ))}
-                  </View>
-                )}
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
           )}
 
@@ -434,39 +402,33 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
           {sections.summary && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>About Me</Text>
-              <Text style={styles.summary}>
-                {sections.summary.data.summary}
-              </Text>
+              <Text style={styles.summary}>{sections.summary.data.summary}</Text>
             </View>
           )}
 
           {/* Work Experience Section */}
-          {sections.workExperience &&
-            sections.workExperience.data.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Work Experience</Text>
-                {sections.workExperience.data.map((job, index) => (
-                  <View key={index} style={styles.experienceItem}>
-                    <Text style={styles.jobTitle}>{job.title}</Text>
-                    <Text style={styles.company}>{job.company}</Text>
-                    <Text style={styles.duration}>{job.duration}</Text>
-                    {job.description && (
-                      <Text style={styles.description}>{job.description}</Text>
-                    )}
-                    {job.responsibilities &&
-                      job.responsibilities.length > 0 && (
-                        <View style={styles.bulletContainer}>
-                          {job.responsibilities.map((responsibility, idx) => (
-                            <Text key={idx} style={styles.bulletPoint}>
-                              • {responsibility}
-                            </Text>
-                          ))}
-                        </View>
-                      )}
-                  </View>
-                ))}
-              </View>
-            )}
+          {sections.workExperience && sections.workExperience.data.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Work Experience</Text>
+              {sections.workExperience.data.map((job, index) => (
+                <View key={index} style={styles.experienceItem}>
+                  <Text style={styles.jobTitle}>{job.title}</Text>
+                  <Text style={styles.company}>{job.company}</Text>
+                  <Text style={styles.duration}>{job.duration}</Text>
+                  {job.description && <Text style={styles.description}>{job.description}</Text>}
+                  {job.responsibilities && job.responsibilities.length > 0 && (
+                    <View style={styles.bulletContainer}>
+                      {job.responsibilities.map((responsibility, idx) => (
+                        <Text key={idx} style={styles.bulletPoint}>
+                          • {responsibility}
+                        </Text>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Education Section */}
           {sections.education && sections.education.data.length > 0 && (
@@ -479,13 +441,9 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
                   <Text style={styles.dates}>
                     {edu.startDate} - {edu.endDate}
                   </Text>
-                  {edu.cgpa && (
-                    <Text style={styles.description}>CGPA: {edu.cgpa}</Text>
-                  )}
+                  {edu.cgpa && <Text style={styles.description}>CGPA: {edu.cgpa}</Text>}
                   {edu.percentage && (
-                    <Text style={styles.description}>
-                      Percentage: {edu.percentage}
-                    </Text>
+                    <Text style={styles.description}>Percentage: {edu.percentage}</Text>
                   )}
                 </View>
               ))}
@@ -506,9 +464,7 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
                       </Link>
                     )}
                   </View>
-                  <Text style={styles.projectDescription}>
-                    {project.description}
-                  </Text>
+                  <Text style={styles.projectDescription}>{project.description}</Text>
                   {project.technologies && project.technologies.length > 0 && (
                     <View style={styles.technologies}>
                       {project.technologies.map((tech, idx) => (
@@ -524,28 +480,25 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
           )}
 
           {/* Certifications Section */}
-          {sections.certifications &&
-            sections.certifications.data.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Certifications</Text>
-                {sections.certifications.data.map((cert, index) => (
-                  <View key={index} style={styles.certificationItem}>
-                    <View style={styles.projectHeader}>
-                      <Text style={styles.certificationName}>{cert.name}</Text>
-                      {cert.url && (
-                        <Link src={cert.url} style={styles.mainLink}>
-                          <PDFLinkIcon />
-                        </Link>
-                      )}
-                    </View>
-                    <Text style={styles.certificationIssuer}>
-                      {cert.issuer}
-                    </Text>
-                    <Text style={styles.certificationDate}>{cert.date}</Text>
+          {sections.certifications && sections.certifications.data.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Certifications</Text>
+              {sections.certifications.data.map((cert, index) => (
+                <View key={index} style={styles.certificationItem}>
+                  <View style={styles.projectHeader}>
+                    <Text style={styles.certificationName}>{cert.name}</Text>
+                    {cert.url && (
+                      <Link src={cert.url} style={styles.mainLink}>
+                        <PDFLinkIcon />
+                      </Link>
+                    )}
                   </View>
-                ))}
-              </View>
-            )}
+                  <Text style={styles.certificationIssuer}>{cert.issuer}</Text>
+                  <Text style={styles.certificationDate}>{cert.date}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           {/* Awards Section */}
           {sections.awards && sections.awards.data.length > 0 && (
@@ -587,23 +540,15 @@ const CreativeTemplate: React.FC<CreativeTemplateProps> = ({ sections }) => {
             <View style={styles.section}>
               {sections.customSection.data.map((customSec, index) => (
                 <View key={index} style={{ marginBottom: 10 }}>
-                  <Text style={styles.sectionTitle}>
-                    {customSec.sectionTitle}
-                  </Text>
+                  <Text style={styles.sectionTitle}>{customSec.sectionTitle}</Text>
                   {customSec.entries.map((entry, idx) => (
                     <View key={idx} style={styles.customEntryItem}>
                       {entry.organization && (
-                        <Text style={styles.customEntryOrg}>
-                          {entry.organization}
-                        </Text>
+                        <Text style={styles.customEntryOrg}>{entry.organization}</Text>
                       )}
-                      {entry.role && (
-                        <Text style={styles.customEntryRole}>{entry.role}</Text>
-                      )}
+                      {entry.role && <Text style={styles.customEntryRole}>{entry.role}</Text>}
                       {entry.description && (
-                        <Text style={styles.customEntryDesc}>
-                          {entry.description}
-                        </Text>
+                        <Text style={styles.customEntryDesc}>{entry.description}</Text>
                       )}
                     </View>
                   ))}

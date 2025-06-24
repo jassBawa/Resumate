@@ -7,20 +7,16 @@ export interface ResumeSections {
       location: string;
       linkedin?: string;
     };
-    analysis: SectionAnalysis;
   };
   summary?: {
     data: {
       summary: string;
     };
-    analysis: SectionAnalysis;
   };
   skills?: {
     data: {
-      hardSkills: string[];
-      softSkills: string[];
+      skills: string[];
     };
-    analysis: SectionAnalysis;
   };
   workExperience?: {
     data: Array<{
@@ -30,7 +26,6 @@ export interface ResumeSections {
       description?: string;
       responsibilities?: string[];
     }>;
-    analysis: SectionAnalysis;
   };
   education?: {
     data: Array<{
@@ -41,7 +36,6 @@ export interface ResumeSections {
       cgpa?: string;
       percentage?: string;
     }>;
-    analysis: SectionAnalysis;
   };
   certifications?: {
     data: Array<{
@@ -50,7 +44,6 @@ export interface ResumeSections {
       date: string;
       url?: string;
     }>;
-    analysis: SectionAnalysis;
   };
   projects?: {
     data: Array<{
@@ -59,7 +52,6 @@ export interface ResumeSections {
       url?: string;
       technologies?: string[];
     }>;
-    analysis: SectionAnalysis;
   };
   awards?: {
     data: Array<{
@@ -67,7 +59,6 @@ export interface ResumeSections {
       issuer: string;
       year: string;
     }>;
-    analysis: SectionAnalysis;
   };
   publications?: {
     data: Array<{
@@ -76,18 +67,15 @@ export interface ResumeSections {
       date: string;
       url?: string;
     }>;
-    analysis: SectionAnalysis;
   };
   languages?: {
     data: Array<{
       language: string;
       proficiency: string;
     }>;
-    analysis: SectionAnalysis;
   };
   hobbies?: {
     data: string[];
-    analysis: SectionAnalysis;
   };
   customSection?: {
     data: Array<{
@@ -98,14 +86,17 @@ export interface ResumeSections {
         description?: string;
       }>;
     }>;
-    analysis: SectionAnalysis;
   };
 }
 
-export interface SectionAnalysis {
+export interface JDAnalysis {
+  overallScore: number;
+  skillMatchScore: number;
+  experienceMatch: number;
   summary: string;
   strengths: string[];
   weaknesses: string[];
-  suggestions: string[];
+  recommnedations: string[];
+  missingKeywords: string[];
   ATS_Fit_Score: number;
 }

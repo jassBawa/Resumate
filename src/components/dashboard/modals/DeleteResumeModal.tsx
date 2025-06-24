@@ -8,32 +8,49 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { deleteResume } from '@/lib/actions/resume';
 import { Loader2 } from 'lucide-react';
-import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface DeleteResumeModalProps {
-  isDeleteDialogOpen: boolean;
-  isDeleting: boolean;
-  handleDelete: () => void;
-  setIsDeleteDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  threadId: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function DeleteResumeModal({
-  isDeleteDialogOpen,
-  setIsDeleteDialogOpen,
-  isDeleting,
-  handleDelete,
-}: DeleteResumeModalProps) {
+export function DeleteResumeModal({ threadId, isOpen, onClose }: DeleteResumeModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteResume(threadId);
+
+      if (result.success) {
+        toast.success('Resume deleted successfully');
+        router.push('/dashboard');
+        onClose();
+      } else {
+        toast.error(result.error || 'Failed to delete resume');
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error('An unexpected error occurred');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   return (
-    <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Are you sure you want to delete this resume?
-          </AlertDialogTitle>
+          <AlertDialogTitle>Are you sure you want to delete this resume?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            resume and all associated versions.
+            This action cannot be undone. This will permanently delete your resume and all
+            associated versions.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -45,7 +62,7 @@ export function DeleteResumeModal({
           >
             {isDeleting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Deleting...
               </>
             ) : (
