@@ -1,14 +1,6 @@
 import { SubscriptionModalHeader } from './SubscriptionModalHeader';
 import { SubscriptionModalPlan } from './SubscriptionModalPlan';
-
-interface Plan {
-  id: string;
-  name: string;
-  price: number;
-  period: 'month' | 'year';
-  features: string[];
-  popular?: boolean;
-}
+import type { Plan } from '@/types/subscription';
 
 interface SubscriptionModalContentProps {
   plan: Plan;

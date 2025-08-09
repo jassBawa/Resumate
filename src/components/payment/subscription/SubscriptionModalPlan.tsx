@@ -3,15 +3,7 @@ import { Check, Shield, Star, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface Plan {
-  id: string;
-  name: string;
-  price: number;
-  period: 'month' | 'year';
-  features: string[];
-  popular?: boolean;
-}
+import type { Plan } from '@/types/subscription';
 
 interface SubscriptionModalPlanProps {
   plan: Plan;

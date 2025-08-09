@@ -11,7 +11,19 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { orderCreationId, razorpayPaymentId, razorpayOrderId, razorpaySignature } = body;
+    const {
+      orderCreationId,
+      razorpayPaymentId,
+      razorpayOrderId,
+      razorpaySignature,
+      razorpayCustomerId,
+    } = body as {
+      orderCreationId: string;
+      razorpayPaymentId: string;
+      razorpayOrderId: string;
+      razorpaySignature: string;
+      razorpayCustomerId?: string;
+    };
 
     if (!orderCreationId || !razorpayPaymentId || !razorpayOrderId || !razorpaySignature) {
       return NextResponse.json({ error: 'Missing payment details' }, { status: 400 });
@@ -69,6 +81,8 @@ export async function POST(request: NextRequest) {
       data: {
         isSubscribed: true,
         subscriptionEndDate,
+        subscriptionId: razorpayPaymentId,
+        ...(razorpayCustomerId ? { razorpayCustomerId } : {}),
       },
     });
 
