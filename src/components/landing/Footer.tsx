@@ -1,20 +1,22 @@
+import Link from 'next/link';
 import { FileText } from 'lucide-react';
 
 export default function Footer() {
   const footerLinks = [
     {
       title: 'Features',
-      links: ['AI Chatbot', 'Job Analysis', 'Manual Editing', 'PDF Export'],
+      links: [
+        { label: 'AI Chatbot' },
+        { label: 'Job Analysis' },
+        { label: 'Manual Editing' },
+        { label: 'PDF Export' },
+      ],
     },
     {
       title: 'Company',
-      links: ['About', 'Privacy', 'Terms', 'Contact'],
+      links: [{ label: 'Contact', href: '/contact' }],
     },
-    {
-      title: 'Support',
-      links: ['Help Center', 'Documentation', 'API', 'Status'],
-    },
-  ];
+  ] as const;
 
   return (
     <footer className="bg-gray-900 py-12 text-white">
@@ -32,12 +34,20 @@ export default function Footer() {
             </p>
           </div>
 
-          {footerLinks.map((section, index) => (
-            <div key={index}>
+          {footerLinks.map(section => (
+            <div key={section.title}>
               <h3 className="mb-4 font-semibold">{section.title}</h3>
               <ul className="space-y-2 text-gray-400">
-                {section.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>{link}</li>
+                {section.links.map(link => (
+                  <li key={link.label}>
+                    {section.title === 'Features' || !('href' in link) ? (
+                      <span className="cursor-default opacity-90 select-none">{link.label}</span>
+                    ) : (
+                      <Link href={link.href!} className="hover:text-white">
+                        {link.label}
+                      </Link>
+                    )}
+                  </li>
                 ))}
               </ul>
             </div>
