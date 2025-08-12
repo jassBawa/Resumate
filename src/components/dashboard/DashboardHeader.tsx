@@ -24,7 +24,6 @@ export default function DashboardHeader() {
         <div className="flex items-center gap-3">
           <CustomDarkToggle />
           <UserButton
-            afterSignOutUrl="/"
             appearance={{
               elements: {
                 avatarBox: 'h-8 w-8',

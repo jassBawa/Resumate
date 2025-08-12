@@ -12,6 +12,9 @@ import { useUser } from '@clerk/nextjs';
 import { UserButton } from '@clerk/nextjs';
 import LoadingAnimation from '@/components/dashboard/LoadingAnimation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { SubscriptionModal } from '@/components/payment/SubscriptionModal';
+import { UpgradePrompt } from '@/components/payment/UpgradePrompt';
+import { SubscriptionButton } from '@/components/payment/SubscriptionButton';
 
 const DashboardLayout = ({ threadId }: { threadId: string }) => {
   const [activeSection, setActiveSection] = useState('edit');
@@ -75,6 +78,17 @@ const DashboardLayout = ({ threadId }: { threadId: string }) => {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
+                  <SubscriptionButton
+                    variant="outline"
+                    size="sm"
+                    className="hidden sm:flex"
+                    onSuccess={() => {
+                      // Refresh the page or update subscription status
+                      window.location.reload();
+                    }}
+                  >
+                    Upgrade to Pro
+                  </SubscriptionButton>
                   <div className="flex items-center gap-2">
                     <div className="hidden text-right sm:block">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -103,6 +117,12 @@ const DashboardLayout = ({ threadId }: { threadId: string }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Subscription Modal */}
+      <SubscriptionModal mode="forced" />
+
+      {/* Upgrade Prompt */}
+      <UpgradePrompt />
     </>
   );
 };

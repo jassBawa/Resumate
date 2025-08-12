@@ -1,4 +1,5 @@
 import { DashboardHeader } from '@/components/dashboard';
+import { SubscriptionProvider } from '@/contexts/SubscriptionProvider';
 import React from 'react';
 
 function DashboardLayout({
@@ -7,11 +8,13 @@ function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen bg-background">
-      <DashboardHeader />
+    <SubscriptionProvider>
+      <div className="bg-background min-h-screen">
+        <DashboardHeader />
 
-      {children}
-    </div>
+        {children}
+      </div>
+    </SubscriptionProvider>
   );
 }
 
