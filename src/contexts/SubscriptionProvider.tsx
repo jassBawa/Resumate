@@ -52,14 +52,14 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       const now = new Date();
       const trialEndDate = user.subscriptionEndDate ? new Date(user.subscriptionEndDate) : null;
 
-      // Calculate trial status
-      const isTrialExpired = trialEndDate ? trialEndDate < now : false;
-      // const isTrialExpired = true; // testing
+      const isTrialExpired = !trialEndDate || trialEndDate < now;
+
       const daysUntilTrialExpires = trialEndDate
         ? Math.ceil((trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
         : 0;
+
       const daysSinceTrialExpired =
-        trialEndDate && isTrialExpired
+        trialEndDate && trialEndDate < now
           ? Math.floor((now.getTime() - trialEndDate.getTime()) / (1000 * 60 * 60 * 24))
           : 0;
 
